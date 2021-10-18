@@ -1,0 +1,132 @@
+.containerRegister{
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 2px 2px 5px 10px rgba(229,229,229,0.75);
+  -webkit-box-shadow: 2px 2px 5px 10px rgba(229,229,229,0.75);
+  -moz-box-shadow: 2px 2px 5px 10px rgba(229,229,229,0.75);
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 15px;
+  padding-top: 5px;
+}
+
+.avatar{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.imageLogo{
+  height: 90px;
+  width: 90px;
+}
+
+.headingRegister{
+  text-align: center;
+  font-weight: bolder;
+  color: #3498db;
+  margin-bottom: 0%;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.inputs{
+  
+
+}
+
+.formLogin{
+
+}
+
+.nameSection{
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+}
+
+@media screen and (max-width: 1000px) {
+  .nameSection{
+      display: flex;
+      flex-direction: column;
+  }
+}
+
+.firstN{
+  margin-right: 5px;
+
+}
+
+.lastN{
+  margin-right: 5px;
+
+}
+
+.inputSelect{
+  width: 322px;
+  background-color: white;
+  padding: 10px;
+  justify-content: center;  
+  margin-top: 2%; 
+  border: 1px solid #3498db;
+  color: #3498db;
+  font-weight: bold;
+
+}
+
+.inputRegister{
+  width: 300px;
+  background-color: white;
+  padding: 10px;
+  justify-content: center;  
+  margin-top: 2%; 
+  border: 1px solid #3498db;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.inputRegister:focus{
+
+}
+
+.labelText{
+  font-size: 15px;
+
+}
+
+.labelRegister{
+  font-size: 15px;
+  color: #3498db;
+
+}
+
+.btnSubmitRegister{
+  background-color: #3498db;
+  border: none;
+  width: 100%;
+  color: white;
+  padding: 13px;
+  cursor: pointer;
+  margin-top: 18px;
+  font-weight: bold;
+}
+
+.btnSubmitRegister:hover{
+  background-color: white;
+  border: 1px solid #3498db;
+  color: #3498db;
+  
+}
+
+.admin{
+  text-decoration: none;
+  color: black;
+}
+
+.rightRegister{
+  margin-top: 1%;
+}

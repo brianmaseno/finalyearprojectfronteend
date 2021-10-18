@@ -1,0 +1,131 @@
+.container{
+  width: 100%;
+  height: 753px;
+  margin: 0%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: #F6F7F6;
+}
+
+.card{
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20%;
+  
+}
+
+.containerLogin{
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 2px 2px 5px 10px rgba(229,229,229,0.75);
+  -webkit-box-shadow: 2px 2px 5px 10px rgba(229,229,229,0.75);
+  -moz-box-shadow: 2px 2px 5px 10px rgba(229,229,229,0.75);
+  padding: 20px;
+}
+
+.loadRow{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-bottom: 10px;
+
+}
+
+.loadBalls{
+
+
+}
+
+.avatar{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.imageLogo{
+  height: 90px;
+  width: 90px;
+}
+
+.headingLogin{
+  text-align: center;
+  font-weight: bolder;
+  color: #3498db;
+  margin-bottom: 0%;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.inputs{
+  margin-top: 15px;
+
+}
+
+.formLogin{
+
+}
+
+.inputLogin{
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 10px;
+  justify-content: center;  
+  margin-top: 1%; 
+  border: 1px solid #3498db;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.inputLogin:focus{
+
+}
+
+.labelText{
+  font-size: 13px;
+  color: #3498db;
+}
+
+.btnSubmit{
+  background-color: #3498db;
+  border: none;
+  width: 100%;
+  color: white;
+  padding: 13px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btnSubmit:hover{
+  background-color: white;
+  border: 1px solid #3498db;
+  color: #3498db;
+}
+
+.admin{
+  text-decoration: none;
+  color: #3498db;
+  font-size: 14px;
+}
+
+.account{
+  text-decoration: none;
+  color: black;
+  margin-bottom: 5px;
+}
+
+.right .account .admin:hover{
+  color: "green"
+}
+
+.right{
+  margin-top: 3%;
+}
