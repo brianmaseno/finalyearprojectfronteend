@@ -2,7 +2,7 @@
   "name": "kenyatta-national-hospital",
   "homepage": "http://www.kenyatta-national",
   "authors": [
-    "lumbert-omwaga"
+    "brian-maseno"
   ],
   "description": "Kenyatta National Hospital EHR System",
   "main": "public/index.html",
@@ -15,7 +15,7 @@
     "google",
     "twitter"
   ],
-  "license": "Lumbert Omwaga License",
+  "license": "Brian Maseno License",
   "ignore": [
     "**/.*",
     "node_modules",
