@@ -16,6 +16,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "history": "5.0.0",
     "perfect-scrollbar": "1.5.1",
+    "prettier": "^2.4.1",
     "prop-types": "15.7.2",
     "react": "17.0.2",
     "react-chartist": "0.14.4",
@@ -53,8 +54,7 @@
   },
   "devDependencies": {
     "gulp": "4.0.2",
-    "gulp-append-prepend": "1.0.9",
-    "prettier": "2.2.1"
+    "gulp-append-prepend": "1.0.9"
   },
   "browserslist": {
     "production": [
