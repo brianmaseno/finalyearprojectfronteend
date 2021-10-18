@@ -2,7 +2,7 @@
   "name": "material-dashboard-react",
   "version": "1.10.0",
   "description": "Material Dashboard React. Coded by Creative Tim",
-  "private": false,
+  "private": true,
   "main": "dist/index.js",
   "dependencies": {
     "@material-ui/core": "4.11.4",
@@ -62,6 +62,10 @@
       "not dead",
       "not op_mini all"
     ],
-    "development": []
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
