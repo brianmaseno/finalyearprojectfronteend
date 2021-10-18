@@ -14,8 +14,13 @@ import { useLab } from "hooks/useLab";
 import { CSVLink, CSVDownload } from "react-csv";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+
 
 const styles = {
+  
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
       color: "rgba(255,255,255,.62)",
@@ -43,6 +48,24 @@ const styles = {
       lineHeight: "1",
     },
   },
+  pdfButton: {
+    backgroundColor: "#dc3545",
+    color: "white",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontWeight: 500,
+    transition: "background-color 0.3s",
+    "&:hover": {
+      backgroundColor: "#c82333"
+    },
+    "&:disabled": {
+      backgroundColor: "#6c757d",
+      cursor: "not-allowed"
+    }
+  }
+
 };
 
 const useStyles = makeStyles(styles);
@@ -52,7 +75,41 @@ export default function TestServices() {
   const { patients } = usePatients();
   const { lab } = useLab()
   const [loading, setLoading] = useState(true);
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+
+
+  const generatePDF = () => {
+  const doc = new jsPDF();
+  
+  // Add title
+  doc.setFontSize(18);
+  doc.text('Laboratory Test Services Report', 14, 20);
+  doc.setFontSize(11);
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+  // Use autoTable directly
+  autoTable(doc, {
+    startY: 40,
+    head: [['Test ID', 'Test Name', 'Result', 'Cost (Ksh)']],
+    body: lab.map(item => [
+      item.lab_test_id,
+      item.test_name,
+      item.test_results,
+      item.test_cost
+    ]),
+    theme: 'grid',
+    headStyles: {
+      fillColor: [17, 184, 204],
+      textColor: 255
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245]
+    }
+  });
+
+  // Save PDF
+  doc.save('lab-test-services.pdf');
+};
 
   useEffect(() => {
     setTimeout(() => {
@@ -79,9 +136,15 @@ export default function TestServices() {
           </CardHeader>
           <CardBody>
             <div className="servContainer">
-              <div className="print">
-                    <CSVLink className="excel" data={lab}>Excel</CSVLink>
-                </div>
+            <div className="print">
+            <button 
+  className={classes.pdfButton} 
+  onClick={generatePDF}
+  disabled={lab.length === 0}
+>
+  Generate PDF Report
+</button>
+              </div>
               <div className="reportBody">
                 <div>
                   {!loading ? 

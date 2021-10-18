@@ -30,6 +30,79 @@ import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
 import axios from 'axios';
 
+// Modal styles for confirmation dialog
+const modalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '20px',
+    width: '400px',
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '15px',
+    color: '#dc3545',
+    textAlign: 'center',
+  },
+  message: {
+    fontSize: '16px',
+    color: '#444',
+    marginBottom: '20px',
+    textAlign: 'center',
+    lineHeight: '1.5',
+  },
+  warning: {
+    fontSize: '14px',
+    color: '#dc3545',
+    marginBottom: '20px',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: '20px',
+  },
+  deleteButton: {
+    padding: '8px 25px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  },
+  cancelButton: {
+    padding: '8px 25px',
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  }
+};
+
 const useStyles = makeStyles(styles);
 
 export default function ReceptionistDashboard() {
@@ -41,7 +114,11 @@ export default function ReceptionistDashboard() {
   const cancelled = useAppointments("cancelled");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+  
+  // New state variables for delete confirmation
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState(null);
 
   const searchPatient = (e) => {
     e.preventDefault()
@@ -72,6 +149,44 @@ export default function ReceptionistDashboard() {
         }
     })
   }
+  
+  // Handler for the Delete button click
+  const handleDeleteClick = (patient) => {
+    setPatientToDelete(patient);
+    setShowDeleteConfirmation(true);
+  };
+  
+  // Handler for confirming deletion
+  const handleConfirmDelete = () => {
+    if (patientToDelete) {
+      axios.get(`${base}/KNH/patient/DeletePatientbyId?patient_id=${patientToDelete.identity_no}`)
+        .then((data) => {
+          if (data.data.message == "Deleted") {
+            toast.success(`Patient ${patientToDelete.firstname} ${patientToDelete.lastname} deleted successfully`);
+            setLoading(true);
+            setTimeout(() => {
+              setPatients([]);
+              setLoading(false);
+              getAllPatients();
+            }, 2000);
+          } else {
+            toast.error("Failed to delete patient");
+          }
+        })
+        .catch((error) => {
+          toast.error("Error occurred while deleting patient");
+          console.log(error);
+        });
+    }
+    setShowDeleteConfirmation(false);
+    setPatientToDelete(null);
+  };
+  
+  // Handler for canceling deletion
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setPatientToDelete(null);
+  };
 
   useEffect(() => {
     setLoading(true)
@@ -92,6 +207,44 @@ export default function ReceptionistDashboard() {
   return (
     <div>
       <ToastContainer />
+      
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirmation && patientToDelete && (
+        <div style={modalStyles.overlay}>
+          <div style={modalStyles.modal}>
+            <div style={modalStyles.title}>
+              Delete Patient
+            </div>
+            <div style={modalStyles.message}>
+              Are you sure you want to delete patient:<br />
+              <strong>{patientToDelete.firstname} {patientToDelete.lastname}</strong><br />
+              ID: {patientToDelete.identity_no}
+            </div>
+            <div style={modalStyles.warning}>
+              This action cannot be undone and will remove all patient records.
+            </div>
+            <div style={modalStyles.buttonContainer}>
+              <button 
+                style={modalStyles.deleteButton}
+                onClick={handleConfirmDelete}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+              >
+                Delete Patient
+              </button>
+              <button 
+                style={modalStyles.cancelButton}
+                onClick={handleCancelDelete}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#5a6268'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
@@ -170,7 +323,7 @@ export default function ReceptionistDashboard() {
             <CardHeader color="info">
               <h4 className={classes.cardTitleWhite}>Patients Information</h4>
               <p className={classes.cardCategoryWhite}>
-                All Patients since 10th October, 2021
+                All Patients since 20th February, 2025
               </p>
             </CardHeader>
             <CardBody>
@@ -178,11 +331,11 @@ export default function ReceptionistDashboard() {
                 <div className="searchCont">
                   <input type="text" className="searchInput" placeholder="Search Patient By ID" onChange={(e) => {
                     if (e.target.value === "") {
-                      getAllPatients()
+                      getAllPatients();
                     }
                     else{
-                      setSearch(e.target.value)
-                      setPatients(patients.filter((item) => item.identity_no == e.target.value))
+                      setSearch(e.target.value);
+                      setPatients(patients.filter((item) => item.identity_no == e.target.value));
                     }
                   }}/>
                   <button className="btnSearch" onClick={searchPatient}>Search</button>
@@ -205,7 +358,7 @@ export default function ReceptionistDashboard() {
                 </thead>
                 <tbody>
                 {allPatients.length > 0 ? allPatients.map((item) => (
-                      <tr>
+                      <tr key={item.identity_no}>
                         <td>{item.identity_no}</td>
                         <td>{item.firstname}</td>
                         <td>{item.lastname}</td>
@@ -214,26 +367,13 @@ export default function ReceptionistDashboard() {
                         <td>{item.gender}</td>
                         <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            axios.get(`${base}/KNH/patient/DeletePatientbyId?patient_id=${item.identity_no}`)
-                            .then((data) => {
-                                if (data.data.message == "Deleted") {
-                                  toast.success("Deleted");
-                                  setLoading(true);
-                                  setTimeout(() => {
-                                    setPatients([])
-                                    setLoading(false);
-                                    getAllPatients()
-                                  }, 2000);
-                                }
-                                else{
-                                  toast.error("Not Deleted");
-                                }                
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                            });
-                            }}>Delete</p>
+                          <p 
+                            className="editP" 
+                            style={{backgroundColor: "#11b8cc"}} 
+                            onClick={() => handleDeleteClick(item)}
+                          >
+                            Delete
+                          </p>
                         </div>
                       </td>
                     </tr>

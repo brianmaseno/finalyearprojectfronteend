@@ -54,7 +54,8 @@ export default function TestResults() {
   const { user } = useLoggedInUser();
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false)
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+  const FIXED_TEST_COST = 4000
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -154,9 +155,7 @@ export default function TestResults() {
                     <tr>
                       <td>{item.patient_id}</td>
                       <td>{item.test_name}</td>
-                      <td>
-                        <textarea type="number" placeholder="Enter Cost" className="patInput" onChange={(e) => setCost(e.target.value)} />
-                      </td>
+                      <td>KSH {FIXED_TEST_COST}</td>
                       <td>
                         <div>
                           <textarea placeholder="Enter Result" className="patInput" onChange={(e) => setResult(e.target.value)}>
@@ -166,9 +165,9 @@ export default function TestResults() {
                       <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            const check = cost == "" || result == "";
+                            const check = result == "";
                             if (check) {
-                              toast.error("Parameter missing")
+                              toast.error("Result is missing")
                             }
                             else {
                               fetch(`${base}/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)
@@ -197,7 +196,7 @@ export default function TestResults() {
                                         patient_id: item.patient_id,
                                         treatment_id: item.treatment_id,
                                         service_name: "Lab Tests",
-                                        service_cost: cost,
+                                        service_cost: FIXED_TEST_COST,
                                         service_department: user.department_id,
                                         added_by: user.national_id
                                       }

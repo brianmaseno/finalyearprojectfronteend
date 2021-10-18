@@ -13,6 +13,81 @@ import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
 
+// Modal styles for confirmation dialog
+const modalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '20px',
+    width: '400px',
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#333',
+    textAlign: 'center',
+  },
+  message: {
+    fontSize: '16px',
+    color: '#444',
+    marginBottom: '20px',
+    textAlign: 'center',
+    lineHeight: '1.5',
+  },
+  details: {
+    fontSize: '14px',
+    color: '#666',
+    marginBottom: '20px',
+    padding: '10px 15px',
+    backgroundColor: '#f8f8f8',
+    borderRadius: '4px',
+    width: '90%',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: '20px',
+  },
+  confirmButton: {
+    padding: '8px 25px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  },
+  cancelButton: {
+    padding: '8px 25px',
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  }
+};
+
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -47,15 +122,17 @@ const useStyles = makeStyles(styles);
 
 export default function EditAccounts() {
   const classes = useStyles();
-  const [data, setData] = useState([])
-  const [search, setSearch] = useState("")
-  const [loading, setLoading] = useState(false)
-  const base = useBaseUrl()
-
-  const message = `Account suspended successfully`;
+  const [data, setData] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl();
+  
+  // State variables for suspension confirmation
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [accountToSuspend, setAccountToSuspend] = useState(null);
 
   const searchStaff = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (search != "") {
       setData([]);
       fetch(`${base}/KNH/staff/accounts/activated`)
@@ -67,9 +144,9 @@ export default function EditAccounts() {
             else{
                 console.log("no data");
             }
-        })
+        });
     }
-  }
+  };
 
   const getAllActivatedStaff = () => {
     fetch(`${base}/KNH/staff/accounts/activated`)
@@ -81,8 +158,47 @@ export default function EditAccounts() {
             else{
                 console.log("no data");
             }
+        });
+  };
+  
+  // Handler for showing confirmation dialog
+  const handleSuspendClick = (account) => {
+    setAccountToSuspend(account);
+    setShowConfirmation(true);
+  };
+  
+  // Handler for confirming suspension
+  const handleConfirmSuspend = () => {
+    if (accountToSuspend) {
+      fetch(`${base}/KNH/staff/suspend?username=${accountToSuspend.username}`)
+        .then(response => response.json())
+        .then((data) => {
+          if (data.message === "Suspended") {
+            toast.success("Account Suspended");
+            setData([]);
+            setLoading(true);
+            setTimeout(() => {
+              setLoading(false);
+              getAllActivatedStaff();
+            }, 2000);
+          } else {
+            toast.error("Account Not Suspended");
+          }
         })
-  }
+        .catch(error => {
+          console.error("Error suspending account:", error);
+          toast.error("Error suspending account");
+        });
+    }
+    setShowConfirmation(false);
+    setAccountToSuspend(null);
+  };
+  
+  // Handler for canceling suspension
+  const handleCancelSuspend = () => {
+    setShowConfirmation(false);
+    setAccountToSuspend(null);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -97,12 +213,51 @@ export default function EditAccounts() {
               console.log("no data");
               setLoading(false);
           }
-      })
-  }, [])
+      });
+  }, []);
 
   return (
     <>
     <ToastContainer />
+    
+    {/* Confirmation Dialog */}
+    {showConfirmation && accountToSuspend && (
+      <div style={modalStyles.overlay}>
+        <div style={modalStyles.modal}>
+          <div style={modalStyles.title}>
+            Confirm Account Suspension
+          </div>
+          <div style={modalStyles.message}>
+            Are you sure you want to suspend this employee's account?
+          </div>
+          <div style={modalStyles.details}>
+            <div><strong>ID:</strong> {accountToSuspend.national_id}</div>
+            <div><strong>Name:</strong> {accountToSuspend.firstname} {accountToSuspend.lastname}</div>
+            <div><strong>Username:</strong> {accountToSuspend.username}</div>
+            <div><strong>Qualification:</strong> {accountToSuspend.qualification}</div>
+          </div>
+          <div style={modalStyles.buttonContainer}>
+            <button 
+              style={modalStyles.confirmButton}
+              onClick={handleConfirmSuspend}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+            >
+              Suspend
+            </button>
+            <button 
+              style={modalStyles.cancelButton}
+              onClick={handleCancelSuspend}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#5a6268'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    
     <div className="pathCont">
       <div className="path">
         <p className="pathName">Dashboard / <span>Activated Accounts</span></p>
@@ -120,15 +275,20 @@ export default function EditAccounts() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
-                  if (e.target.value === "") {
-                    getAllActivatedStaff()
-                  }
-                  else{
-                    setSearch(e.target.value)
-                    setData(data.filter((item) => item.national_id == e.target.value))
-                  }
-                }}/>
+                <input 
+                  type="text" 
+                  className="searchInput" 
+                  placeholder="Search Employee By ID" 
+                  onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllActivatedStaff();
+                    }
+                    else{
+                      setSearch(e.target.value);
+                      setData(data.filter((item) => item.national_id == e.target.value));
+                    }
+                  }}
+                />
                 <button className="btnSearch" onClick={searchStaff}>Search</button>
               </div>
             </div>
@@ -149,7 +309,7 @@ export default function EditAccounts() {
               </thead>
               <tbody>
                 {data ? data.map((item) => (
-                    <tr>
+                    <tr key={item.national_id}>
                       <td>{item.national_id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.lastname}</td>
@@ -158,25 +318,12 @@ export default function EditAccounts() {
                       <td>{item.status}</td>
                       <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
-                          <p className="editP" onClick={() => {
-                            fetch(`${base}/KNH/staff/suspend?username=${item.username}`)
-                            .then(response => response.json())
-                            .then((data) => {
-                                if (data.message == "Suspended") {
-                                  toast.success("Account Suspended");
-                                  setData([]);
-                                  setLoading(true);
-                                  setTimeout(() => {
-                                    setLoading(false);
-                                   getAllActivatedStaff() 
-                                  }, 2000);
-                                }
-                                else{
-                                  toast.error("Account Not Suspended");
-                                  setUpdated(false)
-                                }
-                            })
-                            }}>Suspend</p>
+                          <p 
+                            className="editP" 
+                            onClick={() => handleSuspendClick(item)}
+                          >
+                            Suspend
+                          </p>
                         </div>
                       </td>
                   </tr>

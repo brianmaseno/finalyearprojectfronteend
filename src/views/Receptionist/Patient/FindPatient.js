@@ -67,6 +67,14 @@ export default function FindPatient() {
   const [height, setHeight] = useState("");
   const [temperature, setTemperature] = useState("");
   const [pressure, setPressure] = useState("");
+  const [patientIdValid, setPatientIdValid] = useState(true);
+
+  // Handle patient ID validation - only allow digits and enforce 8-digit requirement
+  const handlePatientIdChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 8); // Only allow digits and limit to 8
+    setPatientID(value);
+    setPatientIdValid(/^\d{8}$/.test(value) || value === '');
+  };
 
   const updatePatient = (e) => {
     e.preventDefault()
@@ -146,6 +154,11 @@ export default function FindPatient() {
 
   const searchPatient = (e) => {
     e.preventDefault();
+    
+    if (patientID && !/^\d{8}$/.test(patientID)) {
+      toast.error("Patient ID must be exactly 8 digits");
+      return;
+    }
 
     const check = patientID == "";
 
@@ -185,8 +198,6 @@ export default function FindPatient() {
       toast.error("Patient Id required")
       console.log("Missing Parameters")
     }
-    
-
   }
 
   const deletePatient = (e) => {
@@ -217,8 +228,6 @@ export default function FindPatient() {
     else{
       console.log("Missing Parameters")
     }
-    
-
   }
 
   return (
@@ -246,13 +255,37 @@ export default function FindPatient() {
                 </div>
                 <div className="checkBody">
                     <div className="checkAv">
-                        <p className="patId">Patient ID</p>
+                        <p className="patId">Patient ID* (8 digits required)</p>
+                    </div>
+                    
+                    <div className="checkAv">
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="Enter Patient ID" 
+                          className="patText" 
+                          value={patientID}
+                          onChange={handlePatientIdChange}
+                          maxLength={8}
+                          style={{
+                            borderColor: patientIdValid ? '' : 'red',
+                            borderWidth: patientIdValid ? '1px' : '2px'
+                          }}
+                        />
+                        {!patientIdValid && patientID !== '' && (
+                          <div style={{color: 'red', fontSize: '12px', marginTop: '5px'}}>
+                            Patient ID must be exactly 8 digits
+                          </div>
+                        )}
                     </div>
                     <div className="checkAv">
-                        <input type="text" required placeholder="Enter Patient ID" className="patText" onChange={(e) => setPatientID(e.target.value)}/>
-                    </div>
-                    <div className="checkAv">
-                        <button className="btnPay" onClick={searchPatient}>Check Patient</button>
+                        <button 
+                          className="btnPay" 
+                          onClick={searchPatient} 
+                          disabled={!patientIdValid || patientID === ''}
+                        >
+                          Check Patient
+                        </button>
                     </div>
                   </div>
               </div>
@@ -265,7 +298,7 @@ export default function FindPatient() {
                   {item.length > 0 ? 
                   <div className="checkBody">
                     {item.map((data) => (
-                      <div className="checkAv">
+                      <div className="checkAv" key={data.identity_no}>
                         <form className="frm">
                           <div className="formCont">
                             <div className="formIn">
@@ -300,7 +333,7 @@ export default function FindPatient() {
                           <div className="formCont">
                             <div className="formIn">
                               <label className="labelPat">ID</label>
-                              <input placeholder="ID" className="patInput" value={data.identity_no}/>
+                              <input placeholder="ID" className="patInput" value={data.identity_no} disabled />
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Phone Number</label>
@@ -310,7 +343,7 @@ export default function FindPatient() {
                           <div className="formCont">
                             <div className="formIn">
                               <label className="labelPat">Gender</label>
-                              <input placeholder="Gender" className="patInput" value={data.gender}/>
+                              <input placeholder="Gender" className="patInput" value={data.gender} disabled />
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Weight</label>

@@ -44,15 +44,76 @@ const styles = {
   },
 };
 
+// Modal styles for confirmation popup
+const modalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '20px',
+    width: '400px',
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#333',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: '20px',
+  },
+  yesButton: {
+    padding: '8px 25px',
+    backgroundColor: '#11b8cc',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  },
+  noButton: {
+    padding: '8px 25px',
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  }
+};
+
 const useStyles = makeStyles(styles);
 
 export default function LabRequests() {
   const classes = useStyles();
   const { data } = useAccountStatus("suspended");
- const [loading, setLoading] = useState(false)
-  const [test, setTest] = useState([])
-  const [search, setSearch] = useState("")
-  const base = useBaseUrl()
+  const [loading, setLoading] = useState(false);
+  const [test, setTest] = useState([]);
+  const [search, setSearch] = useState("");
+  const base = useBaseUrl();
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedTestId, setSelectedTestId] = useState(null);
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -84,6 +145,46 @@ export default function LabRequests() {
       })
   }
 
+  // Handle opening the confirmation dialog
+  const handleConfirmClick = (labTestId) => {
+    setSelectedTestId(labTestId);
+    setShowConfirmation(true);
+  };
+
+  // Handle the actual confirmation
+  const handleConfirmYes = () => {
+    if (selectedTestId) {
+      fetch(`${base}/KNH/patient/treatment/labrequest/approve?lab_test_id=${selectedTestId}`)
+        .then(response => response.json())
+        .then((data) => {
+          if (data.message == "Approved Successfully") {
+            toast.success("Test Approved Successfully")
+            setLoading(true);
+            setTimeout(() => {
+              setTest([]);
+              setLoading(false);
+              getAllTests()
+            }, 2000);
+          }
+          else{
+            toast.error("Not Approved");
+            console.log("Not Approved")
+          }
+        })
+        .catch(error => {
+          toast.error("Error approving test");
+          console.error(error);
+        });
+    }
+    setShowConfirmation(false);
+  };
+
+  // Handle closing the confirmation without confirming
+  const handleConfirmNo = () => {
+    setShowConfirmation(false);
+    setSelectedTestId(null);
+  };
+
   useEffect(() => {
     setLoading(true);
     axios.get(`${base}/KNH/patient/lab/tests/requests`)
@@ -105,6 +206,36 @@ export default function LabRequests() {
   return (
     <>
     <ToastContainer />
+    
+    {/* Confirmation Modal */}
+    {showConfirmation && (
+      <div style={modalStyles.overlay}>
+        <div style={modalStyles.modal}>
+          <div style={modalStyles.title}>
+            Are you sure you want to confirm this lab test request?
+          </div>
+          <div style={modalStyles.buttonContainer}>
+            <button 
+              style={modalStyles.yesButton} 
+              onClick={handleConfirmYes}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#0ea2b3'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#11b8cc'}
+            >
+              Yes
+            </button>
+            <button 
+              style={modalStyles.noButton} 
+              onClick={handleConfirmNo}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#c0392b'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#e74c3c'}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    
     <div className="pathCont">
       <div className="path">
         <p className="pathName">Dashboard / <span>Lab Requests</span></p>
@@ -149,33 +280,20 @@ export default function LabRequests() {
               </thead>
               <tbody>
                 {test.length > 0 ? test.map((item) => (
-                    <tr>
+                    <tr key={item.lab_test_id}>
                       <td>{item.patient_id}</td>
                       <td>{item.treatment_id}</td>
                       <td>{item.staff_id}</td>
                       <td>{item.test_name}</td>
                       <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            console.log(item.lab_test_id)
-                                fetch(`${base}/KNH/patient/treatment/labrequest/approve?lab_test_id=${item.lab_test_id}`)
-                                .then(response => response.json())
-                                .then((data) => {
-                                    if (data.message == "Approved Successfully") {
-                                      toast.success("Test Approved Successfully")
-                                      setLoading(true);
-                                      setTimeout(() => {
-                                        setTest([]);
-                                        setLoading(false);
-                                        getAllTests()
-                                      }, 2000);
-                                    }
-                                    else{
-                                      toast.error("Not Approved");
-                                      console.log("Not Approved")
-                                    }
-                                })
-                                }}>Confirm</p>
+                          <p 
+                            className="editP" 
+                            style={{backgroundColor: "#11b8cc"}} 
+                            onClick={() => handleConfirmClick(item.lab_test_id)}
+                          >
+                            Confirm
+                          </p>
                         </div>
                       </td>
                   </tr>

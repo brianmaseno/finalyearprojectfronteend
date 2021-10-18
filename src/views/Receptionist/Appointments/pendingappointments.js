@@ -51,7 +51,32 @@ export default function PendingAppointments() {
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
   const base = useBaseUrl()
-  const { departments } = useDepartments()
+  const { departments } = useDepartments();
+    // Add after other state declarations
+  const [patients, setPatients] = useState({});
+
+    const fetchPatientDetails = async (patientIds) => {
+    try {
+      const uniqueIds = [...new Set(patientIds)]; // Remove duplicates
+      const patientDetails = {};
+      
+      for (const id of uniqueIds) {
+        const response = await fetch(`${base}/KNH/patient/CheckPatientbyId?patient_id=${id}`);
+        const data = await response.json();
+        if (data.data) {
+          patientDetails[id] = {
+            firstname: data.data[0].firstname,
+            lastname: data.data[0].lastname
+          };
+        }
+      }
+      
+      setPatients(patientDetails);
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+      toast.error("Error loading patient details");
+    }
+  };
 
   const searchPending = (e) => {
     e.preventDefault()
@@ -70,35 +95,38 @@ export default function PendingAppointments() {
     }
   }
   
-  const getPendingAppointments = () => {
+    const getPendingAppointments = () => {
     fetch(`${base}/KNH/appointments/all/pending`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
-            setPending(data.data)
-            console.log(pending)
-        }
-        else{
+            setPending(data.data);
+            // Fetch patient details for all appointments
+            const patientIds = data.data.map(item => item.patient_id);
+            fetchPatientDetails(patientIds);
+        } else {
             console.log("no Appointment");
         }
     })
-  }
+  };
 
-  useEffect(() => {
+    useEffect(() => {
     setLoading(true);
     fetch(`${base}/KNH/appointments/all/pending`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
-            setPending(data.data)
+            setPending(data.data);
+            // Fetch patient details
+            const patientIds = data.data.map(item => item.patient_id);
+            fetchPatientDetails(patientIds);
+            setLoading(false);
+          } else {
+            console.log("No Data");
             setLoading(false);
           }
-          else{
-            console.log("No Data")
-            setLoading(false);
-          }
-      })
-  }, [])
+      });
+  }, []);
 
   return (
     <>
@@ -135,12 +163,13 @@ export default function PendingAppointments() {
               {!loading ? 
               <>
               {pending.length > 0 ?
-              <table className="styled-table">
+                            <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
                     <th>Appointment ID</th>
                     <th>Appointment Date</th>
                     <th>Patient ID</th>
+                    <th>Patient Name</th>
                     <th>Clinician ID</th>
                     <th>Department ID</th>
                     <th style={{textAlign: "center"}}>Status</th>
@@ -148,19 +177,24 @@ export default function PendingAppointments() {
                 </thead>
                 <tbody>
                   {pending.length > 0 ? pending.map((item) => (
-                      <tr>
-                        <td>{item._id}</td>
-                        <td>{item.appointment_due_date}</td>
-                        <td>{item.patient_id}</td>
-                        <td>{item.doctor_id}</td>
-                        <td>{item.department_id}</td>
-                        <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                    <tr key={item._id}>
+                      <td>{item._id}</td>
+                      <td>{item.appointment_due_date}</td>
+                      <td>{item.patient_id}</td>
+                      <td>
+                        {patients[item.patient_id] ? 
+                          `${patients[item.patient_id].firstname} ${patients[item.patient_id].lastname}` : 
+                          'Loading...'}
+                      </td>
+                      <td>{item.doctor_id}</td>
+                      <td>{item.department_id}</td>
+                      <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}}>pending</p>
                         </div>
                       </td>
                     </tr>
-                    )) : null}
+                  )) : null}
                 </tbody>
               </table>
               :

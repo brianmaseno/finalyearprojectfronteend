@@ -45,6 +45,71 @@ const styles = {
   },
 };
 
+// Modal styles for confirmation popup
+const modalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '20px',
+    width: '400px',
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#333',
+    textAlign: 'center',
+  },
+  message: {
+    fontSize: '16px',
+    color: '#444',
+    marginBottom: '20px',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: '20px',
+  },
+  confirmButton: {
+    padding: '8px 25px',
+    backgroundColor: '#28a745',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  },
+  cancelButton: {
+    padding: '8px 25px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  }
+};
+
 const useStyles = makeStyles(styles);
 
 export default function PrescribedDrugs() {
@@ -55,11 +120,133 @@ export default function PrescribedDrugs() {
   const { drug } = useDrugs()
   const [loading, setLoading] = useState(false);
   const [disLoading, setDisLoading] = useState(false);
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+  const [patientIdValid, setPatientIdValid] = useState(true);
+  
+  // New state variables for confirmation dialog
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [selectedDrug, setSelectedDrug] = useState(null);
+  const [isBatchDispense, setIsBatchDispense] = useState(false);
+    // Add after other state declarations
+  const [patientDetails, setPatientDetails] = useState(null);
 
-  const dispenseDrugs = (e) => {
-    e.preventDefault()
+    // Add after other functions
+  const fetchPatientDetails = async (patientId) => {
+    try {
+      const response = await fetch(`${base}/KNH/patient/CheckPatientbyId?patient_id=${patientId}`);
+      const data = await response.json();
+      if (data.data) {
+        setPatientDetails({
+          firstname: data.data[0].firstname,
+          lastname: data.data[0].lastname
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+      toast.error("Error loading patient details");
+    }
+  };
 
+
+  const handlePatientIdChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 8); // Only allow digits and limit to 8
+    setPatientId(value);
+    setPatientIdValid(/^\d{8}$/.test(value) || value === '');
+  };
+
+  // Handler for the "Dispense Drugs" button (batch dispensing)
+  const handleBatchDispenseClick = () => {
+    setIsBatchDispense(true);
+    setConfirmationMessage(`Are you sure you want to dispense all medications for patient ${patientId}?`);
+    setShowConfirmation(true);
+  };
+
+  // Handler for individual "Dispense" buttons
+  const handleSingleDispenseClick = (item) => {
+    setIsBatchDispense(false);
+    setSelectedDrug(item);
+    setConfirmationMessage(`Are you sure you want to dispense ${item.drug_name} for patient ${patientId}?`);
+    setShowConfirmation(true);
+  };
+
+  // Handler for "Yes" in confirmation dialog
+  const handleConfirmDispense = () => {
+    if (isBatchDispense) {
+      // Handle batch dispensing
+      dispenseDrugs();
+    } else {
+      // Handle single drug dispensing
+      dispenseSingleDrug();
+    }
+    setShowConfirmation(false);
+  };
+
+  // Handler for "No" in confirmation dialog
+  const handleCancelDispense = () => {
+    setShowConfirmation(false);
+    setSelectedDrug(null);
+    setIsBatchDispense(false);
+  };
+
+  // Function to dispense a single drug
+  const dispenseSingleDrug = () => {
+    if (!selectedDrug) return;
+    
+    const prescription_id = selectedDrug.prescription_id;
+    const treatment_id = selectedDrug.treatment_id;
+    const drug_id = selectedDrug.drug_id;
+    
+    const payDetails = {
+      patient_id: patientId,
+      treatment_id: treatment_id,
+      service_name: "Drug Dispensation",
+      service_cost: drug.filter((item) => item._id == drug_id)[0].drug_cost,
+      service_department: user.department_id,
+      added_by: user.national_id
+    };
+    
+    fetch(`${base}/KNH/patient/drugs/issue?prescription_id=${prescription_id}&&drug_id=${drug_id}&&quantity=${"3"}`)
+      .then(response => response.json())
+      .then((data) => {
+        if (data.message == "Updated Successfully") {
+          console.log(data.message);
+          toast.success("Drug Issued");
+          
+          // Notification
+          const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
+          fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
+            .then(response => response.json())
+            .then((data) => {
+              console.log(data);
+            });
+          
+          // Billing
+          axios({
+            method: 'post',
+            url: `${base}/KNH/patient/billing/set`,
+            data: payDetails
+          })
+            .then((data) => {
+              if (data.data.message == "Added to Bill") {
+                console.log("Added to Bill");
+                checkPatient();
+              } else {
+                console.log("Not Added");
+              }                
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          
+          checkPatient(); // Refresh the list
+        } else {
+          toast.error("Error");
+        }
+      });
+  };
+
+  const dispenseDrugs = () => {
     if (data.length > 0) {
       setDisLoading(true);
 
@@ -123,41 +310,80 @@ export default function PrescribedDrugs() {
     }
   }
 
-  const checkPatient = (e) => {
+   const checkPatient = (e) => {
+    if (e) e.preventDefault();
+  
+    if (patientId && !/^\d{8}$/.test(patientId)) {
+      toast.error("Patient ID must be exactly 8 digits");
+      return;
+    }
     const check = patientId == "";
-
+  
     if (check) {
       toast.error("Patient Id required")
-    }
-    else {
+    } else {
       setLoading(true);
-
-    if (!(patientId === "")) {
-      fetch(`${base}/KNH/patient/drugs/prescribed/patient?patient_id=${patientId}`)
-      .then(response => response.json())
-      .then((data) => {
-          if (data.message == "Found") {
-            setLoading(false);
-            setData(data.data);
-          }
-          else{
-            toast.error("No Prescribed Drugs")
-            setLoading(false);
-            console.log("no data");
-          }
-      })
+      setPatientDetails(null); // Reset patient details
+  
+      if (!(patientId === "")) {
+        // Fetch prescribed drugs
+        fetch(`${base}/KNH/patient/drugs/prescribed/patient?patient_id=${patientId}`)
+          .then(response => response.json())
+          .then(async (data) => {
+            if (data.message == "Found") {
+              setData(data.data);
+              await fetchPatientDetails(patientId); // Fetch patient details
+              setLoading(false);
+            } else {
+              toast.error("No Prescribed Drugs")
+              setLoading(false);
+              console.log("no data");
+            }
+          });
+      } else {
+        toast.error("Error")
+        setLoading(false);
+        console.log("ID Missing")
+      }
     }
-    else{
-      toast.error("Error")
-      setLoading(false);
-      console.log("ID MIssing")
-    }
-    }
-  }
+  };
 
   return (
     <>
     <ToastContainer />
+    
+    {/* Confirmation Modal */}
+    {showConfirmation && (
+      <div style={modalStyles.overlay}>
+        <div style={modalStyles.modal}>
+          <div style={modalStyles.title}>
+            Confirm Dispensing
+          </div>
+          <div style={modalStyles.message}>
+            {confirmationMessage}
+          </div>
+          <div style={modalStyles.buttonContainer}>
+            <button 
+              style={modalStyles.confirmButton} 
+              onClick={handleConfirmDispense}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#218838'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#28a745'}
+            >
+              Yes, Dispense
+            </button>
+            <button 
+              style={modalStyles.cancelButton} 
+              onClick={handleCancelDispense}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    
     <div className="pathCont">
       <div className="path">
         <p className="pathName">Dashboard / <span>Prescribed Drugs</span></p>
@@ -178,20 +404,32 @@ export default function PrescribedDrugs() {
                     <div className="titlePatient">
                         <p className="titleTxt">Check Prescribed Drugs</p>
                     </div>
+
                     <div className="checkBody">
-                        <div className="checkAv">
-                            <p className="patId">Patient ID</p>
-                        </div>
-                        <div className="checkAv">
-                            <input type="text" placeholder="Enter Patient ID" className="patText" onChange={(e) => setPatientId(e.target.value)}/>
-                        </div>
-                        <div className="checkAv">
-                            {!loading ? <button className="btnPay" onClick={checkPatient}>Check Patient</button>
-                            :
-                            <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
-                            }
-                        </div>
+                      <div className="checkAv">
+                        <label className="checkAv">Patient ID* (8 digits required)</label>
+                        <input 
+                          placeholder="Patient ID" 
+                          className="inCase"
+                          onChange={handlePatientIdChange}
+                          value={patientId}
+                          maxLength={8}
+                          pattern="\d*"
+                          style={{borderColor: patientIdValid ? '' : 'red'}}
+                        />
+                        {!patientIdValid && patientId !== '' && (
+                          <div style={{color: 'red', fontSize: '12px', marginTop: '5px'}}>
+                            Patient ID must be exactly 8 digits
+                          </div>
+                        )}
                       </div>
+                      <div className="checkAv">
+                          {!loading ? <button className="btnPay" onClick={checkPatient}>Check Patient</button>
+                          :
+                          <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                          }
+                      </div>
+                    </div>
                   </div>
                   <div className="patientContainer">
                     <div className="titlePatient">
@@ -199,11 +437,12 @@ export default function PrescribedDrugs() {
                       </div>
                       <div className="checkBody">
                         {data.length > 0 ? 
-                        <table className="styled-table">
+                                               <table className="styled-table">
                           <thead>
                             <tr style={{marginBottom: "20px"}}>
                               <th>Prescription ID</th>
                               <th>Patient ID</th>
+                              <th>Patient Name</th>
                               <th>Drug</th>
                               <th>Usage</th>
                               <th>Notes</th>
@@ -212,73 +451,29 @@ export default function PrescribedDrugs() {
                           </thead>
                           <tbody>
                             {data.map((item) => (
-                                <tr>
-                                    <td>{item.prescription_id}</td>
-                                    <td>{item.patient_id}</td>
-                                    <td>{item.drug_name}</td>
-                                    <td>{item.usage}</td>
-                                    <td>{item.notes}</td>
-                                    <td>
-                                    <div className="editContainer">
-                                      <p className="editP" style={{backgroundColor: "green"}} onClick={(e) => {
-                                        const prescription_id = item.prescription_id
-                                        const treatment_id = item.treatment_id
-                                        const drug_id = item.drug_id
-                                
-                                        const payDetails = {
-                                          patient_id: patientId,
-                                          treatment_id: treatment_id,
-                                          service_name: "Drug Dispensation",
-                                          service_cost: drug.filter((item) => item._id == drug_id)[0].drug_cost,
-                                          service_department: user.department_id,
-                                          added_by: user.national_id
-                                        }
-                                
-                                        fetch(`${base}/KNH/patient/drugs/issue?prescription_id=${prescription_id}&&drug_id=${drug_id}&&quantity=${"3"}`)
-                                        .then(response => response.json())
-                                        .then((data) => {
-                                            if (data.message == "Updated Successfully") {
-                                                console.log(data.message)
-                                                setDisLoading(false);
-                                                toast.success("Drug Issued");
-                                                //notification
-                                                const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
-                                                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
-                                                  .then(response => response.json())
-                                                  .then((data) => {
-                                                      console.log(data);
-                                                      
-                                                  })
-                                
-                                                  //billing
-                                                  axios({
-                                                    method: 'post',
-                                                    url: `${base}/KNH/patient/billing/set`,
-                                                    data: payDetails})
-                                                    .then((data) => {
-                                                        if (data.data.message == "Added to Bill") {
-                                                            console.log("Added to Bill")
-                                                            checkPatient();
-                                                        }
-                                                        else{
-                                                            console.log("Not Added")
-                                                        }                
-                                                    })
-                                                    .catch((error) => {
-                                                        console.log(error);
-                                                  });
-                                
-                                                  setData([]);
-                                            }
-                                            else{
-                                              setDisLoading(false);
-                                              toast.error("Error");
-                                            }
-                                        })
-                                      }}>Dispense</p>
-                                    </div>
-                                  </td>
-                                </tr>
+                              <tr key={item.prescription_id}>
+                                <td>{item.prescription_id}</td>
+                                <td>{item.patient_id}</td>
+                                <td>
+                                  {patientDetails ? 
+                                    `${patientDetails.firstname} ${patientDetails.lastname}` : 
+                                    'Loading...'}
+                                </td>
+                                <td>{item.drug_name}</td>
+                                <td>{item.usage}</td>
+                                <td>{item.notes}</td>
+                                <td>
+                                  <div className="editContainer">
+                                    <p 
+                                      className="editP" 
+                                      style={{backgroundColor: "green"}} 
+                                      onClick={() => handleSingleDispenseClick(item)}
+                                    >
+                                      Dispense
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
                             ))}   
                           </tbody>
                         </table>
@@ -291,10 +486,16 @@ export default function PrescribedDrugs() {
                       </div>
                       {data.length > 0 ? 
                       <div className="recContainer">
-                        {!disLoading ? <button className="btnReceive" onClick={dispenseDrugs}>Dispense Drugs</button>
-                        :
-                        <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
-                        }
+                        {!disLoading ? (
+                          <button 
+                            className="btnReceive" 
+                            onClick={handleBatchDispenseClick}
+                          >
+                            Dispense Drugs
+                          </button>
+                        ) : (
+                          <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                        )}
                       </div>
                       :
                       null}

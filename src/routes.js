@@ -15,7 +15,7 @@ import NotificationsPage from "views/Notifications/Notifications.js";
 import PendingAccounts from "views/PendingAccounts/PendingAccounts";
 import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
 import EditAccounts from "views/EditAccounts/EditAccounts";
-import AddDepartment from "views/Admin/AddDepartment";
+// import AddDepartment from "views/Admin/AddDepartment";
 import ChangePassword from "views/Admin/UpdatePassword/updatePassword";
 
 const dashboardRoutes = [
@@ -51,22 +51,22 @@ const dashboardRoutes = [
     component: SuspendedAccounts,
     layout: "/admin",
   },
-  {
-    path: "/changepassword",
-    name: "Change Password",
-    rtlName: "Change Password",
-    icon: LockIcon,
-    component: ChangePassword,
-    layout: "/admin",
-  },
-  {
-    path: "/adddepartment",
-    name: "Add Department",
-    rtlName: "Add Department",
-    icon: AddIcon,
-    component: AddDepartment,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/changepassword",
+  //   name: "Change Password",
+  //   rtlName: "Change Password",
+  //   icon: LockIcon,
+  //   component: ChangePassword,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/adddepartment",
+  //   name: "Add Department",
+  //   rtlName: "Add Department",
+  //   icon: AddIcon,
+  //   component: AddDepartment,
+  //   layout: "/admin",
+  // },
   {
     path: "/notifications",
     name: "Notifications",
@@ -75,14 +75,14 @@ const dashboardRoutes = [
     component: NotificationsPage,
     layout: "/admin",
   },
-  {
-    path: "/user",
-    name: "User Profile",
-    rtlName: "User Profile",
-    icon: Person,
-    component: UserProfile,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/user",
+  //   name: "User Profile",
+  //   rtlName: "User Profile",
+  //   icon: Person,
+  //   component: UserProfile,
+  //   layout: "/admin",
+  // },
   {
     path: "/logout",
     name: "Log Out",

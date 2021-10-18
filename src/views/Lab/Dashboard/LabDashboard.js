@@ -34,7 +34,33 @@ export default function LabDashboard() {
   const { pending } = usePendingLab()
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+    // Add after other state declarations
+  const [patients, setPatients] = useState({});
+
+    // Add after other function declarations
+  const fetchPatientDetails = async (patientIds) => {
+    try {
+      const uniqueIds = [...new Set(patientIds)]; // Remove duplicates
+      const patientDetails = {};
+      
+      for (const id of uniqueIds) {
+        const response = await fetch(`${base}/KNH/patient/CheckPatientbyId?patient_id=${id}`);
+        const data = await response.json();
+        if (data.data) {
+          patientDetails[id] = {
+            firstname: data.data[0].firstname,
+            lastname: data.data[0].lastname
+          };
+        }
+      }
+      
+      setPatients(patientDetails);
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+      toast.error("Error loading patient details");
+    }
+  };
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -53,34 +79,38 @@ export default function LabDashboard() {
     }
   }
 
-  const getAllTests = () => {
+   const getAllTests = () => {
     fetch(`${base}/KNH/patient/lab/tests/report`)
       .then(response => response.json())
       .then((data) => {
-          if (data.message == "Report Found") {
-              setRows(data.data);
-          }
-          else{
-              console.log("no data");
-          }
-      })
-  }
+        if (data.message == "Report Found") {
+          setRows(data.data);
+          // Fetch patient details for all tests
+          const patientIds = data.data.map(item => item.patient_id);
+          fetchPatientDetails(patientIds);
+        } else {
+          console.log("no data");
+        }
+      });
+  };
 
-  useEffect(() => {
+    useEffect(() => {
     setLoading(true);
     fetch(`${base}/KNH/patient/lab/tests/report`)
-          .then(response => response.json())
-          .then((data) => {
-              if (data.message == "Report Found") {
-                  setRows(data.data);
-                  setLoading(false);
-              }
-              else{
-                  console.log("no data");
-                  setLoading(false);
-              }
-          })
-  }, [])
+      .then(response => response.json())
+      .then((data) => {
+        if (data.message == "Report Found") {
+          setRows(data.data);
+          // Fetch patient details
+          const patientIds = data.data.map(item => item.patient_id);
+          fetchPatientDetails(patientIds);
+          setLoading(false);
+        } else {
+          console.log("no data");
+          setLoading(false);
+        }
+      });
+  }, []);
   return (
     <div>
       <GridContainer>
@@ -144,7 +174,7 @@ export default function LabDashboard() {
             <CardHeader color="info">
               <h4 className={classes.cardTitleWhite}>Completed Tests</h4>
               <p className={classes.cardCategoryWhite}>
-                Tests done since 10th October, 2021
+                Tests done since 20th February, 2025
               </p>
             </CardHeader>
             <CardBody>
@@ -165,10 +195,19 @@ export default function LabDashboard() {
               {!loading ? 
               <>
               {rows.length > 0 ? 
-              <Table
+                            <Table
                 tableHeaderColor="info"
-                tableHead={["Test ID", "Test Name", "Patient ID", "Test Date", "Test Cost (Ksh)"]}
-                tableData={rows.map((item) => ([item.lab_test_id, item.test_name, item.patient_id, item.lab_test_date, item.test_cost]))}
+                tableHead={["Test ID", "Test Name", "Patient ID", "Patient Name", "Test Date", "Test Cost (Ksh)"]}
+                tableData={rows.map((item) => ([
+                  item.lab_test_id,
+                  item.test_name, 
+                  item.patient_id,
+                  patients[item.patient_id] ? 
+                    `${patients[item.patient_id].firstname} ${patients[item.patient_id].lastname}` : 
+                    'Loading...',
+                  item.lab_test_date,
+                  item.test_cost
+                ]))}
               />
               :
               <div className="noData">

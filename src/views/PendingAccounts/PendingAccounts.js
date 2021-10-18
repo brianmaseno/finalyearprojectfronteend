@@ -13,6 +13,81 @@ import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
 
+// Modal styles for confirmation dialog
+const modalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '20px',
+    width: '400px',
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: '#333',
+    textAlign: 'center',
+  },
+  message: {
+    fontSize: '16px',
+    color: '#444',
+    marginBottom: '20px',
+    textAlign: 'center',
+    lineHeight: '1.5',
+  },
+  details: {
+    fontSize: '14px',
+    color: '#666',
+    marginBottom: '20px',
+    padding: '10px 15px',
+    backgroundColor: '#f8f8f8',
+    borderRadius: '4px',
+    width: '90%',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: '20px',
+  },
+  confirmButton: {
+    padding: '8px 25px',
+    backgroundColor: '#11b8cc',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  },
+  cancelButton: {
+    padding: '8px 25px',
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  }
+};
+
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -47,13 +122,17 @@ const useStyles = makeStyles(styles);
 
 export default function PendingAccounts() {
   const classes = useStyles();
-  const [search, setSearch] = useState("")
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
-  const base = useBaseUrl()
+  const [search, setSearch] = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl();
+  
+  // State variables for activation confirmation
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [accountToActivate, setAccountToActivate] = useState(null);
 
   const searchStaff = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (search != "") {
       setData([]);
       fetch(`${base}/KNH/staff/accounts/pending`)
@@ -65,9 +144,9 @@ export default function PendingAccounts() {
             else{
                 console.log("no data");
             }
-        })
+        });
     }
-  }
+  };
 
   const getAllPendingStaff = () => {
     fetch(`${base}/KNH/staff/accounts/pending`)
@@ -79,11 +158,51 @@ export default function PendingAccounts() {
             else{
                 console.log("no data");
             }
+        });
+  };
+  
+  // Handler for showing confirmation dialog
+  const handleActivateClick = (account) => {
+    setAccountToActivate(account);
+    setShowConfirmation(true);
+  };
+  
+  // Handler for confirming activation
+  const handleConfirmActivate = () => {
+    if (accountToActivate) {
+      fetch(`${base}/KNH/staff/activate?username=${accountToActivate.username}`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Activated") {
+              toast.success("Account Activated Successfully");
+              setData([]);
+              setLoading(true);
+              setTimeout(() => {
+                setLoading(false);
+                getAllPendingStaff();
+              }, 2000);
+            }
+            else{
+              toast.error("Account Activation Failed");
+            }
         })
-  }
+        .catch(error => {
+          console.error("Error activating account:", error);
+          toast.error("Error activating account");
+        });
+    }
+    setShowConfirmation(false);
+    setAccountToActivate(null);
+  };
+  
+  // Handler for canceling activation
+  const handleCancelActivate = () => {
+    setShowConfirmation(false);
+    setAccountToActivate(null);
+  };
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     fetch(`${base}/KNH/staff/accounts/pending`)
       .then(response => response.json())
       .then((data) => {
@@ -94,12 +213,52 @@ export default function PendingAccounts() {
           else{
               setLoading(false);
           }
-      })
-  }, [])
+      });
+  }, []);
 
   return (
     <>
     <ToastContainer />
+    
+    {/* Confirmation Dialog */}
+    {showConfirmation && accountToActivate && (
+      <div style={modalStyles.overlay}>
+        <div style={modalStyles.modal}>
+          <div style={modalStyles.title}>
+            Confirm Account Activation
+          </div>
+          <div style={modalStyles.message}>
+            Are you sure you want to activate this employee's account?
+          </div>
+          <div style={modalStyles.details}>
+            <div><strong>ID:</strong> {accountToActivate.national_id}</div>
+            <div><strong>Name:</strong> {accountToActivate.firstname} {accountToActivate.lastname}</div>
+            <div><strong>Username:</strong> {accountToActivate.username}</div>
+            <div><strong>Qualification:</strong> {accountToActivate.qualification}</div>
+            <div><strong>Current Status:</strong> {accountToActivate.status}</div>
+          </div>
+          <div style={modalStyles.buttonContainer}>
+            <button 
+              style={modalStyles.confirmButton}
+              onClick={handleConfirmActivate}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#0ea6b9'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#11b8cc'}
+            >
+              Activate
+            </button>
+            <button 
+              style={modalStyles.cancelButton}
+              onClick={handleCancelActivate}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#5a6268'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    
     <div className="pathCont">
       <div className="path">
         <p className="pathName">Dashboard / <span>Pending Accounts</span></p>
@@ -117,15 +276,20 @@ export default function PendingAccounts() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
-                  if (e.target.value === "") {
-                    getAllPendingStaff()
-                  }
-                  else{
-                    setSearch(e.target.value)
-                    setData(data.filter((item) => item.national_id == e.target.value))
-                  }
-                }}/>
+                <input 
+                  type="text" 
+                  className="searchInput" 
+                  placeholder="Search Employee By ID" 
+                  onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllPendingStaff();
+                    }
+                    else{
+                      setSearch(e.target.value);
+                      setData(data.filter((item) => item.national_id == e.target.value));
+                    }
+                  }}
+                />
                 <button className="btnSearch" onClick={searchStaff}>Search</button>
               </div>
             </div>
@@ -146,7 +310,7 @@ export default function PendingAccounts() {
               </thead>
               <tbody>
                 {data.length > 0 ? data.map((item) => (
-                    <tr>                        
+                    <tr key={item.national_id}>                        
                       <td>{item.national_id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.lastname}</td>
@@ -155,24 +319,13 @@ export default function PendingAccounts() {
                       <td>{item.status}</td>
                       <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            fetch(`${base}/KNH/staff/activate?username=${item.username}`)
-                            .then(response => response.json())
-                            .then((data) => {
-                                if (data.message == "Activated") {
-                                  toast.success("Account Activated");
-                                  setData([])
-                                  setLoading(true);
-                                  setTimeout(() => {
-                                    setLoading(false);
-                                    getAllPendingStaff();
-                                  }, 2000);
-                                }
-                                else{
-                                  toast.error("Account Not Activated");
-                                }
-                            })
-                            }}>Activate</p>
+                          <p 
+                            className="editP" 
+                            style={{backgroundColor: "#11b8cc"}} 
+                            onClick={() => handleActivateClick(item)}
+                          >
+                            Activate
+                          </p>
                         </div>
                       </td>                      
                   </tr>

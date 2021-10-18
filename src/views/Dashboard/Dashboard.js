@@ -175,7 +175,7 @@ export default function Dashboard() {
             <CardHeader color="info">
               <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
               <p className={classes.cardCategoryWhite}>
-                All employees since 10th October, 2021
+                All employees since 1 January, 2025
               </p>
             </CardHeader>
             <CardBody>
@@ -198,8 +198,8 @@ export default function Dashboard() {
               {rows.length > 0 ? 
               <Table
                 tableHeaderColor="info"
-                tableHead={["ID", "First Name", "Last Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item.national_id, item.firstname, item.lastname, item.qualification, item.county]))}
+                tableHead={["ID", "First Name", "Last Name", "Qualification"]}
+                tableData={rows.map((item) => ([item.national_id, item.firstname, item.lastname, item.qualification ]))}
               />
               :
               <div className="noData">

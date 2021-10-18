@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 RUN
 
 RUN THE COMMAND BELOW ON THE TERMINAL
@@ -15,3 +16,5 @@ NEXT
 5. Create users for each qualification e.g Pharmacist, Doctor and login as different users
 
 6. All Qualifications e.g Pharmacist, Doctor will have a different view on the UI
+=======
+>>>>>>> 0900f9f (changes)

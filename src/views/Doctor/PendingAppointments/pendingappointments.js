@@ -51,7 +51,33 @@ export default function DoctorPendingAppointments() {
   const { user } = useLoggedInUser();
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+    // Add after other state declarations
+  const [patients, setPatients] = useState({});
+
+    // Add after state declarations
+  const fetchPatientDetails = async (patientIds) => {
+    try {
+      const uniqueIds = [...new Set(patientIds)]; // Remove duplicates
+      const patientDetails = {};
+      
+      for (const id of uniqueIds) {
+        const response = await fetch(`${base}/KNH/patient/CheckPatientbyId?patient_id=${id}`);
+        const data = await response.json();
+        if (data.data) {
+          patientDetails[id] = {
+            firstname: data.data[0].firstname,
+            lastname: data.data[0].lastname
+          };
+        }
+      }
+      
+      setPatients(patientDetails);
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+      toast.error("Error loading patient details");
+    }
+  };
 
   const searchAppointment = (e) => {
     e.preventDefault()
@@ -70,34 +96,38 @@ export default function DoctorPendingAppointments() {
     }
   }
 
-  const getAllPendingAppointments = () => {
+    const getAllPendingAppointments = () => {
     fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
-            setPending(data.data)
-        }
-        else{
+            setPending(data.data);
+            // Fetch patient details for all appointments
+            const patientIds = data.data.map(item => item.patient_id);
+            fetchPatientDetails(patientIds);
+        } else {
             console.log("no Patient");
         }
-    })
-  }
+    });
+  };
 
-  useEffect(() => {
+    useEffect(() => {
     setLoading(true);
     fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
-          .then(response => response.json())
-          .then((data) => {
-              if (data.message == "Found") {
-                  setPending(data.data);
-                  setLoading(false);
-              }
-              else{
-                  console.log("no data");
-                  setLoading(false);
-              }
-          })
-  }, [])
+      .then(response => response.json())
+      .then((data) => {
+        if (data.message == "Found") {
+          setPending(data.data);
+          // Fetch patient details
+          const patientIds = data.data.map(item => item.patient_id);
+          fetchPatientDetails(patientIds);
+          setLoading(false);
+        } else {
+          console.log("no data");
+          setLoading(false);
+        }
+      });
+  }, []);
 
   return (
     <>
@@ -141,6 +171,7 @@ export default function DoctorPendingAppointments() {
                       <th>Appointment ID</th>
                       <th>Appointment Date</th>
                       <th>Patient ID</th>
+                      <th>Patient Name</th>
                       <th>Clinician ID</th>
                       <th>Department ID</th>
                       <th style={{textAlign: "center"}}>Action</th>
@@ -152,6 +183,11 @@ export default function DoctorPendingAppointments() {
                           <td>{item._id}</td>
                           <td>{item.appointment_due_date}</td>
                           <td>{item.patient_id}</td>
+                          <td>
+          {patients[item.patient_id] ? 
+            `${patients[item.patient_id].firstname} ${patients[item.patient_id].lastname}` : 
+            'Loading...'}
+        </td>
                           <td>{item.doctor_id}</td>
                           <td>{item.department_id}</td>
                           <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>

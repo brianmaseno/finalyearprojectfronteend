@@ -14,6 +14,8 @@ import logo from "assets/img/logoknh.jpg";
 import { CSVLink, CSVDownload } from "react-csv";
 import { useBaseUrl } from "hooks/useBaseUrl";
 import { useDrugs } from "hooks/useDrugs";
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable';
 
 const styles = {
   cardCategoryWhite: {
@@ -43,6 +45,24 @@ const styles = {
       lineHeight: "1",
     },
   },
+  pdfButton: {
+    backgroundColor: "#dc3545",
+    color: "white",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontWeight: 500,
+    transition: "background-color 0.3s",
+    marginLeft: "10px",
+    "&:hover": {
+      backgroundColor: "#c82333"
+    },
+    "&:disabled": {
+      backgroundColor: "#6c757d",
+      cursor: "not-allowed"
+    }
+  }
 };
 
 const useStyles = makeStyles(styles);
@@ -63,6 +83,51 @@ export default function DrugReports() {
     e.preventDefault()
     setRows(rows.filter((item) => item.patient_id == search))
   }
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    
+    // Add hospital logo and header
+    doc.setFontSize(18);
+    doc.text('Kenyatta National Hospital', 14, 20);
+    doc.setFontSize(14);
+    doc.text('Drug Dispensing Report', 14, 30);
+    doc.setFontSize(11);
+    doc.text(`Generated on: ${today}`, 14, 40);
+    if(from && to) {
+      doc.text(`Period: ${from} to ${to}`, 14, 45);
+    }
+  
+    // Create table data
+    const tableData = rows.map(item => [
+      "12/11/2021",
+      item.treatment_id,
+      item.patient_id,
+      drug.filter((e) => e._id == item.drug)[0].drug_name,
+      item.usage_per_day,
+      `Ksh ${drug.filter((e) => e._id == item.drug)[0].drug_buying_price}`,
+      `Ksh ${drug.filter((e) => e._id == item.drug)[0].drug_cost}`,
+      `Ksh ${parseInt(drug.filter((e) => e._id == item.drug)[0].drug_cost) - parseInt(drug.filter((e) => e._id == item.drug)[0].drug_buying_price)}`
+    ]);
+  
+    // Add table
+    autoTable(doc, {
+      startY: 50,
+      head: [['Date', 'Treatment ID', 'Patient ID', 'Drug', 'Usage', 'Buying Price', 'Selling Price', 'Profit']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [17, 184, 204],
+        textColor: 255
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    });
+  
+    // Save PDF
+    doc.save('drug-dispensing-report.pdf');
+  };
 
   const getAllPrescriptions = () => {
     fetch(`${base}/KNH/patient/drugs/dispensingreport`)
@@ -182,8 +247,15 @@ export default function DrugReports() {
                 </div>
               </div>
               <div className="print">
-                  <CSVLink data={rows} className="excel">Excel</CSVLink>
-              </div>
+  <CSVLink data={rows} className="excel">Excel</CSVLink>
+  <button 
+    className={classes.pdfButton}
+    onClick={generatePDF}
+    disabled={rows.length === 0}
+  >
+    Generate PDF
+  </button>
+</div>
               </>
               : null }
             </div>

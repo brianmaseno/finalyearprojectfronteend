@@ -21,6 +21,7 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 import { useBilling } from "hooks/useBilling";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
+import { ToastContainer, toast } from "react-toastify";
 
 const useStyles = makeStyles(styles);
 
@@ -32,7 +33,32 @@ export default function BillingDashboard() {
   const total = unpaid + paid
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
-  const base = useBaseUrl()
+  const base = useBaseUrl();
+  const [patients, setPatients] = useState({});
+
+    // Add after other function declarations
+  const fetchPatientDetails = async (patientIds) => {
+    try {
+      const uniqueIds = [...new Set(patientIds)]; // Remove duplicates
+      const patientDetails = {};
+      
+      for (const id of uniqueIds) {
+        const response = await fetch(`${base}/KNH/patient/CheckPatientbyId?patient_id=${id}`);
+        const data = await response.json();
+        if (data.data) {
+          patientDetails[id] = {
+            firstname: data.data[0].firstname,
+            lastname: data.data[0].lastname
+          };
+        }
+      }
+      
+      setPatients(patientDetails);
+    } catch (error) {
+      console.error("Error fetching patient details:", error);
+      toast.error("Error loading patient details");
+    }
+  };
 
   const searchBilling = (e) => {
     e.preventDefault()
@@ -51,37 +77,41 @@ export default function BillingDashboard() {
     }
   }
 
-  const allBillings = () => {
+    const allBillings = () => {
     fetch(`${base}/KNH/patient/billing/completedbills/report/all`)
       .then(response => response.json())
       .then((data) => {
-          if (data.message == "Found") {
-              setRows(data.data);
-              console.log(data.data)
-          }
-          else{
-              console.log("no data");
-          }
-      })
-  }
+        if (data.message == "Found") {
+          setRows(data.data);
+          // Fetch patient details for all billings
+          const patientIds = data.data.map(item => item.patient_id);
+          fetchPatientDetails(patientIds);
+        } else {
+          console.log("no data");
+        }
+      });
+  };
 
-  useEffect(() => {
+    useEffect(() => {
     setLoading(true);
     fetch(`${base}/KNH/patient/billing/completedbills/report/all`)
-          .then(response => response.json())
-          .then((data) => {
-              if (data.message == "Found") {
-                  setRows(data.data);
-                  setLoading(false);
-              }
-              else{
-                  console.log("no data");
-                  setLoading(false)
-              }
-          })
-  }, [])
+      .then(response => response.json())
+      .then((data) => {
+        if (data.message == "Found") {
+          setRows(data.data);
+          // Fetch patient details
+          const patientIds = data.data.map(item => item.patient_id);
+          fetchPatientDetails(patientIds);
+          setLoading(false);
+        } else {
+          console.log("no data");
+          setLoading(false);
+        }
+      });
+  }, []);
   return (
     <div>
+      <ToastContainer />
       <GridContainer>
         <GridItem xs={12} sm={6} md={4}>
           <Card>
@@ -142,7 +172,7 @@ export default function BillingDashboard() {
             <CardHeader color="info">
               <h4 className={classes.cardTitleWhite}>Completed Payments</h4>
               <p className={classes.cardCategoryWhite}>
-                All payments since 10th October, 2021
+                All payments since 10th February, 2025
               </p>
             </CardHeader>
             <CardBody>
@@ -163,10 +193,18 @@ export default function BillingDashboard() {
               {!loading ? 
               <>
               {rows.length > 0 ?
-              <Table
+                            <Table
                 tableHeaderColor="info"
-                tableHead={["Patient ID", "Service Name", "Service Cost", "Date"]}
-                tableData={rows.map((item) => ([item.patient_id, item.service_name, item.service_cost, item.added_on]))}
+                tableHead={["Patient ID", "Patient Name", "Service Name", "Service Cost", "Date"]}
+                tableData={rows.map((item) => ([
+                  item.patient_id,
+                  patients[item.patient_id] ? 
+                    `${patients[item.patient_id].firstname} ${patients[item.patient_id].lastname}` : 
+                    'Loading...',
+                  item.service_name,
+                  item.service_cost,
+                  item.added_on
+                ]))}
               />
               :
               <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}><p>No Data</p></div>
