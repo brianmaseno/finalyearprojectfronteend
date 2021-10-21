@@ -1,0 +1,79 @@
+.patContainer{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+  margin: 10px;
+}
+
+.tableOuter{
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.patTable{
+	width: 100%;
+	display: flex;
+	flex-direction:row;
+	justify-content: center;
+}
+
+.patHeading{
+
+}
+
+.patBody{
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.patColumn{
+	width: 100%;
+	display: flex;
+	flex-direction:column;
+	justify-content: center;
+
+}
+
+.patRow{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	margin-bottom:10px
+}
+
+.patInput{
+	width: 100%;
+	padding: 8px;
+	margin: 7px;
+	border: 1px solid gray;
+	border-width: 1px;
+	border-radius: 3px;
+	font-weight: bold;
+}
+
+.opt{
+	color: black;
+	padding: 10px;
+	font-weight: bold;
+	border-radius: 10px;
+	font-size: 13px;
+	margin: 20px;
+	cursor: pointer;
+}
+
+.patBtn{
+  background-color: #11b8cc;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}

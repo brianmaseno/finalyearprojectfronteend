@@ -21,6 +21,13 @@ import TypographyPage from "views/Typography/Typography";
 import ReceptionistDashboard from "views/Receptionist/Dashboard/ReceptionistDashboard";
 import AddPatient from "views/Receptionist/Patient/AddPatient";
 import FindPatient from "views/Receptionist/Patient/FindPatient";
+import BookAppointment from "views/Receptionist/Appointments/appointments";
+import PendingAppointments from "views/Receptionist/Appointments/pendingappointments";
+import ApprovedAppointments from "views/Receptionist/Appointments/approvedappointments";
+import LabReports from "views/Reports/Lab/labreports";
+import BillingReports from "views/Reports/Billing/billingreports";
+import TreatmentReports from "views/Reports/Treatment/treatmentreport";
+import DrugReports from "views/Reports/Drugs/drugreport";
 //import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 //import RTLPage from "views/RTLPage/RTLPage.js";
@@ -55,7 +62,7 @@ const ReceptionistRoutes = [
     name: "Book Appointment",
     rtlName: "قائمة الجدول",
     icon: "content_paste",
-    component: TypographyPage,
+    component: BookAppointment,
     layout: "/receptionist",
   },
   {
@@ -63,7 +70,7 @@ const ReceptionistRoutes = [
     name: "Pending Appointment",
     rtlName: "الرموز",
     icon: "check",
-    component: TypographyPage,
+    component: PendingAppointments,
     layout: "/receptionist",
   },
   {
@@ -71,7 +78,7 @@ const ReceptionistRoutes = [
     name: "Approved Appointment",
     rtlName: "خرائط",
     icon: "pending",
-    component: TypographyPage,
+    component: ApprovedAppointments,
     layout: "/receptionist",
   },
   {
@@ -79,7 +86,7 @@ const ReceptionistRoutes = [
     name: "Billing Reports",
     rtlName: "إخطارات",
     icon: "error",
-    component: TypographyPage,
+    component: BillingReports,
     layout: "/receptionist",
   },
   {
@@ -87,7 +94,7 @@ const ReceptionistRoutes = [
     name: "Treatment Reports",
     rtlName: "إخطارات",
     icon: "error",
-    component: TypographyPage,
+    component: TreatmentReports,
     layout: "/receptionist",
   },
   {
@@ -95,7 +102,7 @@ const ReceptionistRoutes = [
     name: "Lab Reports",
     rtlName: "إخطارات",
     icon: "error",
-    component: TypographyPage,
+    component: LabReports,
     layout: "/receptionist",
   },
   {
@@ -103,7 +110,7 @@ const ReceptionistRoutes = [
     name: "Drug Reports",
     rtlName: "إخطارات",
     icon: "error",
-    component: TypographyPage,
+    component: DrugReports,
     layout: "/receptionist",
   },
   {
@@ -111,7 +118,7 @@ const ReceptionistRoutes = [
     name: "Notifications",
     rtlName: "إخطارات",
     icon: Notifications,
-    component: TypographyPage,
+    component: NotificationsPage,
     layout: "/receptionist",
   },
   {
@@ -119,7 +126,7 @@ const ReceptionistRoutes = [
     name: "User Profile",
     rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
-    component: TypographyPage,
+    component: UserProfile,
     layout: "/receptionist",
   },
   {

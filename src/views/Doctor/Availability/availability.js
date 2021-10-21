@@ -9,7 +9,6 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import './case.css'
 
 const styles = {
   cardCategoryWhite: {
@@ -43,7 +42,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function CaseNotes() {
+export default function DoctorAvailability() {
   const classes = useStyles();
 
   return (
@@ -51,30 +50,13 @@ export default function CaseNotes() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>Adding Case Notes</h4>
+            <h4 className={classes.cardTitleWhite}>Add Availability</h4>
             <p className={classes.cardCategoryWhite}>
-              Case Notes
+              Availability
             </p>
           </CardHeader>
           <CardBody>
-            <div className="caseOuter">
-              <div className="caseContainer">
-                <div className="caseId">
-                  <label className="idC">Patient ID*</label>
-                  <input placeholder="Patient ID" className="inCase"/>
-                </div>
-                <div className="caseText">
-                  <label className="noteC">Add Notes</label>
-                  <textarea className="txtC" placeholder="Add notes">
-
-                  </textarea>
-                </div>
-                <div className="caseFooter">
-                  <button className="caseSave">Save Notes</button>
-                  <button className="caseCancel">Cancel</button>
-                </div>
-              </div>
-            </div>
+            
           </CardBody>
         </Card>
       </GridItem>

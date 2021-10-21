@@ -1,0 +1,24 @@
+.presOuter{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.presContainer{
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin-bottom: 20px;
+}
+
+.tablePres{
+  width: 100%;
+  margin-top: 20px;
+}
+
+.presIn{
+  width: 90%;
+  padding: 10px;
+  font-weight: bold;
+}

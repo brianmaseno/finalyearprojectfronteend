@@ -9,7 +9,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import './case.css'
+import './results.css'
 
 const styles = {
   cardCategoryWhite: {
@@ -43,7 +43,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function CaseNotes() {
+export default function DoctorLabTestResults() {
   const classes = useStyles();
 
   return (
@@ -51,9 +51,9 @@ export default function CaseNotes() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>Adding Case Notes</h4>
+            <h4 className={classes.cardTitleWhite}>Lab Test Results</h4>
             <p className={classes.cardCategoryWhite}>
-              Case Notes
+              Lab Test
             </p>
           </CardHeader>
           <CardBody>
@@ -63,15 +63,33 @@ export default function CaseNotes() {
                   <label className="idC">Patient ID*</label>
                   <input placeholder="Patient ID" className="inCase"/>
                 </div>
-                <div className="caseText">
-                  <label className="noteC">Add Notes</label>
-                  <textarea className="txtC" placeholder="Add notes">
-
-                  </textarea>
-                </div>
                 <div className="caseFooter">
-                  <button className="caseSave">Save Notes</button>
+                  <button className="caseSave">Search</button>
                   <button className="caseCancel">Cancel</button>
+                </div>
+                <div>
+                  <div>
+                    <table className="labTable">
+                      <thead>
+                        <tr>
+                          <th className="labH">Test ID</th>
+                          <th className="labH">Patient ID</th>
+                          <th className="labH">Test</th>
+                          <th className="labH">Date</th>
+                          <th className="labH">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="labD">12341234</td>
+                          <td className="labD">12341234</td>
+                          <td className="labD">end value has mixed support, consider using flex-end instead end value has mixed support, consider using flex-end instead end value has mixed support, consider using flex-end instead</td>
+                          <td className="labD">12/13/2021</td>
+                          <td className="labD">Checked</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>

@@ -9,6 +9,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import './styles/find.css';
 
 const styles = {
   cardCategoryWhite: {
@@ -50,24 +51,106 @@ export default function FindPatient() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>Approved Employees Accounts</h4>
+            <h4 className={classes.cardTitleWhite}>Find Patient</h4>
             <p className={classes.cardCategoryWhite}>
-              All Approved Employees Accounts details
+              Check Patient Details
             </p>
           </CardHeader>
           <CardBody>
-            <Table
-              tableHeaderColor="primary"
-              tableHead={["Name", "Country", "City", "Salary"]}
-              tableData={[
-                ["Dakota Rice", "Niger", "Oud-Turnhout", "$36,738"],
-                ["Minerva Hooper", "Curaçao", "Sinaai-Waas", "$23,789"],
-                ["Sage Rodriguez", "Netherlands", "Baileux", "$56,142"],
-                ["Philip Chaney", "Korea, South", "Overland Park", "$38,735"],
-                ["Doris Greene", "Malawi", "Feldkirchen in Kärnten", "$63,542"],
-                ["Mason Porter", "Chile", "Gloucester", "$78,615"],
-              ]}
-            />
+            <div className="findContainer">
+              <div className="makeContainer">
+                <div className="titlePatient">
+                    <p className="titleTxt">Search Patient</p>
+                </div>
+                <div className="checkBody">
+                    <div className="checkAv">
+                        <p className="patId">Patient ID</p>
+                    </div>
+                    <div className="checkAv">
+                        <input type="text" placeholder="Enter Patient ID" className="patText"/>
+                    </div>
+                    <div className="checkAv">
+                        <button className="btnPay">Check Patient</button>
+                    </div>
+                  </div>
+              </div>
+              <div className="patientContainer">
+                <div className="titlePatient">
+                      <p className="titleTxt">Patient Details</p>
+                  </div>
+                  <div className="checkBody">
+                      <div className="checkAv">
+                          <form className="frm">
+                            <div className="formCont">
+                              <div className="formIn">
+                                <label className="labelPat">First Name</label>
+                                <input placeholder="First Name" className="patInput"/>
+                              </div>
+                              <div className="formIn">
+                                <label className="labelPat">Last Name</label>
+                                <input placeholder="Last Name" className="patInput"/>
+                              </div>
+                            </div>
+                            <div className="formCont">
+                              <div className="formIn">
+                                <label className="labelPat">Age</label>
+                                <input placeholder="Age" className="patInput"/>
+                              </div>
+                              <div className="formIn">
+                                <label className="labelPat">County</label>
+                                <input placeholder="County" className="patInput"/>
+                              </div>
+                            </div>
+                            <div className="formCont">
+                              <div className="formIn">
+                                <label className="labelPat">Sub County</label>
+                                <input placeholder="Sub-County" className="patInput"/>
+                              </div>
+                              <div className="formIn">
+                                <label className="labelPat">Village</label>
+                                <input placeholder="Village" className="patInput"/>
+                              </div>
+                            </div>
+                            <div className="formCont">
+                              <div className="formIn">
+                                <label className="labelPat">ID</label>
+                                <input placeholder="ID" className="patInput"/>
+                              </div>
+                              <div className="formIn">
+                                <label className="labelPat">Phone Number</label>
+                                <input placeholder="County" className="patInput"/>
+                              </div>
+                            </div>
+                            <div className="formCont">
+                              <div className="formIn">
+                                <label className="labelPat">Gender</label>
+                                <input placeholder="Gender" className="patInput"/>
+                              </div>
+                              <div className="formIn">
+                                <label className="labelPat">Weight</label>
+                                <input placeholder="Weight" className="patInput"/>
+                              </div>
+                            </div>
+                            <div className="formCont">
+                              <div className="formIn">
+                                <label className="labelPat">Height</label>
+                                <input placeholder="Height" className="patInput"/>
+                              </div>
+                              <div className="formIn">
+                                <label className="labelPat">Temperature</label>
+                                <input placeholder="Temperature" className="patInput"/>
+                              </div>
+                            </div>
+
+                            <div className="formBtn">
+                                <button className="btnUpdate">Update Patient</button>
+                                <button className="btnDelete">Delete Patient</button>
+                            </div>
+                          </form>
+                      </div>
+                    </div>
+              </div>
+            </div>
           </CardBody>
         </Card>
       </GridItem>

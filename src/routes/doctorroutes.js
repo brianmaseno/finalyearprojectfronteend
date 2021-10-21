@@ -20,6 +20,12 @@ import EditAccounts from "views/EditAccounts/EditAccounts";
 import TypographyPage from "views/Typography/Typography";
 import DoctorDashboard from "views/Doctor/Dashboard/DoctorDashboard";
 import CaseNotes from "views/Doctor/CaseNotes/CaseNotes";
+import Prescription from "views/Doctor/Prescription/prescription";
+import DoctorPendingAppointments from "views/Doctor/PendingAppointments/pendingappointments";
+import DoctorApprovedAppointments from "views/Doctor/ApprovedAppointments/approvedappointments";
+import RequestLabTest from "views/Doctor/LabResults/requestlabresults";
+import DoctorLabTestResults from "views/Doctor/LabResults/labresults";
+import DoctorAvailability from "views/Doctor/Availability/availability";
 //import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 //import RTLPage from "views/RTLPage/RTLPage.js";
@@ -46,7 +52,7 @@ const DoctorRoutes = [
     name: "Doctor Availability",
     rtlName: "طباعة",
     icon: LibraryBooks,
-    component: TypographyPage,
+    component: DoctorAvailability,
     layout: "/doctor",
   },
   {
@@ -54,7 +60,7 @@ const DoctorRoutes = [
     name: "Pending Appointment",
     rtlName: "الرموز",
     icon: "check",
-    component: TypographyPage,
+    component: DoctorPendingAppointments,
     layout: "/doctor",
   },
   {
@@ -62,7 +68,7 @@ const DoctorRoutes = [
     name: "Approved Appointment",
     rtlName: "خرائط",
     icon: "pending",
-    component: TypographyPage,
+    component: DoctorApprovedAppointments,
     layout: "/doctor",
   },
   {
@@ -70,7 +76,7 @@ const DoctorRoutes = [
     name: "Request LabTest",
     rtlName: "إخطارات",
     icon: "error",
-    component: TypographyPage,
+    component: RequestLabTest,
     layout: "/doctor",
   },
   {
@@ -78,7 +84,7 @@ const DoctorRoutes = [
     name: "LabTest Results",
     rtlName: "إخطارات",
     icon: "error",
-    component: TypographyPage,
+    component: DoctorLabTestResults,
     layout: "/doctor",
   },
   {
@@ -86,15 +92,7 @@ const DoctorRoutes = [
     name: "Prescription",
     rtlName: "إخطارات",
     icon: "error",
-    component: NotificationsPage,
-    layout: "/doctor",
-  },
-  {
-    path: "/reports",
-    name: "Reports",
-    rtlName: "إخطارات",
-    icon: "error",
-    component: NotificationsPage,
+    component: Prescription,
     layout: "/doctor",
   },
   {

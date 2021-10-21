@@ -17,6 +17,9 @@ import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
 import EditAccounts from "views/EditAccounts/EditAccounts";
 import LabDashboard from "views/Lab/Dashboard/LabDashboard";
 import LabRequests from "views/Lab/Requests/LabRequests";
+import LabReports from "views/Reports/Lab/labreports";
+import TestServices from "views/Lab/TestServices/testservices";
+import TestResults from "views/Lab/TestResults/testresults";
 //import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 //import RTLPage from "views/RTLPage/RTLPage.js";
@@ -43,7 +46,7 @@ const LabRoutes = [
     name: "Add Test Result",
     rtlName: "إخطارات",
     icon: "error",
-    component: SuspendedAccounts,
+    component: TestResults,
     layout: "/lab",
   },
   {
@@ -51,7 +54,7 @@ const LabRoutes = [
     name: "Test Services",
     rtlName: "إخطارات",
     icon: "error",
-    component: SuspendedAccounts,
+    component: TestServices,
     layout: "/lab",
   },
   {
@@ -59,7 +62,7 @@ const LabRoutes = [
     name: "Test Reports",
     rtlName: "إخطارات",
     icon: "error",
-    component: SuspendedAccounts,
+    component: LabReports,
     layout: "/lab",
   },
   {

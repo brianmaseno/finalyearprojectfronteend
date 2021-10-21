@@ -13,6 +13,7 @@ import { useAccountStatus } from "hooks/useAccountStatus";
 import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
+import { usePatients } from "hooks/usePatients";
 
 const styles = {
   cardCategoryWhite: {
@@ -46,71 +47,66 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function LabRequests() {
+export default function PendingAppointments() {
   const classes = useStyles();
-  const { data } = useAccountStatus("suspended");
-  const { loading } = useDataStatus(data);
+  const { patients } = usePatients();
 
   return (
     <>
     <ToastContainer />
     <div className="pathCont">
       <div className="path">
-        <p className="pathName">Dashboard / <span>Lab Requests</span></p>
+        <p className="pathName">Dashboard / <span>Pending Appointments</span></p>
       </div>
     </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>All Pending Lab Requests</h4>
+            <h4 className={classes.cardTitleWhite}>All Pending Appointments</h4>
             <p className={classes.cardCategoryWhite}>
-              Lab Requests Details
+              Pending Appointments details
             </p>
           </CardHeader>
           <CardBody>
-            <div className="searchOut">
+          <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Requests"/>
+                <input type="text" className="searchInput" placeholder="Search Appointment"/>
                 <button className="btnSearch">Search</button>
               </div>
-            </div>
-            {loading ? 
-            <table className="styled-table">
-              <thead>
-                <tr style={{marginBottom: "20px"}}>
-                  <th>Patient ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Test</th>
-                  <th>Qualification</th>
-                  <th>Status</th>
-                  <th style={{textAlign: "center"}}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.length > 0 ? data.map((item) => (
-                    <tr>
-                      <td>{item._id}</td>
-                      <td>{item.firstname}</td>
-                      <td>{item.lastname}</td>
-                      <td>{item.username}</td>
-                      <td>{item.qualification}</td>
-                      <td>{item.status}</td>
-                      <td>
+              </div>
+              <table className="styled-table">
+                <thead>
+                  <tr style={{marginBottom: "20px"}}>
+                    <th>Appointment ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Identity Number</th>
+                    <th>Telephone</th>
+                    <th>Gender</th>
+                    <th style={{textAlign: "center"}}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      <tr>
+                        {patients.length > 0 ? patients.map((item) => (
+                          <>
+                        <td>{item._id}</td>
+                        <td>{item.firstname}</td>
+                        <td>{item.lastname}</td>
+                        <td>{item.identity_no}</td>
+                        <td>{item.telephone}</td>
+                        <td>{item.gender}</td>
+                        <td>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}}>Test</p>
+                          <p className="editP" style={{backgroundColor: "#11b8cc"}}>pending</p>
                         </div>
                       </td>
-                  </tr>
-                )) : null}
-              </tbody>
-            </table>
-            : 
-            <div className="noData">
-            <p className="txtNo">No Suspended Account</p>
-          </div>
-            }
+                        </>
+                        )) : null}
+                    </tr>
+                </tbody>
+              </table>
           </CardBody>
         </Card>
       </GridItem>

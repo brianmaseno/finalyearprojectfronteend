@@ -9,7 +9,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import './case.css'
+import './prescription.css'
 
 const styles = {
   cardCategoryWhite: {
@@ -43,7 +43,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function CaseNotes() {
+export default function Prescription() {
   const classes = useStyles();
 
   return (
@@ -51,26 +51,47 @@ export default function CaseNotes() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>Adding Case Notes</h4>
+            <h4 className={classes.cardTitleWhite}>Adding Prescription</h4>
             <p className={classes.cardCategoryWhite}>
-              Case Notes
+              Prescription
             </p>
           </CardHeader>
           <CardBody>
-            <div className="caseOuter">
-              <div className="caseContainer">
+            <div className="presOuter">
+              <div className="presContainer">
                 <div className="caseId">
                   <label className="idC">Patient ID*</label>
                   <input placeholder="Patient ID" className="inCase"/>
                 </div>
                 <div className="caseText">
-                  <label className="noteC">Add Notes</label>
-                  <textarea className="txtC" placeholder="Add notes">
+                  <label className="noteC"></label>
+                  <table className="tablePres">
+                    <tr>
+                      <th className="headPres">Drug</th>
+                      <th className="headPres">No. of Days</th>
+                      <th className="headPres">Usage Per Day</th>
+                      <th className="headPres">Notes</th>
+                    </tr>
+                    <tr>
+                      <td className="bodyPres">
+                        <input placeholder="Enter Drug" className="presIn"/>
+                      </td>
+                      <td className="bodyPres">
+                        <input placeholder="Enter Days" className="presIn"/>
+                      </td>
+                      <td className="bodyPres">
+                        <input placeholder="Usage Per Day" className="presIn"/>
+                      </td>
+                      <td className="bodyPres">
+                        <textarea placeholder="Notes" className="presIn">
 
-                  </textarea>
+                        </textarea>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave">Save Notes</button>
+                  <button className="caseSave">Add Prescription</button>
                   <button className="caseCancel">Cancel</button>
                 </div>
               </div>

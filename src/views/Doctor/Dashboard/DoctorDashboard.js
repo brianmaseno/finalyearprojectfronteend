@@ -39,6 +39,7 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
+import { useDataStatus } from "hooks/useDataStatus";
 
 const useStyles = makeStyles(styles);
 
@@ -48,6 +49,7 @@ export default function DoctorDashboard() {
   const [pending, setPending] = useState([])
   const [approved, setApproved] = useState([])
   const [blocked, setBlocked] = useState([])
+  const { loading } = useDataStatus(rows);
 
   useEffect(() => {
     fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
@@ -139,37 +141,71 @@ export default function DoctorDashboard() {
         </GridItem>
       </GridContainer>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
+        <GridItem xs={12} sm={12} md={12}>
           <Card>
-            <CardHeader color="danger">
+            <CardHeader color="info">
               <h4 className={classes.cardTitleWhite}>Pending Appointments</h4>
               <p className={classes.cardCategoryWhite}>
-                All pending appointments since 10th October, 2021
+                All Pending appointments since 10th October, 2021
               </p>
             </CardHeader>
             <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
-              />
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={6}>
-          <Card>
-            <CardHeader color="success">
-              <h4 className={classes.cardTitleWhite}>Approved Appointments</h4>
-              <p className={classes.cardCategoryWhite}>
-                All approved appointments since 10th October, 2021
-              </p>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
-              />
+              <div className="searchOut">
+                <div className="searchCont">
+                  <input type="text" className="searchInput" placeholder="Search Appointment"/>
+                  <button className="btnSearch">Search</button>
+                </div>
+              </div>
+              {loading ?
+              <table className="styled-table">
+                <thead>
+                  <tr style={{marginBottom: "20px"}}>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Qualification</th>
+                    <th>Status</th>
+                    <th style={{textAlign: "center"}}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows ? rows.map((item) => (
+                      <tr>
+                        <td>{item._id}</td>
+                        <td>{item.firstname}</td>
+                        <td>{item.lastname}</td>
+                        <td>{item.username}</td>
+                        <td>{item.qualification}</td>
+                        <td>{item.status}</td>
+                        <td>
+                          <div className="editContainer">
+                            <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
+                              fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/suspend?username=${item.username}`)
+                              .then(response => response.json())
+                              .then((data) => {
+                                  if (data.message == "Suspended") {
+                                    toast.success("Account Suspended");
+                                    setUpdated(true);
+                                    console.log("Suspended")
+                                  }
+                                  else{
+                                    toast.error("Account Not Suspended");
+                                    setUpdated(false)
+                                  }
+                              })
+                              }}>Approve</p>
+                          </div>
+                        </td>
+                    </tr>
+                  )) : null}
+                </tbody>
+              </table>
+              : 
+                <div className="noData">
+                <p className="txtNo">No Pending Appointment</p>
+              </div>
+              }
             </CardBody>
           </Card>
         </GridItem>

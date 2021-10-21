@@ -73,7 +73,7 @@ export default function LabDashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Total Lab Results</p>
+              <p className={classes.cardCategory}>Total Lab Tests</p>
               <h3 className={classes.cardTitle}>
                 {rows ? rows.length : 0} <small></small>
               </h3>
@@ -92,7 +92,7 @@ export default function LabDashboard() {
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Pending Accounts</p>
+              <p className={classes.cardCategory}>Total Patients</p>
               <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -109,7 +109,7 @@ export default function LabDashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Blocked Accounts</p>
+              <p className={classes.cardCategory}>Pending Requests</p>
               <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -126,7 +126,7 @@ export default function LabDashboard() {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Activated Accounts</p>
+              <p className={classes.cardCategory}>Total Tests Done</p>
               <h3 className={classes.cardTitle}>{approved ? approved.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -142,9 +142,9 @@ export default function LabDashboard() {
         <GridItem xs={12} sm={12} md={12}>
           <Card>
             <CardHeader color="info">
-              <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
+              <h4 className={classes.cardTitleWhite}>Completed Tests</h4>
               <p className={classes.cardCategoryWhite}>
-                All employees since 10th October, 2021
+                Tests done since 10th October, 2021
               </p>
             </CardHeader>
             <CardBody>

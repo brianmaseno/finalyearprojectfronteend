@@ -12,6 +12,8 @@ import CardBody from "components/Card/CardBody.js";
 import './editaccount.css';
 import { useAccountStatus } from "hooks/useAccountStatus";
 import { useDataStatus } from "hooks/useDataStatus";
+import { useUpdatedStaff } from "hooks/useUpdateStaff";
+import { ToastContainer, toast } from "react-toastify";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,11 +49,17 @@ const useStyles = makeStyles(styles);
 
 export default function EditAccounts() {
   const classes = useStyles();
+  const [username, setUsername] = useState("");
+  const [updated, setUpdated] = useState(false)
+  const [newData, setNewData] = useState([])
   const { data } = useAccountStatus("activated");
   const { loading } = useDataStatus(data);
 
+  const message = `Account suspended successfully`;
+
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
       <div className="path">
         <p className="pathName">Dashboard / <span>Activated Accounts</span></p>
@@ -97,7 +105,21 @@ export default function EditAccounts() {
                       <td>{item.status}</td>
                       <td>
                         <div className="editContainer">
-                          <p className="editP">Suspend</p>
+                          <p className="editP" onClick={() => {
+                            fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/suspend?username=${item.username}`)
+                            .then(response => response.json())
+                            .then((data) => {
+                                if (data.message == "Suspended") {
+                                  toast.success("Account Suspended");
+                                  setUpdated(true);
+                                  console.log("Suspended")
+                                }
+                                else{
+                                  toast.error("Account Not Suspended");
+                                  setUpdated(false)
+                                }
+                            })
+                            }}>Suspend</p>
                         </div>
                       </td>
                   </tr>

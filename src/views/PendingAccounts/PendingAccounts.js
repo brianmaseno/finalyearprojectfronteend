@@ -12,6 +12,8 @@ import CardBody from "components/Card/CardBody.js";
 import './PendingAccounts.css';
 import { useAccountStatus } from "hooks/useAccountStatus";
 import { useDataStatus } from "hooks/useDataStatus";
+import { ToastContainer, toast } from "react-toastify";
+import ReactLoading from 'react-loading';
 
 const styles = {
   cardCategoryWhite: {
@@ -50,8 +52,11 @@ export default function PendingAccounts() {
   const { data } = useAccountStatus("pending");
   const { loading } = useDataStatus(data);
 
+  console.log(loading)
+
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
       <div className="path">
         <p className="pathName">Dashboard / <span>Pending Accounts</span></p>
@@ -73,7 +78,8 @@ export default function PendingAccounts() {
                 <button className="btnSearch">Search</button>
               </div>
             </div>
-            {loading ?
+            {!loading ? <div className="noData"><br /><ReactLoading type="spinningBubbles" color="#11b8cc" height={30} width={30} /></div> : <>
+            {data.length > 0 ? <>
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
@@ -87,8 +93,9 @@ export default function PendingAccounts() {
                 </tr>
               </thead>
               <tbody>
-                {data ? data.map((item) => (
                     <tr>
+                      {data.length > 0 ? data.map((item) => (
+                        <>
                       <td>{item._id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.lastname}</td>
@@ -97,17 +104,34 @@ export default function PendingAccounts() {
                       <td>{item.status}</td>
                       <td>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "green"}}>Activate</p>
+                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
+                            fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/activate?username=${item.username}`)
+                            .then(response => response.json())
+                            .then((data) => {
+                                if (data.message == "Activated") {
+                                  toast.success("Account Activated");
+                                  console.log("Activated")
+                                }
+                                else{
+                                  toast.error("Account Not Activated");
+                                }
+                            })
+                            }}>Activate</p>
                         </div>
                       </td>
+                      </>
+                      )) : null}
                   </tr>
-                )) : null}
               </tbody>
             </table>
+            ))
+            </>
             : 
-              <div className="noData">
+            <div className="noData">
               <p className="txtNo">No Pending Accounts</p>
             </div>
+            }
+            </>
             }
           </CardBody>
         </Card>

@@ -49,7 +49,7 @@ export default function Dashboard() {
   const rows = useAllStaff();
   const pending = useStatus("pending");
   const approved = useStatus("activated");
-  const blocked = useStatus("blocked");
+  const blocked = useStatus("suspended");
   
 
   return (

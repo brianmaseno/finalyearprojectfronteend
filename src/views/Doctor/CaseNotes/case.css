@@ -1,0 +1,84 @@
+.caseOuter{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.caseContainer{
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  margin-bottom: 10px;
+}
+
+.caseId{
+  display: flex;
+  flex-direction: row;
+
+}
+
+.idC{
+  width: 100px;
+  margin-right: 10px;
+  font-weight: bold;
+
+}
+
+.inCase{
+  padding: 10px;
+  width: 100%;
+  font-weight: bold;
+
+}
+
+.caseText{
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+
+}
+
+.noteC{
+  width: 100px;
+  margin-right: 10px;
+  font-weight: bold;
+
+}
+
+.txtC{
+  padding: 10px;
+  width: 100%;
+  font-weight: bold;
+  height: 150px;
+
+}
+
+.caseFooter{
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  margin-left: 95px;
+
+}
+
+.caseSave{
+  background-color: green;
+  color: white;
+  font-weight: bold;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+
+}
+
+.caseCancel{
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid black;
+  margin-left: 10px;
+  cursor: pointer;
+
+}

@@ -6,13 +6,13 @@ export const useDataStatus = (data) => {
   const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-      if (data.length > 0) {
-        setLoading(true);
+      if (data == null) {
+        setLoading(false);
       }
       else{
-        setLoading(false)
+        setLoading(true)
       }
-    }, [data])
+    }, [])
 
     return { loading }
 

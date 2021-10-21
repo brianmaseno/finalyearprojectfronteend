@@ -39,31 +39,15 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
+import { usePatients } from "hooks/usePatients";
 
 const useStyles = makeStyles(styles);
 
 export default function ReceptionistDashboard() {
   const classes = useStyles();
   const [rows, setRows] = useState([])
-  const [pending, setPending] = useState([])
-  const [approved, setApproved] = useState([])
-  const [blocked, setBlocked] = useState([])
+  const { patients } = usePatients();
 
-  useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
-          .then(response => response.json())
-          .then((data) => {
-              if (data.message == "Found") {
-                  setRows(data.data);
-                  setPending(rows.filter((row) => (row.status == "pending")));
-                  setApproved(rows.filter((row) => (row.status == "activated")));
-                  setBlocked(rows.filter((row) => (row.status == "suspended")));
-              }
-              else{
-                  console.log("no data");
-              }
-          })
-  }, [])
   return (
     <div>
       <GridContainer>
@@ -75,7 +59,7 @@ export default function ReceptionistDashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Total Patients</p>
               <h3 className={classes.cardTitle}>
-                {rows ? rows.length : 0} <small></small>
+                {patients ? patients.length : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -93,7 +77,7 @@ export default function ReceptionistDashboard() {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Pending Appointments</p>
-              <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{patients ? patients.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -110,7 +94,7 @@ export default function ReceptionistDashboard() {
                 <Icon>info_outline</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Cancelled Appointments</p>
-              <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{patients ? patients.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -127,7 +111,7 @@ export default function ReceptionistDashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Approved Appointments</p>
-              <h3 className={classes.cardTitle}>{approved ? approved.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{patients ? patients.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -148,11 +132,57 @@ export default function ReceptionistDashboard() {
               </p>
             </CardHeader>
             <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
-              />
+              <div className="searchOut">
+                <div className="searchCont">
+                  <input type="text" className="searchInput" placeholder="Search Patient"/>
+                  <button className="btnSearch">Search</button>
+                </div>
+              </div>
+              <table className="styled-table">
+                <thead>
+                  <tr style={{marginBottom: "20px"}}>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Identity Number</th>
+                    <th>Telephone</th>
+                    <th>Gender</th>
+                    <th style={{textAlign: "center"}}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      <tr>
+                        {patients.length > 0 ? patients.map((item) => (
+                          <>
+                        <td>{item._id}</td>
+                        <td>{item.firstname}</td>
+                        <td>{item.lastname}</td>
+                        <td>{item.identity_no}</td>
+                        <td>{item.telephone}</td>
+                        <td>{item.gender}</td>
+                        <td>
+                        <div className="editContainer">
+                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
+                            fetch(``)
+                            .then(response => response.json())
+                            .then((data) => {
+                                if (data.message == "Activated") {
+                                  toast.success("Account Activated");
+                                  console.log("Activated")
+                                }
+                                else{
+                                  toast.error("Account Not Activated");
+                                  setUpdated(false)
+                                }
+                            })
+                            }}>Delete</p>
+                        </div>
+                      </td>
+                        </>
+                        )) : null}
+                    </tr>
+                </tbody>
+              </table>
             </CardBody>
           </Card>
         </GridItem>

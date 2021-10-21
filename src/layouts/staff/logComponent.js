@@ -43,7 +43,7 @@ export default function LogComponent() {
                   setUser(data.data)
                   sessionStorage.setItem("user", data.data.username)
                   sessionStorage.setItem("status", data.data.status)
-                  setCurrentUser(data.data.status);
+                  setCurrentUser(data.data);
 
                   if (data.data.access_level == "Doctor") {
                     history.push('/doctor');

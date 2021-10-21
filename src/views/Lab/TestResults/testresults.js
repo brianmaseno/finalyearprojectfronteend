@@ -46,7 +46,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function SuspendedAccounts() {
+export default function TestResults() {
   const classes = useStyles();
   const { data } = useAccountStatus("suspended");
   const { loading } = useDataStatus(data);
@@ -56,22 +56,22 @@ export default function SuspendedAccounts() {
     <ToastContainer />
     <div className="pathCont">
       <div className="path">
-        <p className="pathName">Dashboard / <span>Suspended Accounts</span></p>
+        <p className="pathName">Dashboard / <span>Test Results</span></p>
       </div>
     </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>All Suspended Employees Accounts</h4>
+            <h4 className={classes.cardTitleWhite}>Add Test Results</h4>
             <p className={classes.cardCategoryWhite}>
-              All Suspended Accounts details
+              Test Results
             </p>
           </CardHeader>
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Employee"/>
+                <input type="text" className="searchInput" placeholder="Search Patient"/>
                 <button className="btnSearch">Search</button>
               </div>
             </div>
@@ -79,12 +79,9 @@ export default function SuspendedAccounts() {
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
-                  <th>ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Username</th>
-                  <th>Qualification</th>
-                  <th>Status</th>
+                  <th>Patient ID</th>
+                  <th>Test</th>
+                  <th>Results</th>
                   <th style={{textAlign: "center"}}>Action</th>
                 </tr>
               </thead>
@@ -93,26 +90,15 @@ export default function SuspendedAccounts() {
                     <tr>
                       <td>{item._id}</td>
                       <td>{item.firstname}</td>
-                      <td>{item.lastname}</td>
-                      <td>{item.username}</td>
-                      <td>{item.qualification}</td>
-                      <td>{item.status}</td>
+                      <td>
+                        <div>
+                          <textarea placeholder="Enter Result" className="patInput">
+                          </textarea>
+                        </div>
+                      </td>
                       <td>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/activate?username=${item.username}`)
-                            .then(response => response.json())
-                            .then((data) => {
-                                if (data.message == "Activated") {
-                                  toast.success("Account Activated");
-                                  console.log("Activated")
-                                }
-                                else{
-                                  toast.error("Account Not Activated");
-                                  setUpdated(false)
-                                }
-                            })
-                            }}>Restore</p>
+                          <p className="editP" style={{backgroundColor: "#11b8cc"}}>Submit</p>
                         </div>
                       </td>
                   </tr>
