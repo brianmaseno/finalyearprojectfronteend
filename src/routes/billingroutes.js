@@ -17,6 +17,7 @@ import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
 import EditAccounts from "views/EditAccounts/EditAccounts";
 import BillingDashboard from "views/Billing/Dashboard/BillingDashboard";
 import MakePayment from "views/Billing/Payments/MakePayment";
+import BillingReports from "views/Reports/Billing/billingreports";
 //import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 //import RTLPage from "views/RTLPage/RTLPage.js";
@@ -39,19 +40,11 @@ const BillingRoutes = [
     layout: "/billing",
   },
   {
-    path: "/payments",
-    name: "Payments",
-    rtlName: "إخطارات",
-    icon: "error",
-    component: SuspendedAccounts,
-    layout: "/billing",
-  },
-  {
     path: "/billingreports",
     name: "Billing Reports",
     rtlName: "إخطارات",
     icon: "error",
-    component: SuspendedAccounts,
+    component: BillingReports,
     layout: "/billing",
   },
   {

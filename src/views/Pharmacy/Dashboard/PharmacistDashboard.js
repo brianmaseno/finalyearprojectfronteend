@@ -67,13 +67,13 @@ export default function PharmacistDashboard() {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} sm={6} md={3}>
+        <GridItem xs={12} sm={6} md={4}>
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Drugs Dispensed</p>
+              <p className={classes.cardCategory}>Total Drugs</p>
               <h3 className={classes.cardTitle}>
                 {rows ? rows.length : 0} <small></small>
               </h3>
@@ -86,13 +86,13 @@ export default function PharmacistDashboard() {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
+        <GridItem xs={12} sm={6} md={4}>
           <Card>
             <CardHeader color="success" stats icon>
               <CardIcon color="success">
                 <Store />
               </CardIcon>
-              <p className={classes.cardCategory}>Pending Accounts</p>
+              <p className={classes.cardCategory}>Drugs Dispensed</p>
               <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -103,13 +103,13 @@ export default function PharmacistDashboard() {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
+        <GridItem xs={12} sm={6} md={4}>
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Blocked Accounts</p>
+              <p className={classes.cardCategory}>Prescribed Drugs</p>
               <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -120,31 +120,14 @@ export default function PharmacistDashboard() {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
-          <Card>
-            <CardHeader color="info" stats icon>
-              <CardIcon color="info">
-                <Accessibility />
-              </CardIcon>
-              <p className={classes.cardCategory}>Activated Accounts</p>
-              <h3 className={classes.cardTitle}>{approved ? approved.length : 0}</h3>
-            </CardHeader>
-            <CardFooter stats>
-              <div className={classes.stats}>
-                <Update />
-                Just Updated
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
       </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card>
             <CardHeader color="info">
-              <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
+              <h4 className={classes.cardTitleWhite}>Dispensed Drugs</h4>
               <p className={classes.cardCategoryWhite}>
-                All employees since 10th October, 2021
+                All Dispensed Drugs since 10th October, 2021
               </p>
             </CardHeader>
             <CardBody>

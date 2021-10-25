@@ -125,7 +125,7 @@ export default function BillingDashboard() {
         <GridItem xs={12} sm={12} md={12}>
           <Card>
             <CardHeader color="info">
-              <h4 className={classes.cardTitleWhite}>All Payments</h4>
+              <h4 className={classes.cardTitleWhite}>Completed Payments</h4>
               <p className={classes.cardCategoryWhite}>
                 All payments since 10th October, 2021
               </p>
@@ -133,7 +133,7 @@ export default function BillingDashboard() {
             <CardBody>
               <Table
                 tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Qualification", "County"]}
+                tableHead={["Patient ID", "First Name", "Last Name", "Amount"]}
                 tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
               />
             </CardBody>

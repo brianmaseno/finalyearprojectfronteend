@@ -13,6 +13,7 @@ import { useAccountStatus } from "hooks/useAccountStatus";
 import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
+const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -50,6 +51,22 @@ export default function LabRequests() {
   const classes = useStyles();
   const { data } = useAccountStatus("suspended");
   const { loading } = useDataStatus(data);
+  const [test, setTest] = useState([])
+
+  useEffect(() => {
+    axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests`)
+      .then((data) => {
+          if (data.data.message == "Requests Found") {
+            setTest(data.data.data)
+          }
+          else{
+            console.log("Not Found")
+          }                
+      })
+      .catch((error) => {
+          console.log(error);
+      });
+  }, [])
 
   return (
     <>
@@ -75,31 +92,37 @@ export default function LabRequests() {
                 <button className="btnSearch">Search</button>
               </div>
             </div>
-            {loading ? 
+            {test.length > 0 ? 
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
                   <th>Patient ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
+                  <th>Doctor ID</th>
                   <th>Test</th>
-                  <th>Qualification</th>
-                  <th>Status</th>
                   <th style={{textAlign: "center"}}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {data.length > 0 ? data.map((item) => (
+                {test.length > 0 ? test.map((item) => (
                     <tr>
-                      <td>{item._id}</td>
-                      <td>{item.firstname}</td>
-                      <td>{item.lastname}</td>
-                      <td>{item.username}</td>
-                      <td>{item.qualification}</td>
-                      <td>{item.status}</td>
+                      <td>{item.patient_id}</td>
+                      <td>{item.staff_id}</td>
+                      <td>{item.test_name}</td>
                       <td>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}}>Test</p>
+                          <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
+                            console.log(item.lab_test_id)
+                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/treatment/labrequest/approve?lab_test_id=${item.lab_test_id}`)
+                                .then(response => response.json())
+                                .then((data) => {
+                                    if (data.message == "Approved Successfully") {
+                                      console.log("Approved")
+                                    }
+                                    else{
+                                      console.log("Not Approved")
+                                    }
+                                })
+                                }}>Confirm</p>
                         </div>
                       </td>
                   </tr>
@@ -108,7 +131,7 @@ export default function LabRequests() {
             </table>
             : 
             <div className="noData">
-            <p className="txtNo">No Suspended Account</p>
+            <p className="txtNo">No Pending Test Requests</p>
           </div>
             }
           </CardBody>

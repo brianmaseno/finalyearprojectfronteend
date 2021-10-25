@@ -14,6 +14,7 @@ import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
 import { usePatients } from "hooks/usePatients";
+import { useAppointments } from "hooks/useAppointments";
 
 const styles = {
   cardCategoryWhite: {
@@ -50,6 +51,7 @@ const useStyles = makeStyles(styles);
 export default function ApprovedAppointments() {
   const classes = useStyles();
   const { patients } = usePatients();
+  const approved = useAppointments("activated");
 
   return (
     <>
@@ -79,32 +81,28 @@ export default function ApprovedAppointments() {
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
                     <th>Appointment ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Identity Number</th>
-                    <th>Telephone</th>
-                    <th>Gender</th>
+                    <th>Appointment Date</th>
+                    <th>Patient ID</th>
+                    <th>Clinician ID</th>
+                    <th>Department ID</th>
                     <th style={{textAlign: "center"}}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
+                {approved.data.length > 0 ? approved.data.map((item) => (
                       <tr>
-                        {patients.length > 0 ? patients.map((item) => (
-                          <>
                         <td>{item._id}</td>
-                        <td>{item.firstname}</td>
-                        <td>{item.lastname}</td>
-                        <td>{item.identity_no}</td>
-                        <td>{item.telephone}</td>
-                        <td>{item.gender}</td>
+                        <td>{item.appointment_due_date}</td>
+                        <td>{item.patient_id}</td>
+                        <td>{item.doctor_id}</td>
+                        <td>{item.department_id}</td>
                         <td>
                         <div className="editContainer">
-                          <p className="editP" style={{backgroundColor: "#11b8cc"}}>pending</p>
+                          <p className="editP" style={{backgroundColor: "#11b8cc"}}>approved</p>
                         </div>
                       </td>
-                        </>
-                        )) : null}
                     </tr>
+                    )) : null}
                 </tbody>
               </table>
           </CardBody>

@@ -17,6 +17,8 @@ import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
 import EditAccounts from "views/EditAccounts/EditAccounts";
 import PharmacistDashboard from "views/Pharmacy/Dashboard/PharmacistDashboard";
 import PrescribedDrugs from "views/Pharmacy/PrescribedDrugs/PrescribedDrugs";
+import DrugReports from "views/Reports/Drugs/drugreport";
+import DispensedDrugs from "views/Pharmacy/DispensedDrugs/dispenseddrugs";
 //import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
 // core components/views for RTL layout
 //import RTLPage from "views/RTLPage/RTLPage.js";
@@ -43,7 +45,7 @@ const PharmacistRoutes = [
     name: "Dispensed Drugs",
     rtlName: "إخطارات",
     icon: "error",
-    component: SuspendedAccounts,
+    component: DispensedDrugs,
     layout: "/pharmacist",
   },
   {
@@ -51,7 +53,7 @@ const PharmacistRoutes = [
     name: "Drugs Report",
     rtlName: "إخطارات",
     icon: "error",
-    component: SuspendedAccounts,
+    component: DrugReports,
     layout: "/pharmacist",
   },
   {

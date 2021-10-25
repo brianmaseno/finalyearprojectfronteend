@@ -40,26 +40,27 @@ import {
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { useDataStatus } from "hooks/useDataStatus";
+import { useDoctorAppointments } from "hooks/useDoctorAppointments";
+import { useAuth } from "hooks/AuthProvider";
+import { usePatients } from "hooks/usePatients";
 
 const useStyles = makeStyles(styles);
 
 export default function DoctorDashboard() {
   const classes = useStyles();
-  const [rows, setRows] = useState([])
+  const { currentUser } = useAuth()
   const [pending, setPending] = useState([])
-  const [approved, setApproved] = useState([])
-  const [blocked, setBlocked] = useState([])
-  const { loading } = useDataStatus(rows);
+  const approved = useDoctorAppointments("approved", currentUser.national_id)
+  const pendingData = useDoctorAppointments("pending", currentUser.national_id)
+  const cancelled = useDoctorAppointments("cancelled", currentUser.national_id)
+  const { patients } = usePatients()
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
-                  setRows(data.data);
-                  setPending(rows.filter((row) => (row.status == "pending")));
-                  setApproved(rows.filter((row) => (row.status == "activated")));
-                  setBlocked(rows.filter((row) => (row.status == "suspended")));
+                  setPending(data.data);
               }
               else{
                   console.log("no data");
@@ -77,7 +78,7 @@ export default function DoctorDashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Total Appointments</p>
               <h3 className={classes.cardTitle}>
-                {rows ? rows.length : 0} <small></small>
+                {patients ? patients.length : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -95,7 +96,7 @@ export default function DoctorDashboard() {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Pending Appointments</p>
-              <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{pendingData.data ? pendingData.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -111,8 +112,8 @@ export default function DoctorDashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Complete Appointments</p>
-              <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
+              <p className={classes.cardCategory}>Cancelled Appointments</p>
+              <h3 className={classes.cardTitle}>{cancelled.data ? cancelled.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -129,7 +130,7 @@ export default function DoctorDashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Approved Appointments</p>
-              <h3 className={classes.cardTitle}>{approved ? approved.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{approved.data ? approved.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -156,49 +157,44 @@ export default function DoctorDashboard() {
                   <button className="btnSearch">Search</button>
                 </div>
               </div>
-              {loading ?
+              {pending.length > 0 ?
               <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                    <th>Qualification</th>
-                    <th>Status</th>
+                    <th>Appointment ID</th>
+                    <th>Appointment Date</th>
+                    <th>Patient ID</th>
+                    <th>Clinician ID</th>
+                    <th>Department ID</th>
                     <th style={{textAlign: "center"}}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rows ? rows.map((item) => (
-                      <tr>
-                        <td>{item._id}</td>
-                        <td>{item.firstname}</td>
-                        <td>{item.lastname}</td>
-                        <td>{item.username}</td>
-                        <td>{item.qualification}</td>
-                        <td>{item.status}</td>
-                        <td>
-                          <div className="editContainer">
-                            <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
-                              fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/suspend?username=${item.username}`)
-                              .then(response => response.json())
-                              .then((data) => {
-                                  if (data.message == "Suspended") {
-                                    toast.success("Account Suspended");
-                                    setUpdated(true);
-                                    console.log("Suspended")
-                                  }
-                                  else{
-                                    toast.error("Account Not Suspended");
-                                    setUpdated(false)
-                                  }
-                              })
-                              }}>Approve</p>
-                          </div>
-                        </td>
-                    </tr>
-                  )) : null}
+                {pending ? pending.map((item) => (
+                        <tr>
+                          <td>{item._id}</td>
+                          <td>{item.appointment_due_date}</td>
+                          <td>{item.patient_id}</td>
+                          <td>{item.doctor_id}</td>
+                          <td>{item.department_id}</td>
+                          <td>
+                            <div className="editContainer">
+                              <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
+                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/approve?appointment_id=${item.appointment_id}`)
+                                .then(response => response.json())
+                                .then((data) => {
+                                    if (data.message == "Appointment Approved Successfully") {
+                                      console.log("Approved")
+                                    }
+                                    else{
+                                      console.log("Not")
+                                    }
+                                })
+                                }}>Approve</p>
+                            </div>
+                          </td>
+                      </tr>
+                    )) : null}
                 </tbody>
               </table>
               : 

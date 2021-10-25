@@ -40,13 +40,17 @@ import {
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { usePatients } from "hooks/usePatients";
+import { useAppointments } from "hooks/useAppointments";
+const axios = require('axios').default;
 
 const useStyles = makeStyles(styles);
 
 export default function ReceptionistDashboard() {
   const classes = useStyles();
-  const [rows, setRows] = useState([])
   const { patients } = usePatients();
+  const pending = useAppointments("pending");
+  const approved = useAppointments("approved");
+  const cancelled = useAppointments("cancelled");
 
   return (
     <div>
@@ -77,7 +81,7 @@ export default function ReceptionistDashboard() {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Pending Appointments</p>
-              <h3 className={classes.cardTitle}>{patients ? patients.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{pending ? pending.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -93,8 +97,8 @@ export default function ReceptionistDashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Cancelled Appointments</p>
-              <h3 className={classes.cardTitle}>{patients ? patients.length : 0}</h3>
+              <p className={classes.cardCategory}>Cancelled Appointment</p>
+              <h3 className={classes.cardTitle}>{cancelled ? cancelled.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -111,7 +115,7 @@ export default function ReceptionistDashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Approved Appointments</p>
-              <h3 className={classes.cardTitle}>{patients ? patients.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{approved ? approved.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -151,9 +155,8 @@ export default function ReceptionistDashboard() {
                   </tr>
                 </thead>
                 <tbody>
+                {patients.length > 0 ? patients.map((item) => (
                       <tr>
-                        {patients.length > 0 ? patients.map((item) => (
-                          <>
                         <td>{item._id}</td>
                         <td>{item.firstname}</td>
                         <td>{item.lastname}</td>
@@ -163,24 +166,23 @@ export default function ReceptionistDashboard() {
                         <td>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            fetch(``)
-                            .then(response => response.json())
+                            axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/DeletePatientbyId?patient_id=${item.identity_no}`)
                             .then((data) => {
-                                if (data.message == "Activated") {
-                                  toast.success("Account Activated");
-                                  console.log("Activated")
+                                if (data.data.message == "Deleted") {
+                                  console.log("Deleted")
                                 }
                                 else{
-                                  toast.error("Account Not Activated");
-                                  setUpdated(false)
-                                }
+                                  console.log("Not Deleted")
+                                }                
                             })
+                            .catch((error) => {
+                                console.log(error);
+                            });
                             }}>Delete</p>
                         </div>
                       </td>
-                        </>
-                        )) : null}
                     </tr>
+                    )) : null}
                 </tbody>
               </table>
             </CardBody>

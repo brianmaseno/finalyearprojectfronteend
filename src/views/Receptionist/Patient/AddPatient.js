@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -9,6 +9,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+const axios = require('axios').default;
 import './styles/add.css';
 
 const styles = {
@@ -45,6 +46,104 @@ const useStyles = makeStyles(styles);
 
 export default function AddPatient() {
   const classes = useStyles();
+  const [showNok, setShowNok] = useState(false);
+
+  //patient
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [county, setCounty] = useState("");
+  const [age, setAge] = useState("");
+  const [identityNumber, setIdentityNumber] = useState("");
+  const [subCounty, setSubCounty] = useState("");
+  const [village, setVillage] = useState("");
+  const [gender, setGender] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [temperature, setTemperature] = useState("");
+  const [pressure, setPressure] = useState("");
+
+  const addPatient = (e) => {
+    e.preventDefault();
+
+    const details = {
+        firstname: firstname,
+        lastname: lastname,
+        gender: gender,
+        age: age,
+        village: village,
+        telephone: telephone,
+        county: county,
+        sub_county: subCounty,
+        identityNo: identityNumber,
+        weight: weight,
+        height: height,
+        temperature: temperature,
+        pressure: pressure
+
+    }
+
+    axios({
+        method: 'post',
+        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/register',
+        data: details})
+        .then((data) => {
+            if (data.data.message == "Inserted Successfully") {
+                console.log("inserted")
+                setShowNok(true);
+            }
+            else{
+                console.log("Not Inserted")
+            }                
+        })
+        .catch((error) => {
+            console.log(error);
+    });
+}
+
+  //next of kin
+  const [kinFirstname, setKinFirstname] = useState("");
+  const [kinLastname, setKinLastname] = useState("");
+  const [kinCounty, setKinCounty] = useState("");
+  const [kinSubCounty, setKInSubCounty] = useState("");
+  const [kinVillage, setKinVillage] = useState("");
+  const [patientID, setPatientID] = useState("");
+  const [kinID, setKinID] = useState("");
+  const [kinPhoneNumber, setKinPhoneNumber] = useState("");
+  const [kinGender, setKinGender] = useState("");
+
+  const addNextOfKin = (e) => {
+    e.preventDefault();
+
+    const details = {
+        firstname: kinFirstname,
+        lastname: kinLastname,
+        gender: kinGender,
+        village: kinVillage,
+        telephone: kinPhoneNumber,
+        county: kinCounty,
+        sub_county: kinSubCounty,
+        national_id: kinID,
+        patientId: patientID
+    }
+
+    axios({
+        method: 'post',
+        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/register/nok',
+        data: details})
+        .then((data) => {
+            if (data.data.message == "Inserted Successfully") {
+                console.log("inserted")
+            }
+            else{
+                console.log("Not Inserted")
+            }                
+        })
+        .catch((error) => {
+            console.log(error);
+    });
+}
+
 
   return (
     <GridContainer>
@@ -62,12 +161,12 @@ export default function AddPatient() {
                 <div class="patBody">
                   <div class="patColumn">
                     <div class="patRow">
-                      <input type="text" placeholder="Enter First Name" class="patInput"/>
-                      <input type="text" placeholder="Enter Last Name" class="patInput"/>
-                      <input type="text" placeholder="Enter Age" class="patInput"/>
+                      <input type="text" required placeholder="Enter First Name" class="patInput" onChange={(e) => setFirstname(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Last Name" class="patInput" onChange={(e) => setLastname(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Age" class="patInput" onChange={(e) => setAge(e.target.value)}/>
                     </div>
                     <div class="patRow">
-                      <select class="patInput">
+                      <select class="patInput" onChange={(e) => setCounty(e.target.value)}>
                         <option class="opt">Select County...</option>
                         <option value="Baringo">Baringo</option>
                         <option value='Bomet'>Bomet</option>
@@ -117,28 +216,28 @@ export default function AddPatient() {
                         <option value='West Pokot'>West Pokot</option>
                         <option value='wajir'>wajir</option>
                       </select>
-                      <input type="text" placeholder="Sub-County" class="patInput"/>
-                      <input type="text" placeholder="Village" class="patInput"/>
+                      <input type="text" required placeholder="Sub-County" class="patInput" onChange={(e) => setSubCounty(e.target.value)}/>
+                      <input type="text" required placeholder="Village" class="patInput" onChange={(e) => setVillage(e.target.value)}/>
                     </div>
                     <div class="patRow">
-                      <input type="text" placeholder="National ID" class="patInput"/>
-                      <input type="text" placeholder="Phone Number" class="patInput"/>
-                      <select class="patInput">
+                      <input type="text" required placeholder="National ID" class="patInput" onChange={(e) => setIdentityNumber(e.target.value)}/>
+                      <input type="text" required placeholder="Phone Number" class="patInput" onChange={(e) => setTelephone(e.target.value)}/>
+                      <select class="patInput" onChange={(e) => setGender(e.target.value)}>
                         <option class="opt">Select Gender...</option>
-                        <option value="one" class="opt">Male</option>
-                        <option value="one" class="opt">Female</option>
+                        <option value="Male" class="opt">Male</option>
+                        <option value="Female" class="opt">Female</option>
                       </select>
                     </div>
                     <div class="patRow">
-                      <input type="text" placeholder="Enter Weight" class="patInput"/>
-                      <input type="text" placeholder="Enter Height" class="patInput"/>
-                      <input type="text" placeholder="Enter Temperature (in degrees celcius)" class="patInput"/>
+                      <input type="text" required placeholder="Enter Weight" class="patInput" onChange={(e) => setWeight(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Height" class="patInput" onChange={(e) => setHeight(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Temperature (in degrees celcius)" class="patInput" onChange={(e) => setTemperature(e.target.value)}/>
                     </div>
                     <div class="patRow">
-                      <input type="text" placeholder="Enter Blood Pressure" class="patInput"/>
+                      <input type="text" required placeholder="Enter Blood Pressure" class="patInput" onChange={(e) => setPressure(e.target.value)}/>
                     </div>
                     <div className="patRow">
-                      <button className="patBtn">Submit</button>
+                      <button className="patBtn" onClick={addPatient}>Submit</button>
                       </div>
                   </div>
                 </div>
@@ -147,6 +246,7 @@ export default function AddPatient() {
           </CardBody>
         </Card>
       </GridItem>
+      {showNok ? 
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
@@ -161,12 +261,12 @@ export default function AddPatient() {
                 <div class="patBody">
                   <div class="patColumn">
                     <div class="patRow">
-                      <input type="text" placeholder="Patient ID" class="patInput"/>
-                      <input type="text" placeholder="Enter Kin First Name" class="patInput"/>
-                      <input type="text" placeholder="Enter Kin Last Name" class="patInput"/>
+                      <input type="text" required placeholder="Patient ID" class="patInput" onChange={(e) => setPatientID(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Kin First Name" class="patInput" onChange={(e) => setKinFirstname(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Kin Last Name" class="patInput" onChange={(e) => setKinLastname(e.target.value)}/>
                     </div>
                     <div class="patRow">
-                      <select class="patInput">
+                      <select class="patInput" onChange={(e) => setKinCounty(e.target.value)}>
                         <option class="opt">Select Kin County...</option>
                         <option value="Baringo">Baringo</option>
                         <option value='Bomet'>Bomet</option>
@@ -216,20 +316,20 @@ export default function AddPatient() {
                         <option value='West Pokot'>West Pokot</option>
                         <option value='wajir'>wajir</option>
                       </select>
-                      <input type="text" placeholder="Kin Sub-County" class="patInput"/>
-                      <input type="text" placeholder="Kin Village" class="patInput"/>
+                      <input type="text" required placeholder="Kin Sub-County" class="patInput" onChange={(e) => setKInSubCounty(e.target.value)}/>
+                      <input type="text" required placeholder="Kin Village" class="patInput" onChange={(e) => setKinVillage(e.target.value)}/>
                     </div>
                     <div class="patRow">
-                      <input type="text" placeholder="Kin National ID" class="patInput"/>
-                      <input type="text" placeholder="Kin Phone Number" class="patInput"/>
-                      <select class="patInput">
+                      <input type="text" required placeholder="Kin National ID" class="patInput" onChange={(e) => setKinID(e.target.value)}/>
+                      <input type="text" required placeholder="Kin Phone Number" class="patInput" onChange={(e) => setKinPhoneNumber(e.target.value)}/>
+                      <select class="patInput" onChange={(e) => setKinGender(e.target.value)}>
                         <option class="opt">Select Kin Gender...</option>
-                        <option value="one" class="opt">Male</option>
-                        <option value="one" class="opt">Female</option>
+                        <option value="Male" class="opt">Male</option>
+                        <option value="Female" class="opt">Female</option>
                       </select>
                     </div>
                     <div className="patRow">
-                      <button className="patBtn">Submit</button>
+                      <button className="patBtn" onClick={addNextOfKin}>Submit</button>
                       </div>
                   </div>
                 </div>
@@ -238,6 +338,8 @@ export default function AddPatient() {
           </CardBody>
         </Card>
       </GridItem>
+      :
+      null }
     </GridContainer>
   );
 }

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -10,6 +10,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './results.css'
+const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -45,6 +46,26 @@ const useStyles = makeStyles(styles);
 
 export default function DoctorLabTestResults() {
   const classes = useStyles();
+  const [patientId, setPatientId] = useState("")
+  const [test, setTest] = useState([])
+
+  const checkPatient = (e) => {
+    e.preventDefault()
+
+    axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/patient?patient_id=${patientId}`)
+      .then((data) => {
+          if (data.data.message == "Requests Found") {
+            setTest(data.data.data)
+            console.log("Found")
+          }
+          else{
+            console.log("Not Found")
+          }                
+      })
+      .catch((error) => {
+          console.log(error);
+      });
+  }
 
   return (
     <GridContainer>
@@ -61,12 +82,13 @@ export default function DoctorLabTestResults() {
               <div className="caseContainer">
                 <div className="caseId">
                   <label className="idC">Patient ID*</label>
-                  <input placeholder="Patient ID" className="inCase"/>
+                  <input placeholder="Patient ID" className="inCase" onChange={(e) => setPatientId(e.target.value)}/>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave">Search</button>
+                  <button className="caseSave" onClick={checkPatient}>Search</button>
                   <button className="caseCancel">Cancel</button>
                 </div>
+                {test.length > 0 ? 
                 <div>
                   <div>
                     <table className="labTable">
@@ -74,23 +96,27 @@ export default function DoctorLabTestResults() {
                         <tr>
                           <th className="labH">Test ID</th>
                           <th className="labH">Patient ID</th>
-                          <th className="labH">Test</th>
+                          <th className="labH">Test Results</th>
                           <th className="labH">Date</th>
                           <th className="labH">Status</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td className="labD">12341234</td>
-                          <td className="labD">12341234</td>
-                          <td className="labD">end value has mixed support, consider using flex-end instead end value has mixed support, consider using flex-end instead end value has mixed support, consider using flex-end instead</td>
-                          <td className="labD">12/13/2021</td>
-                          <td className="labD">Checked</td>
+                        {test.map((item) => (
+                          <tr>
+                            <td className="labD">{item.lab_test_id}</td>
+                            <td className="labD">{item.patient_id}</td>
+                            <td className="labD">{item.test_results}</td>
+                            <td className="labD">{item.lab_test_date}</td>
+                            <td className="labD">Checked</td>
                         </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
+                :
+                null }
               </div>
             </div>
           </CardBody>

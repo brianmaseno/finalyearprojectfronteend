@@ -146,7 +146,7 @@ export default function Dashboard() {
               <Table
                 tableHeaderColor="info"
                 tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
+                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.national_id]))}
               />
               :
               <div className="noData">

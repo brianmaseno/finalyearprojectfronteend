@@ -9,6 +9,8 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import { usePatients } from "hooks/usePatients";
+import './makepayments.css';
 
 const styles = {
   cardCategoryWhite: {
@@ -44,30 +46,78 @@ const useStyles = makeStyles(styles);
 
 export default function MakePayment() {
   const classes = useStyles();
+  const { patients } = usePatients();
 
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>Approved Employees Accounts</h4>
+            <h4 className={classes.cardTitleWhite}>Receive Payment</h4>
             <p className={classes.cardCategoryWhite}>
-              All Approved Employees Accounts details
+              Payment
             </p>
           </CardHeader>
           <CardBody>
-            <Table
-              tableHeaderColor="primary"
-              tableHead={["Name", "Country", "City", "Salary"]}
-              tableData={[
-                ["Dakota Rice", "Niger", "Oud-Turnhout", "$36,738"],
-                ["Minerva Hooper", "Curaçao", "Sinaai-Waas", "$23,789"],
-                ["Sage Rodriguez", "Netherlands", "Baileux", "$56,142"],
-                ["Philip Chaney", "Korea, South", "Overland Park", "$38,735"],
-                ["Doris Greene", "Malawi", "Feldkirchen in Kärnten", "$63,542"],
-                ["Mason Porter", "Chile", "Gloucester", "$78,615"],
-              ]}
-            />
+            <div className="findContainer">
+                <div className="makeContainer">
+                  <div className="titlePatient">
+                      <p className="titleTxt">Receiving Payment</p>
+                  </div>
+                  <div className="checkBody">
+                      <div className="checkAv">
+                          <p className="patId">Patient ID</p>
+                      </div>
+                      <div className="checkAv">
+                          <input type="text" placeholder="Enter Patient ID" className="patText"/>
+                      </div>
+                      <div className="checkAv">
+                          <button className="btnPay">Check Patient</button>
+                      </div>
+                    </div>
+                </div>
+                <div className="patientContainer">
+                  <div className="titlePatient">
+                        <p className="titleTxt">Billing Items for Patient</p>
+                    </div>
+                    <div className="checkBody">
+                      <table className="styled-table">
+                        <thead>
+                          <tr style={{marginBottom: "20px"}}>
+                            <th>Service/Item</th>
+                            <th>Quantity</th>
+                            <th>Unt Price</th>
+                            <th>Total</th>
+                            <th style={{textAlign: "center"}}></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                              <tr>
+                                {patients.length > 0 ? patients.map((item) => (
+                                  <>
+                                <td>{item._id}</td>
+                                <td>{item.firstname}</td>
+                                <td>{item.lastname}</td>
+                                <td>{item.identity_no}</td>
+                                <td>
+                                <div className="editContainer">
+                                  <p className="editP" style={{backgroundColor: "red"}}>Remove</p>
+                                </div>
+                              </td>
+                                </>
+                                )) : null}
+                            </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="recContainer">
+                      <div>
+                        <p className="txtReceive">Total Amount Ksh.400</p>
+                      </div>
+                      <button className="btnReceive">Receive Payment</button>
+                    </div>
+                </div>
+              </div>
           </CardBody>
         </Card>
       </GridItem>

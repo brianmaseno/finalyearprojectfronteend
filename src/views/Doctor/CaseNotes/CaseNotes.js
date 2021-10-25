@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -10,6 +10,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './case.css'
+import { useAuth } from "hooks/AuthProvider";
 
 const styles = {
   cardCategoryWhite: {
@@ -45,6 +46,9 @@ const useStyles = makeStyles(styles);
 
 export default function CaseNotes() {
   const classes = useStyles();
+  const { currentUser } = useAuth()
+  const [patientId, setPatientId] = useState("")
+  const [notes, setNotes] = useState("")
 
   return (
     <GridContainer>

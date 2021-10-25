@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -9,6 +9,8 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import { useAuth } from "hooks/AuthProvider";
+const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -44,6 +46,37 @@ const useStyles = makeStyles(styles);
 
 export default function RequestLabTest() {
   const classes = useStyles();
+  const { currentUser } = useAuth()
+  const [patientId, setPatientId] = useState("")
+  const [notes, setNotes] = useState("");
+
+  const requestLab = (e) => {
+    e.preventDefault()
+
+    const details = {
+      patient_id: patientId,
+      staff_id: currentUser.national_id,
+      test_notes: notes
+    }
+
+    console.log(details)
+
+    axios({
+      method: 'post',
+      url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/treatment/labrequest',
+      data: details})
+      .then((data) => {
+          if (data.data.message == "Inserted Successfully") {
+              console.log("inserted")
+          }
+          else{
+              console.log("Not Inserted")
+          }                
+      })
+      .catch((error) => {
+          console.log(error);
+  });
+  }
 
   return (
     <GridContainer>
@@ -60,16 +93,16 @@ export default function RequestLabTest() {
               <div className="caseContainer">
                 <div className="caseId">
                   <label className="idC">Patient ID*</label>
-                  <input placeholder="Patient ID" className="inCase"/>
+                  <input placeholder="Patient ID" className="inCase" onChange={(e) => setPatientId(e.target.value)}/>
                 </div>
                 <div className="caseText">
                   <label className="noteC">Test</label>
-                  <textarea className="txtC" placeholder="Test to be Conducted">
+                  <textarea className="txtC" placeholder="Test to be Conducted" onChange={(e) => setNotes(e.target.value)}>
 
                   </textarea>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave">Request</button>
+                  <button className="caseSave" onClick={requestLab}>Request</button>
                   <button className="caseCancel">Cancel</button>
                 </div>
               </div>

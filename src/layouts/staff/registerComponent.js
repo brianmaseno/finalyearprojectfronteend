@@ -12,7 +12,7 @@ const axios = require('axios').default;
 import './register.css';
 
 export default function RegisterComponent() {
-  const [firstname, setFirstname] = useState("");
+    const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
     const [username, setUsername] = useState("");
     const [qualification, setQualification] = useState("");
@@ -26,6 +26,7 @@ export default function RegisterComponent() {
     const [added_by, setAddedBy] = useState("");
     const [gender, setGender] = useState("");
     const [password, setPassword] = useState("");
+    const [nationalId, setNationalId] = useState("");
     const [confirmpassword, setConfirmPassword] = useState("");
     const history = useHistory();
 
@@ -53,6 +54,7 @@ export default function RegisterComponent() {
               password: password,
               added_on: added_on,
               added_by: added_by,
+              national_id: nationalId
           }
 
           console.log(department_id);
@@ -154,66 +156,13 @@ export default function RegisterComponent() {
                       <input type="date" name="joiningdate" placeholder="Enter Joining Date" required className="inputRegister" onChange={(e) => setJoiningDate(e.target.value)} /><br/>
                   </div>
                   <div className="userN">
-                      <label className="labelText">Residence</label><br/>
-                      <input type="text" name="residence" placeholder="Enter Residence" required className="inputRegister" onChange={(e) => setResidence(e.target.value)} /><br/>
+                      <label className="labelText">National ID</label><br/>
+                      <input type="text" name="id" placeholder="Enter National ID" required className="inputRegister" onChange={(e) => setNationalId(e.target.value)} /><br/>
                   </div>
               </div>
               
               <div className="nameSection">
                   <div className="firstN">
-                      <label className="labelText">Select County</label><br/>
-                      <select className="inputSelect" onChange={(e) => setCounty(e.target.value)}>
-                          <option>Select---</option>
-                          <option value="Baringo">Baringo</option>
-                          <option value='Bomet'>Bomet</option>
-                          <option value='Bungoma'>Bungoma</option>
-                          <option value='Busia'>Busia</option>
-                          <option value='Elgeyo-Marakwet'>Elgeyo-Marakwet</option>
-                          <option value='Embu'>Embu</option>
-                          <option value='Garissa'>Garissa</option>
-                          <option value='Homa Bay'>Homa Bay</option>
-                          <option value='Isiolo'>Isiolo</option>
-                          <option value='Kajiado'>Kajiado</option>
-                          <option value='Kakamega'>Kakamega</option>
-                          <option value='Kericho'>Kericho</option>
-                          <option value='Kiambu'>Kiambu</option>
-                          <option value='Kilifi'>Kilifi</option>
-                          <option value='Kirinyaga'>Kirinyaga</option>
-                          <option value='Kisii'>Kisii</option>
-                          <option value='Kisumu'>Kisumu</option>
-                          <option value='Kitui'>Kitui</option>
-                          <option value='Kwale'>Kwale</option>
-                          <option value='Laikipia'>Laikipia</option>
-                          <option value='Lamu'>Lamu</option>
-                          <option value='Machakos'>Machakos</option>
-                          <option value='Makueni'>Makueni</option>
-                          <option value='Mandera'>Mandera</option>
-                          <option value='Marsabit'>Marsabit</option>
-                          <option value='Meru'>Meru</option>
-                          <option value='Migori'>Migori</option>
-                          <option value='Mombasa'>Mombasa</option>
-                          <option value="Murang'a">Muranga'a</option>
-                          <option value='Nairobi City'>Nairobi City</option>
-                          <option value='Nakuru'>Nakuru</option>
-                          <option value='Nandi'>Nandi</option>
-                          <option value='Narok'>Narok</option>
-                          <option value='Nyamira'>Nyamira</option>
-                          <option value='Nyandarua'>Nyandarua</option>
-                          <option value='Nyeri'>Nyeri</option>
-                          <option value='Samburu'>Samburu</option>
-                          <option value='Siaya'>Siaya</option>
-                          <option value='Taita-Taveta'>Taita-Taveta</option>
-                          <option value='Tana River'>Tana River</option>
-                          <option value='Tharaka-Nithi'>Tharaka-Nithi</option>
-                          <option value='Trans Nzoia'>Trans Nzoia</option>
-                          <option value='Turkana'>Turkana</option>
-                          <option value='Uasin Gishu'>Uasin Gishu</option>
-                          <option value='Vihiga'>Vihiga</option>
-                          <option value='West Pokot'>West Pokot</option>
-                          <option value='wajir'>wajir</option>
-                      </select>
-                  </div>
-                  <div className="lastN">
                       <label className="labelText">Select Country</label><br/>
                       <select className="inputSelect" onChange={(e) => setCountry(e.target.value)}>
                           <option>Select---</option>
@@ -463,6 +412,59 @@ export default function RegisterComponent() {
                           <option value="Zaire">Zaire</option>
                           <option value="Zambia">Zambia</option>
                           <option value="Zimbabwe">Zimbabwe</option>
+                      </select>
+                  </div>
+                  <div className="lastN">
+                      <label className="labelText">Select County</label><br/>
+                      <select className="inputSelect" onChange={(e) => setCounty(e.target.value)}>
+                          <option>Select---</option>
+                          <option value="Baringo">Baringo</option>
+                          <option value='Bomet'>Bomet</option>
+                          <option value='Bungoma'>Bungoma</option>
+                          <option value='Busia'>Busia</option>
+                          <option value='Elgeyo-Marakwet'>Elgeyo-Marakwet</option>
+                          <option value='Embu'>Embu</option>
+                          <option value='Garissa'>Garissa</option>
+                          <option value='Homa Bay'>Homa Bay</option>
+                          <option value='Isiolo'>Isiolo</option>
+                          <option value='Kajiado'>Kajiado</option>
+                          <option value='Kakamega'>Kakamega</option>
+                          <option value='Kericho'>Kericho</option>
+                          <option value='Kiambu'>Kiambu</option>
+                          <option value='Kilifi'>Kilifi</option>
+                          <option value='Kirinyaga'>Kirinyaga</option>
+                          <option value='Kisii'>Kisii</option>
+                          <option value='Kisumu'>Kisumu</option>
+                          <option value='Kitui'>Kitui</option>
+                          <option value='Kwale'>Kwale</option>
+                          <option value='Laikipia'>Laikipia</option>
+                          <option value='Lamu'>Lamu</option>
+                          <option value='Machakos'>Machakos</option>
+                          <option value='Makueni'>Makueni</option>
+                          <option value='Mandera'>Mandera</option>
+                          <option value='Marsabit'>Marsabit</option>
+                          <option value='Meru'>Meru</option>
+                          <option value='Migori'>Migori</option>
+                          <option value='Mombasa'>Mombasa</option>
+                          <option value="Murang'a">Muranga'a</option>
+                          <option value='Nairobi City'>Nairobi City</option>
+                          <option value='Nakuru'>Nakuru</option>
+                          <option value='Nandi'>Nandi</option>
+                          <option value='Narok'>Narok</option>
+                          <option value='Nyamira'>Nyamira</option>
+                          <option value='Nyandarua'>Nyandarua</option>
+                          <option value='Nyeri'>Nyeri</option>
+                          <option value='Samburu'>Samburu</option>
+                          <option value='Siaya'>Siaya</option>
+                          <option value='Taita-Taveta'>Taita-Taveta</option>
+                          <option value='Tana River'>Tana River</option>
+                          <option value='Tharaka-Nithi'>Tharaka-Nithi</option>
+                          <option value='Trans Nzoia'>Trans Nzoia</option>
+                          <option value='Turkana'>Turkana</option>
+                          <option value='Uasin Gishu'>Uasin Gishu</option>
+                          <option value='Vihiga'>Vihiga</option>
+                          <option value='West Pokot'>West Pokot</option>
+                          <option value='wajir'>wajir</option>
                       </select>
                   </div>
                   <div className="userN">

@@ -13,7 +13,6 @@ import { useAccountStatus } from "hooks/useAccountStatus";
 import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
-const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -47,91 +46,73 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function TestResults() {
+export default function DispensedDrugs() {
   const classes = useStyles();
-  const [data, setData] = useState([])
-  const [cost, setCost] = useState("")
-  const [result, setResult] = useState("")
-
-  useEffect(() => {
-    axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved`)
-      .then((data) => {
-          if (data.data.message == "Requests Found") {
-            setData(data.data.data)
-            console.log(data.data.data)
-          }
-          else{
-            console.log("Not Found")
-          }                
-      })
-      .catch((error) => {
-          console.log(error);
-      });
-  }, [])
+  const { data } = useAccountStatus("suspended");
+  const { loading } = useDataStatus(data);
 
   return (
     <>
     <ToastContainer />
     <div className="pathCont">
       <div className="path">
-        <p className="pathName">Dashboard / <span>Test Results</span></p>
+        <p className="pathName">Dashboard / <span>Dispensed Drugs</span></p>
       </div>
     </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="info">
-            <h4 className={classes.cardTitleWhite}>Add Test Results</h4>
+            <h4 className={classes.cardTitleWhite}>All Dispensed Drugs</h4>
             <p className={classes.cardCategoryWhite}>
-              Test Results
+              Drugs
             </p>
           </CardHeader>
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Patient"/>
+                <input type="text" className="searchInput" placeholder="Search Drug"/>
                 <button className="btnSearch">Search</button>
               </div>
             </div>
-            {data.length > 0 ? 
+            {loading ? 
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
-                  <th>Patient ID</th>
-                  <th>Test</th>
-                  <th>Test Cost</th>
-                  <th>Results</th>
+                  <th>Drug ID</th>
+                  <th>Drug Name</th>
+                  <th>Last Name</th>
+                  <th>Username</th>
+                  <th>Qualification</th>
+                  <th>Status</th>
                   <th style={{textAlign: "center"}}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {data.length > 0 ? data.map((item) => (
                     <tr>
-                      <td>{item.patient_id}</td>
-                      <td>{item.test_name}</td>
-                      <td>
-                        <textarea type="number" placeholder="Enter Cost" className="patInput" onChange={(e) => setCost(e.target.value)} />
-                      </td>
-                      <td>
-                        <div>
-                          <textarea placeholder="Enter Result" className="patInput" onChange={(e) => setResult(e.target.value)}>
-                          </textarea>
-                        </div>
-                      </td>
+                      <td>{item._id}</td>
+                      <td>{item.firstname}</td>
+                      <td>{item.lastname}</td>
+                      <td>{item.username}</td>
+                      <td>{item.qualification}</td>
+                      <td>{item.status}</td>
                       <td>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)
-                                .then(response => response.json())
-                                .then((data) => {
-                                    if (data.message == "Inserted Successfully") {
-                                      console.log("Updated")
-                                    }
-                                    else{
-                                      console.log("Not Updated")
-                                    }
-                                })
-                                }}>Submit</p>
+                            fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/activate?username=${item.username}`)
+                            .then(response => response.json())
+                            .then((data) => {
+                                if (data.message == "Activated") {
+                                  toast.success("Account Activated");
+                                  console.log("Activated")
+                                }
+                                else{
+                                  toast.error("Account Not Activated");
+                                  setUpdated(false)
+                                }
+                            })
+                            }}>Delete</p>
                         </div>
                       </td>
                   </tr>
@@ -140,7 +121,7 @@ export default function TestResults() {
             </table>
             : 
             <div className="noData">
-            <p className="txtNo">No Test Results</p>
+            <p className="txtNo">No Drug</p>
           </div>
             }
           </CardBody>

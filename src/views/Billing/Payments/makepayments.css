@@ -1,0 +1,19 @@
+.recContainer{
+  margin: 20px;
+
+}
+
+.txtReceive{
+  font-weight: bold;
+
+
+}
+
+.btnReceive{
+  background-color: green;
+  font-weight: bold;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}

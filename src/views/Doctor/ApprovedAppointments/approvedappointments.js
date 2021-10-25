@@ -10,6 +10,8 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { useDataStatus } from "hooks/useDataStatus";
+import { useAuth } from "hooks/AuthProvider";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -45,21 +47,17 @@ const useStyles = makeStyles(styles);
 
 export default function DoctorApprovedAppointments() {
   const classes = useStyles();
-  const [rows, setRows] = useState([])
-  const [pending, setPending] = useState([])
   const [approved, setApproved] = useState([])
-  const [blocked, setBlocked] = useState([])
-  const { loading } = useDataStatus(rows);
+  const { loading } = useDataStatus(approved);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
-                  setRows(data.data);
-                  setPending(rows.filter((row) => (row.status == "pending")));
-                  setApproved(rows.filter((row) => (row.status == "activated")));
-                  setBlocked(rows.filter((row) => (row.status == "suspended")));
+                  setApproved(data.data);
+                  console.log(data.data);
               }
               else{
                   console.log("no data");
@@ -84,42 +82,37 @@ export default function DoctorApprovedAppointments() {
                     <button className="btnSearch">Search</button>
                   </div>
                 </div>
-                {loading ?
+                {approved.length > 0 ?
                 <table className="styled-table">
                   <thead>
                     <tr style={{marginBottom: "20px"}}>
-                      <th>ID</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Username</th>
-                      <th>Qualification</th>
-                      <th>Status</th>
+                      <th>Appointment ID</th>
+                      <th>Appointment Date</th>
+                      <th>Patient ID</th>
+                      <th>Clinician ID</th>
+                      <th>Department ID</th>
                       <th style={{textAlign: "center"}}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {rows ? rows.map((item) => (
+                    {approved.length > 0 ? approved.map((item) => (
                         <tr>
                           <td>{item._id}</td>
-                          <td>{item.firstname}</td>
-                          <td>{item.lastname}</td>
-                          <td>{item.username}</td>
-                          <td>{item.qualification}</td>
-                          <td>{item.status}</td>
+                          <td>{item.appointment_due_date}</td>
+                          <td>{item.patient_id}</td>
+                          <td>{item.doctor_id}</td>
+                          <td>{item.department_id}</td>
                           <td>
                             <div className="editContainer">
-                              <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/suspend?username=${item.username}`)
+                              <p className="editP" style={{backgroundColor: "red"}} onClick={() => {
+                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/cancel?appointment_id=${item.appointment_id}`)
                                 .then(response => response.json())
                                 .then((data) => {
-                                    if (data.message == "Suspended") {
-                                      toast.success("Account Suspended");
-                                      setUpdated(true);
-                                      console.log("Suspended")
+                                    if (data.message == "Appointment Cancelled Successfully") {
+                                      console.log("Cancelled")
                                     }
                                     else{
-                                      toast.error("Account Not Suspended");
-                                      setUpdated(false)
+                                      console.log("Not Cancelled")
                                     }
                                 })
                                 }}>Cancel</p>
@@ -131,7 +124,7 @@ export default function DoctorApprovedAppointments() {
                 </table>
                 : 
                   <div className="noData">
-                  <p className="txtNo">No Pending Appointment</p>
+                  <p className="txtNo">No Approved Appointment</p>
                 </div>
                 }
           </CardBody>
