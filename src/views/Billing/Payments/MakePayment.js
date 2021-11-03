@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -46,7 +46,60 @@ const useStyles = makeStyles(styles);
 
 export default function MakePayment() {
   const classes = useStyles();
-  const { patients } = usePatients();
+  const [patientId, setPatientId] = useState([])
+  const [data, setData] = useState([])
+  const [total, setTotal] = useState("")
+
+  const checkPatient = (e) => {
+    e.preventDefault()
+
+    if (!(patientId === "")) {
+      fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/billing/${patientId}/total`)
+          .then(response => response.json())
+          .then((data) => {
+              if (data.message == "Found") {
+                  setData(data.data)
+                  if (data.data.length > 0) {
+                    let totalCost = 0
+                    for (let index = 0; index < data.data.length; index++) {
+                      totalCost += parseInt(data.data[index].service_cost)
+                    }
+                    setTotal(totalCost)
+                    console.log(totalCost)
+                  }
+              }
+              else{
+                  console.log("no data");
+              }
+          })
+    }
+  }
+
+  const makeAllPayments = (e) => {
+    e.preventDefault()
+
+    if (data.length > 0) {
+      for (let index = 0; index < data.length; index++) {
+        const bill_id = data[index]._id
+        
+        if (bill_id != null) {
+          fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/billing/pay?bill_id=${bill_id}`)
+          .then(response => response.json())
+          .then((data) => {
+              if (data.message == "Bill Payed") {
+                  console.log("Bill Payed")
+              }
+              else{
+                  console.log("not payed");
+              }
+          })
+        }
+      }
+    }
+    else{
+      console.log("No Data")
+    }
+  }
 
   return (
     <GridContainer>
@@ -69,10 +122,10 @@ export default function MakePayment() {
                           <p className="patId">Patient ID</p>
                       </div>
                       <div className="checkAv">
-                          <input type="text" placeholder="Enter Patient ID" className="patText"/>
+                          <input type="text" placeholder="Enter Patient ID" className="patText" onChange={(e) => setPatientId(e.target.value)}/>
                       </div>
                       <div className="checkAv">
-                          <button className="btnPay">Check Patient</button>
+                          <button className="btnPay" onClick={checkPatient}>Check Patient</button>
                       </div>
                     </div>
                 </div>
@@ -84,38 +137,41 @@ export default function MakePayment() {
                       <table className="styled-table">
                         <thead>
                           <tr style={{marginBottom: "20px"}}>
-                            <th>Service/Item</th>
-                            <th>Quantity</th>
-                            <th>Unt Price</th>
-                            <th>Total</th>
-                            <th style={{textAlign: "center"}}></th>
+                            <th>Patient ID</th>
+                            <th>Service/Item Name</th>
+                            <th>Service Cost</th>
+                            <th>Date</th>
+                            <th style={{textAlign: "center"}}>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                              <tr>
-                                {patients.length > 0 ? patients.map((item) => (
-                                  <>
-                                <td>{item._id}</td>
-                                <td>{item.firstname}</td>
-                                <td>{item.lastname}</td>
-                                <td>{item.identity_no}</td>
-                                <td>
+                          {data.length > 0 ? data.map((item) => (
+                            <tr>
+                              <td>{item.patient_id}</td>
+                              <td>{item.service_name}</td>
+                              <td>Ksh {item.service_cost}</td>
+                              <td>{item.added_on}</td>
+                              <td>
                                 <div className="editContainer">
                                   <p className="editP" style={{backgroundColor: "red"}}>Remove</p>
                                 </div>
                               </td>
-                                </>
-                                )) : null}
-                            </tr>
+                          </tr>
+                          ))
+                            :
+                            null}
                         </tbody>
                       </table>
                     </div>
+                    {data.length > 0 ? 
                     <div className="recContainer">
                       <div>
-                        <p className="txtReceive">Total Amount Ksh.400</p>
+                        <p className="txtReceive">Total Amount Ksh.{total}</p>
                       </div>
-                      <button className="btnReceive">Receive Payment</button>
+                      <button className="btnReceive" onClick={makeAllPayments}>Receive Payment</button>
                     </div>
+                    :
+                    null}
                 </div>
               </div>
           </CardBody>

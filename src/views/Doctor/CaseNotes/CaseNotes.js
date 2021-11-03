@@ -11,6 +11,8 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './case.css'
 import { useAuth } from "hooks/AuthProvider";
+import { useApprovedTreatment } from "hooks/useApprovedTreatment";
+const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -49,6 +51,36 @@ export default function CaseNotes() {
   const { currentUser } = useAuth()
   const [patientId, setPatientId] = useState("")
   const [notes, setNotes] = useState("")
+  const [treatment_id, setTreatment_id] = useState("")
+  const { data } = useApprovedTreatment()
+
+  const saveNotes = (e) => {
+    e.preventDefault()
+
+    const details = {
+      patient_id: patientId,
+      treatment_id: treatment_id,
+      treatment_notes: notes,
+      staff_id: currentUser.national_id
+    }
+
+    axios({
+      method: 'post',
+      url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/treatment/add',
+      data: details})
+      .then((data) => {
+          if (data.data.message == "Inserted Successfully") {
+              console.log("inserted")
+          }
+          else{
+              console.log("Not Inserted")
+          }                
+      })
+      .catch((error) => {
+          console.log(error);
+    });
+
+  }
 
   return (
     <GridContainer>
@@ -65,16 +97,25 @@ export default function CaseNotes() {
               <div className="caseContainer">
                 <div className="caseId">
                   <label className="idC">Patient ID*</label>
-                  <input placeholder="Patient ID" className="inCase"/>
+                  <input placeholder="Patient ID" className="inCase" onChange={(e) => setPatientId(e.target.value)}/>
+                </div>
+                <div className="caseId" style={{marginTop: "10px"}}>
+                  <label className="idC">Treatment ID*</label>
+                  <select className="inCase" onChange={(e) => setTreatment_id(e.target.value)}>
+                    <option>Select...</option>
+                    {data.length > 0 ? data.map((item) => (
+                      <option value={item._id}>{item._id}</option>
+                    )): null}
+                  </select>
                 </div>
                 <div className="caseText">
                   <label className="noteC">Add Notes</label>
-                  <textarea className="txtC" placeholder="Add notes">
+                  <textarea className="txtC" placeholder="Add notes" onChange={(e) => setNotes(e.target.value)}>
 
                   </textarea>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave">Save Notes</button>
+                  <button className="caseSave" onClick={saveNotes}>Save Notes</button>
                   <button className="caseCancel">Cancel</button>
                 </div>
               </div>

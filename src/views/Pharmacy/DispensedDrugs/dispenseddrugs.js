@@ -48,8 +48,20 @@ const useStyles = makeStyles(styles);
 
 export default function DispensedDrugs() {
   const classes = useStyles();
-  const { data } = useAccountStatus("suspended");
-  const { loading } = useDataStatus(data);
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+          .then(response => response.json())
+          .then((data) => {
+              if (data.message == "Found") {
+                  setData(data.data);
+              }
+              else{
+                  console.log("no data");
+              }
+          })
+  }, [])
 
   return (
     <>
@@ -71,20 +83,20 @@ export default function DispensedDrugs() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Drug"/>
+                <input type="text" className="searchInput" placeholder="Search Prescription ID"/>
                 <button className="btnSearch">Search</button>
               </div>
             </div>
-            {loading ? 
+            {data ? 
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
-                  <th>Drug ID</th>
-                  <th>Drug Name</th>
-                  <th>Last Name</th>
-                  <th>Username</th>
-                  <th>Qualification</th>
-                  <th>Status</th>
+                  <th>Prescription ID</th>
+                  <th>Treatment ID</th>
+                  <th>Patient ID</th>
+                  <th>Drug</th>
+                  <th>Usage</th>
+                  <th>Notes</th>
                   <th style={{textAlign: "center"}}>Action</th>
                 </tr>
               </thead>
@@ -92,27 +104,25 @@ export default function DispensedDrugs() {
                 {data.length > 0 ? data.map((item) => (
                     <tr>
                       <td>{item._id}</td>
-                      <td>{item.firstname}</td>
-                      <td>{item.lastname}</td>
-                      <td>{item.username}</td>
-                      <td>{item.qualification}</td>
-                      <td>{item.status}</td>
+                      <td>{item.treatment_id}</td>
+                      <td>{item.patient_id}</td>
+                      <td>{item.drug}</td>
+                      <td>{item.usage_per_day}</td>
+                      <td>{item.notes}</td>
                       <td>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/activate?username=${item.username}`)
-                            .then(response => response.json())
-                            .then((data) => {
-                                if (data.message == "Activated") {
-                                  toast.success("Account Activated");
-                                  console.log("Activated")
-                                }
-                                else{
-                                  toast.error("Account Not Activated");
-                                  setUpdated(false)
-                                }
-                            })
-                            }}>Delete</p>
+                              fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/cancel?drug_id=${item._id}`)
+                              .then(response => response.json())
+                              .then((data) => {
+                                  if (data.message == "Updated Successfully") {
+                                      console.log("Updated")
+                                  }
+                                  else{
+                                      console.log("no data");
+                                  }
+                              })
+                            }}>Remove</p>
                         </div>
                       </td>
                   </tr>

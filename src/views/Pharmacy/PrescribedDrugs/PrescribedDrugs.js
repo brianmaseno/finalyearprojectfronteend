@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -10,6 +10,9 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { usePatients } from "hooks/usePatients";
+import { useAuth } from "hooks/AuthProvider";
+import { useDrugs } from "hooks/useDrugs";
+const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -45,7 +48,77 @@ const useStyles = makeStyles(styles);
 
 export default function PrescribedDrugs() {
   const classes = useStyles();
-  const { patients } = usePatients();
+  const [patientId, setPatientId] = useState("")
+  const [data, setData] = useState([])
+  const { currentUser } = useAuth()
+  const { drug } = useDrugs()
+
+  const dispenseDrugs = (e) => {
+    e.preventDefault()
+
+    if (data.length > 0) {
+      const drug_id = data[0]._id
+      const treatment_id = data[0].treatment_id
+
+      const payDetails = {
+        patient_id: patientId,
+        treatment_id: treatment_id,
+        service_name: "Drug Dispensation",
+        service_cost: drug.filter((item) => item._id == drug_id).drug_cost,
+        service_department: currentUser.department_id,
+        added_by: currentUser.national_id
+      }
+
+      fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/issue?drug_id=${drug_id}`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              console.log(data.message)
+              axios({
+                method: 'post',
+                url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/billing/set',
+                data: payDetails})
+                .then((data) => {
+                    if (data.data.message == "Added to Bill") {
+                        console.log("Added to Bill")
+                    }
+                    else{
+                        console.log("Not Added")
+                    }                
+                })
+                .catch((error) => {
+                    console.log(error);
+            });
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
+    else{
+      console.log("no id")
+    }
+  }
+
+  const checkPatient = (e) => {
+    e.preventDefault()
+
+    if (!(patientId === "")) {
+      fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/prescribed/patient?patient_id=${patientId}`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setData(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
+    else{
+      console.log("ID MIssing")
+    }
+  }
 
   return (
     <GridContainer>
@@ -68,10 +141,10 @@ export default function PrescribedDrugs() {
                             <p className="patId">Patient ID</p>
                         </div>
                         <div className="checkAv">
-                            <input type="text" placeholder="Enter Patient ID" className="patText"/>
+                            <input type="text" placeholder="Enter Patient ID" className="patText" onChange={(e) => setPatientId(e.target.value)}/>
                         </div>
                         <div className="checkAv">
-                            <button className="btnPay">Check Patient</button>
+                            <button className="btnPay" onClick={checkPatient}>Check Patient</button>
                         </div>
                       </div>
                   </div>
@@ -83,34 +156,32 @@ export default function PrescribedDrugs() {
                         <table className="styled-table">
                           <thead>
                             <tr style={{marginBottom: "20px"}}>
+                              <th>Prescription ID</th>
+                              <th>Treatment ID</th>
                               <th>Patient ID</th>
-                              <th>Prescription</th>
-                              <th>Date</th>
-                              <th>Status</th>
-                              <th style={{textAlign: "center"}}></th>
+                              <th>Drug</th>
+                              <th style={{textAlign: "center"}}>Action</th>
                             </tr>
                           </thead>
                           <tbody>
+                            {data.length > 0 ? data.map((item) => (
                                 <tr>
-                                  {patients.length > 0 ? patients.map((item) => (
-                                    <>
-                                  <td>{item._id}</td>
-                                  <td>{item.firstname}</td>
-                                  <td>{item.lastname}</td>
-                                  <td>{item.identity_no}</td>
-                                  <td>
-                                  <div className="editContainer">
-                                    <p className="editP" style={{backgroundColor: "red"}}>Remove</p>
-                                  </div>
-                                </td>
-                                  </>
-                                  )) : null}
-                              </tr>
+                                    <td>{item._id}</td>
+                                    <td>{item.treatment_id}</td>
+                                    <td>{item.patient_id}</td>
+                                    <td>{item.drug}</td>
+                                    <td>
+                                    <div className="editContainer">
+                                      <p className="editP" style={{backgroundColor: "red"}}>Remove</p>
+                                    </div>
+                                  </td>
+                                </tr>
+                            )): null}   
                           </tbody>
                         </table>
                       </div>
                       <div className="recContainer">
-                        <button className="btnReceive">Dispensed</button>
+                        <button className="btnReceive" onClick={dispenseDrugs}>Dispense Drug</button>
                       </div>
                   </div>
                 </div>

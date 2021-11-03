@@ -39,25 +39,24 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
+import { useBilling } from "hooks/useBilling";
 
 const useStyles = makeStyles(styles);
 
 export default function BillingDashboard() {
   const classes = useStyles();
   const [rows, setRows] = useState([])
-  const [pending, setPending] = useState([])
-  const [approved, setApproved] = useState([])
-  const [blocked, setBlocked] = useState([])
+  const unpaid = useBilling("pendingbills")
+  const paid = useBilling("completedbills")
+  const total = unpaid + paid
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/billing/completedbills/report/all")
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setRows(data.data);
-                  setPending(rows.filter((row) => (row.status == "pending")));
-                  setApproved(rows.filter((row) => (row.status == "activated")));
-                  setBlocked(rows.filter((row) => (row.status == "suspended")));
+                  console.log(data.data)
               }
               else{
                   console.log("no data");
@@ -75,7 +74,7 @@ export default function BillingDashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Total</p>
               <h3 className={classes.cardTitle}>$ 
-                {rows ? rows.length : 0} <small></small>
+                {total > 0 ? total : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -93,7 +92,7 @@ export default function BillingDashboard() {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Paid Amount</p>
-              <h3 className={classes.cardTitle}>$ {pending ? pending.length : 0}</h3>
+              <h3 className={classes.cardTitle}>$ {paid > 0 ? paid : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -110,7 +109,7 @@ export default function BillingDashboard() {
                 <Icon>info_outline</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Unpaid Amount</p>
-              <h3 className={classes.cardTitle}>$ {blocked ? blocked.length : 0}</h3>
+              <h3 className={classes.cardTitle}>$ {unpaid > 0 ? unpaid : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -131,11 +130,22 @@ export default function BillingDashboard() {
               </p>
             </CardHeader>
             <CardBody>
+              {rows.length > 0 ? 
+              <>
+              <div className="searchOut">
+                <div className="searchCont">
+                  <input type="text" className="searchInput" placeholder="Search Payments"/>
+                  <button className="btnSearch">Search</button>
+                </div>
+              </div>
               <Table
                 tableHeaderColor="warning"
-                tableHead={["Patient ID", "First Name", "Last Name", "Amount"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
+                tableHead={["Patient ID", "Service Name", "Service Cost", "Date"]}
+                tableData={rows.map((item) => ([item.patient_id, item.service_name, item.service_cost, item.added_on]))}
               />
+              </>
+              :
+              <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}><p>No Data</p></div>}
             </CardBody>
           </Card>
         </GridItem>

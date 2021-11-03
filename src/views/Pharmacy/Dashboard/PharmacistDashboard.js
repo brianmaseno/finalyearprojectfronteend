@@ -29,7 +29,6 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
 import { bugs, website, server } from "variables/general.js";
 
 import {
@@ -39,30 +38,29 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
+import { usePrescribedDrugs } from "hooks/usePrescribedDrugs";
 
 const useStyles = makeStyles(styles);
 
 export default function PharmacistDashboard() {
   const classes = useStyles();
   const [rows, setRows] = useState([])
-  const [pending, setPending] = useState([])
-  const [approved, setApproved] = useState([])
-  const [blocked, setBlocked] = useState([])
+  const prescribed = usePrescribedDrugs("prescribed/all")
+  const issued = usePrescribedDrugs("dispensingreport")
+  const cancelled = usePrescribedDrugs("dispensingreport/cancelled")
+
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
-          .then(response => response.json())
-          .then((data) => {
-              if (data.message == "Found") {
-                  setRows(data.data);
-                  setPending(rows.filter((row) => (row.status == "pending")));
-                  setApproved(rows.filter((row) => (row.status == "activated")));
-                  setBlocked(rows.filter((row) => (row.status == "suspended")));
-              }
-              else{
-                  console.log("no data");
-              }
-          })
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
   }, [])
   return (
     <div>
@@ -73,9 +71,9 @@ export default function PharmacistDashboard() {
               <CardIcon color="warning">
                 <Icon>content_copy</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Total Drugs</p>
+              <p className={classes.cardCategory}>Prescribed Drugs</p>
               <h3 className={classes.cardTitle}>
-                {rows ? rows.length : 0} <small></small>
+                {prescribed > 0 ? prescribed : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -93,7 +91,7 @@ export default function PharmacistDashboard() {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Drugs Dispensed</p>
-              <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{issued > 0 ? issued : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -109,8 +107,8 @@ export default function PharmacistDashboard() {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Prescribed Drugs</p>
-              <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
+              <p className={classes.cardCategory}>Cancelled Prescriptions</p>
+              <h3 className={classes.cardTitle}>{cancelled > 0 ? cancelled : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -131,11 +129,59 @@ export default function PharmacistDashboard() {
               </p>
             </CardHeader>
             <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
-              />
+              <div className="searchOut">
+                <div className="searchCont">
+                  <input type="text" className="searchInput" placeholder="Search Prescription ID"/>
+                  <button className="btnSearch">Search</button>
+                </div>
+              </div>
+              {rows ? 
+              <table className="styled-table">
+                <thead>
+                  <tr style={{marginBottom: "20px"}}>
+                    <th>Prescription ID</th>
+                    <th>Treatment ID</th>
+                    <th>Patient ID</th>
+                    <th>Drug</th>
+                    <th>Usage</th>
+                    <th>Notes</th>
+                    <th style={{textAlign: "center"}}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.length > 0 ? rows.map((item) => (
+                      <tr>
+                        <td>{item._id}</td>
+                        <td>{item.treatment_id}</td>
+                        <td>{item.patient_id}</td>
+                        <td>{item.drug}</td>
+                        <td>{item.usage_per_day}</td>
+                        <td>{item.notes}</td>
+                        <td>
+                          <div className="editContainer">
+                            <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
+                              fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/cancel?drug_id=${item._id}`)
+                              .then(response => response.json())
+                              .then((data) => {
+                                  if (data.message == "Updated Successfully") {
+                                      console.log("Updated")
+                                  }
+                                  else{
+                                      console.log("no data");
+                                  }
+                              })
+                            }}>Remove</p>
+                          </div>
+                        </td>
+                    </tr>
+                  )) : null}
+                </tbody>
+              </table>
+              : 
+              <div className="noData">
+              <p className="txtNo">No Dispensed Drugs</p>
+            </div>
+              }
             </CardBody>
           </Card>
         </GridItem>

@@ -15,6 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
 import { usePatients } from "hooks/usePatients";
 import logo from "assets/img/logoknh.jpg";
+import { useLab } from "hooks/useLab";
 
 const styles = {
   cardCategoryWhite: {
@@ -51,6 +52,7 @@ const useStyles = makeStyles(styles);
 export default function TestServices() {
   const classes = useStyles();
   const { patients } = usePatients();
+  const { lab } = useLab()
 
   return (
     <>
@@ -82,23 +84,19 @@ export default function TestServices() {
                       <tr>
                         <th>Test ID</th>
                         <th colSpan="2">Test Name</th>
-                        <th>Cost</th>
                         <th>Result</th>
+                        <th>Cost</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="trBody">1234</td>
-                        <td className="trBody" colSpan="2">Malaria Test</td>
-                        <td className="trBody">Ksh 100</td>
-                        <td className="trBody">Ksh 100</td>
-                      </tr>
-                      <tr>
-                        <td className="trBody">1234</td>
-                        <td className="trBody" colSpan="2">Malaria Test</td>
-                        <td className="trBody">Ksh 100</td>
-                        <td className="trBody">Ksh 100</td>
-                      </tr>
+                      {lab.length > 0 ? lab.map((item) => (
+                        <tr>
+                          <td className="trBody">{item.lab_test_id}</td>
+                          <td className="trBody" colSpan="2">{item.test_name}</td>
+                          <td className="trBody">{item.test_results}</td>
+                          <td className="trBody">Ksh {item.test_cost}</td>
+                        </tr>
+                      )): null}
                     </tbody>
                   </table>
                 </div>

@@ -13,6 +13,7 @@ import { useAccountStatus } from "hooks/useAccountStatus";
 import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ReactLoading from 'react-loading';
+import { useAuth } from "hooks/AuthProvider";
 const axios = require('axios').default;
 
 const styles = {
@@ -52,6 +53,7 @@ export default function TestResults() {
   const [data, setData] = useState([])
   const [cost, setCost] = useState("")
   const [result, setResult] = useState("")
+  const { currentUser } = useAuth()
 
   useEffect(() => {
     axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved`)
@@ -126,6 +128,29 @@ export default function TestResults() {
                                 .then((data) => {
                                     if (data.message == "Inserted Successfully") {
                                       console.log("Updated")
+                                      const payDetails = {
+                                        patient_id: item.patient_id,
+                                        treatment_id: item.treatment_id,
+                                        service_name: "Lab Tests",
+                                        service_cost: cost,
+                                        service_department: currentUser.department_id,
+                                        added_by: currentUser.national_id
+                                      }
+                                      axios({
+                                        method: 'post',
+                                        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/billing/set',
+                                        data: payDetails})
+                                        .then((data) => {
+                                            if (data.data.message == "Added to Bill") {
+                                                console.log("Added to Bill")
+                                            }
+                                            else{
+                                                console.log("Not Added")
+                                            }                
+                                        })
+                                        .catch((error) => {
+                                            console.log(error);
+                                    });
                                     }
                                     else{
                                       console.log("Not Updated")

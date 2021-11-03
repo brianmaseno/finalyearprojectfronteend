@@ -39,25 +39,24 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
+import { useLab } from "hooks/useLab";
+import { usePendingLab } from "hooks/usePendingLab";
 
 const useStyles = makeStyles(styles);
 
 export default function LabDashboard() {
   const classes = useStyles();
   const [rows, setRows] = useState([])
-  const [pending, setPending] = useState([])
-  const [approved, setApproved] = useState([])
-  const [blocked, setBlocked] = useState([])
+  const { lab } = useLab()
+  const { pending } = usePendingLab()
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+    console.log(pending)
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
           .then(response => response.json())
           .then((data) => {
-              if (data.message == "Found") {
+              if (data.message == "Requests Found") {
                   setRows(data.data);
-                  setPending(rows.filter((row) => (row.status == "pending")));
-                  setApproved(rows.filter((row) => (row.status == "activated")));
-                  setBlocked(rows.filter((row) => (row.status == "suspended")));
               }
               else{
                   console.log("no data");
@@ -67,7 +66,7 @@ export default function LabDashboard() {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} sm={6} md={3}>
+        <GridItem xs={12} sm={6} md={4}>
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
@@ -75,7 +74,7 @@ export default function LabDashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Total Lab Tests</p>
               <h3 className={classes.cardTitle}>
-                {rows ? rows.length : 0} <small></small>
+                {pending ? pending + lab.length : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -86,31 +85,14 @@ export default function LabDashboard() {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
-          <Card>
-            <CardHeader color="success" stats icon>
-              <CardIcon color="success">
-                <Store />
-              </CardIcon>
-              <p className={classes.cardCategory}>Total Patients</p>
-              <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
-            </CardHeader>
-            <CardFooter stats>
-              <div className={classes.stats}>
-                <DateRange />
-                Last 24 Hours
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
+        <GridItem xs={12} sm={6} md={4}>
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Pending Requests</p>
-              <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{pending ? pending : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -120,14 +102,14 @@ export default function LabDashboard() {
             </CardFooter>
           </Card>
         </GridItem>
-        <GridItem xs={12} sm={6} md={3}>
+        <GridItem xs={12} sm={6} md={4}>
           <Card>
             <CardHeader color="info" stats icon>
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Total Tests Done</p>
-              <h3 className={classes.cardTitle}>{approved ? approved.length : 0}</h3>
+              <h3 className={classes.cardTitle}>{lab ? lab.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -148,10 +130,16 @@ export default function LabDashboard() {
               </p>
             </CardHeader>
             <CardBody>
+            <div className="searchOut">
+                <div className="searchCont">
+                  <input type="text" className="searchInput" placeholder="Search Patient"/>
+                  <button className="btnSearch">Search</button>
+                </div>
+              </div>
               <Table
                 tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.country]))}
+                tableHead={["Test ID", "Test Name", "Patient ID", "Test Date"]}
+                tableData={rows.map((item) => ([item.lab_test_id, item.test_name, item.patient_id, item.lab_test_date]))}
               />
             </CardBody>
           </Card>

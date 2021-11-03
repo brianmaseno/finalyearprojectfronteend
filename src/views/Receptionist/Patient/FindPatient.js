@@ -50,6 +50,88 @@ export default function FindPatient() {
   const [patientID, setPatientID] = useState("")
   const [item, setItem] = useState([])
 
+  const [firstname, setFirstname] = useState("")
+  const [lastname, setLastname] = useState("")
+  const [age, setAge] = useState("")
+  const [county, setCounty] = useState("")
+  const [subCounty, setSubCounty] = useState("")
+  const [village, setVillage] = useState("")
+  const [telephone, setTelephone] = useState("")
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [temperature, setTemperature] = useState("");
+  const [pressure, setPressure] = useState("");
+
+  const updatePatient = (e) => {
+    e.preventDefault()
+
+    if (firstname === "") {
+      setFirstname(item[0].firstname)
+    }
+    if(lastname === ""){
+      setLastname(item[0].lastname)
+    }
+    if(age === ""){
+      setAge(item[0].age)
+    }
+    if(county === ""){
+      setCounty(item[0].county)
+    }
+    if(subCounty === ""){
+      setSubCounty(item[0].sub_county)
+    }
+    if(village === ""){
+      setVillage(item[0].village)
+    }
+    if(telephone === ""){
+      setTelephone(item[0].telephone)
+    }
+    if(weight === ""){
+      setWeight(item[0].weight)
+    }
+    if(height === ""){
+      setHeight(item[0].height)
+    }
+    if(temperature === ""){
+      setTemperature(item[0].temperature)
+    }
+    if(pressure === ""){
+      setPressure(item[0].pressure)
+    }
+
+    const details = {
+      patient_Id: patientID,
+      firstname: firstname,
+      lastname: lastname,
+      age: age,
+      village: village,
+      telephone: telephone,
+      county: county,
+      sub_county: subCounty,
+      weight: weight,
+      height: height,
+      temperature: temperature,
+      pressure: pressure
+    }
+
+    axios({
+        method: 'post',
+        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/Profile/EditProfile',
+        data: details})
+        .then((data) => {
+          console.log(data)
+            if (data.data.message == "Edited Successfully") {
+                console.log("Edited Successfully")
+            }
+            else{
+                console.log("Not Edited")
+            }                
+        })
+        .catch((error) => {
+            console.log(error);
+    });
+  }
+
   const searchPatient = (e) => {
     e.preventDefault();
 
@@ -62,6 +144,18 @@ export default function FindPatient() {
             console.log(data.data.data)
             setItem(data.data.data)
             setAvailable(true);
+
+            setFirstname(data.data.data[0].firstname)
+            setLastname(data.data.data[0].lastname)
+            setAge(data.data.data[0].age)
+            setCounty(data.data.data[0].county)
+            setSubCounty(data.data.data[0].sub_county)
+            setVillage(data.data.data[0].village)
+            setTelephone(data.data.data[0].telephone)
+            setWeight(data.data.data[0].weight)
+            setHeight(data.data.data[0].height)
+            setTemperature(data.data.data[0].temperature)
+            setPressure(data.data.data[0].pressure)
           }
           else{
             console.log("Not Found")
@@ -145,31 +239,31 @@ export default function FindPatient() {
                           <div className="formCont">
                             <div className="formIn">
                               <label className="labelPat">First Name</label>
-                              <input placeholder="First Name" className="patInput" value={data.firstname}/>
+                              <input placeholder={data.firstname} className="patInput" onChange={(e) => setFirstname(e.target.value)}/>
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Last Name</label>
-                              <input placeholder="Last Name" className="patInput" value={data.lastname}/>
+                              <input placeholder={data.lastname} className="patInput" onChange={(e) => setLastname(e.target.value)}/>
                             </div>
                           </div>
                           <div className="formCont">
                             <div className="formIn">
                               <label className="labelPat">Age</label>
-                              <input placeholder="Age" className="patInput" value={data.age}/>
+                              <input placeholder={data.age} className="patInput" onChange={(e) => setAge(e.target.value)}/>
                             </div>
                             <div className="formIn">
                               <label className="labelPat">County</label>
-                              <input placeholder="County" className="patInput" value={data.county}/>
+                              <input placeholder={data.county} className="patInput" onChange={(e) => setCounty(e.target.value)}/>
                             </div>
                           </div>
                           <div className="formCont">
                             <div className="formIn">
                               <label className="labelPat">Sub County</label>
-                              <input placeholder="Sub-County" className="patInput" value={data.sub_county}/>
+                              <input placeholder={data.sub_county} className="patInput" onChange={(e) => setSubCounty(e.target.value)}/>
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Village</label>
-                              <input placeholder="Village" className="patInput" value={data.village}/>
+                              <input placeholder={data.village} className="patInput" onChange={(e) => setVillage(e.target.value)}/>
                             </div>
                           </div>
                           <div className="formCont">
@@ -179,7 +273,7 @@ export default function FindPatient() {
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Phone Number</label>
-                              <input placeholder="Phone Number" className="patInput" value={data.telephone}/>
+                              <input placeholder={data.telephone} className="patInput" onChange={(e) => setTelephone(e.target.value)}/>
                             </div>
                           </div>
                           <div className="formCont">
@@ -189,22 +283,22 @@ export default function FindPatient() {
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Weight</label>
-                              <input placeholder="Weight" className="patInput" value={data.weight}/>
+                              <input placeholder={data.weight} className="patInput" onChange={(e) => setWeight(e.target.value)} />
                             </div>
                           </div>
                           <div className="formCont">
                             <div className="formIn">
                               <label className="labelPat">Height</label>
-                              <input placeholder="Height" className="patInput" value={data.height}/>
+                              <input placeholder={data.height} className="patInput" onChange={(e) => setHeight(e.target.value)}/>
                             </div>
                             <div className="formIn">
                               <label className="labelPat">Temperature</label>
-                              <input placeholder="Temperature" className="patInput" value={data.temperature}/>
+                              <input placeholder={data.temperature} className="patInput" onChange={(e) => setTemperature(e.target.value)}/>
                             </div>
                           </div>
 
                           <div className="formBtn">
-                              <button className="btnUpdate">Update Patient</button>
+                              <button className="btnUpdate" onClick={updatePatient}>Update Patient</button>
                               <button className="btnDelete" onClick={deletePatient}>Delete Patient</button>
                           </div>
                         </form>
