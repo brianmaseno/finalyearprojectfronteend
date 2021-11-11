@@ -49,13 +49,42 @@ const useStyles = makeStyles(styles);
 
 export default function EditAccounts() {
   const classes = useStyles();
-  const [username, setUsername] = useState("");
-  const [updated, setUpdated] = useState(false)
-  const [newData, setNewData] = useState([])
-  const { data } = useAccountStatus("activated");
+  const [data, setData] = useState([])
+  const [search, setSearch] = useState("")
   const { loading } = useDataStatus(data);
 
   const message = `Account suspended successfully`;
+
+  const searchStaff = (e) => {
+    e.preventDefault()
+    setData(data.filter((item) => item.national_id == search))
+  }
+
+  const getAllActivatedStaff = () => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/activated`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Found") {
+                setData(data.data);
+            }
+            else{
+                console.log("no data");
+            }
+        })
+  }
+
+  useEffect(() => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/activated`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setData(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }, [])
 
   return (
     <>
@@ -77,7 +106,15 @@ export default function EditAccounts() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Employee"/>
+                <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getAllActivatedStaff()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setData(data.filter((item) => item.national_id == e.target.value))
+                  }
+                }}/>
                 <button className="btnSearch">Search</button>
               </div>
             </div>

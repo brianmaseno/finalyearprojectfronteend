@@ -52,6 +52,25 @@ export default function LabRequests() {
   const { data } = useAccountStatus("suspended");
   const { loading } = useDataStatus(data);
   const [test, setTest] = useState([])
+  const [search, setSearch] = useState("")
+
+  const searchTests = (e) => {
+    e.preventDefault()
+    setTest(rows.filter((item) => item.patient_id == search))
+  }
+
+  const getAllTests = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Requests Found") {
+              setTest(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }
 
   useEffect(() => {
     axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests`)
@@ -88,8 +107,16 @@ export default function LabRequests() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Requests"/>
-                <button className="btnSearch">Search</button>
+                <input type="text" className="searchInput" placeholder="Search Requests" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getAllTests()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setTest(test.filter((item) => item.patient_id == e.target.value))
+                  }
+                }}/>
+                <button className="btnSearch" onClick={searchTests}>Search</button>
               </div>
             </div>
             {test.length > 0 ? 

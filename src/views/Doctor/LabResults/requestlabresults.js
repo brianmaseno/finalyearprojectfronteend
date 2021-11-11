@@ -10,6 +10,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { useAuth } from "hooks/AuthProvider";
+import { useApprovedTreatment } from "hooks/useApprovedTreatment";
 const axios = require('axios').default;
 
 const styles = {
@@ -48,7 +49,9 @@ export default function RequestLabTest() {
   const classes = useStyles();
   const { currentUser } = useAuth()
   const [patientId, setPatientId] = useState("")
+  const [treatmentId, setTreatmentId] = useState("");
   const [notes, setNotes] = useState("");
+  const { data } = useApprovedTreatment();
 
   const requestLab = (e) => {
     e.preventDefault()
@@ -56,6 +59,7 @@ export default function RequestLabTest() {
     const details = {
       patient_id: patientId,
       staff_id: currentUser.national_id,
+      treatment_id: treatmentId,
       test_notes: notes
     }
 
@@ -79,6 +83,12 @@ export default function RequestLabTest() {
   }
 
   return (
+    <>
+    <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Request Lab Results</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -95,6 +105,15 @@ export default function RequestLabTest() {
                   <label className="idC">Patient ID*</label>
                   <input placeholder="Patient ID" className="inCase" onChange={(e) => setPatientId(e.target.value)}/>
                 </div>
+                <div className="caseId" style={{marginTop: "10px"}}>
+                  <label className="idC">Treatment ID*</label>
+                  <select className="inCase" onChange={(e) => setTreatmentId(e.target.value)}>
+                    <option>Select...</option>
+                    {data.length > 0 ? data.map((item) => (
+                      <option value={item._id}>{item._id}</option>
+                    )): null}
+                  </select>
+                </div>
                 <div className="caseText">
                   <label className="noteC">Test</label>
                   <textarea className="txtC" placeholder="Test to be Conducted" onChange={(e) => setNotes(e.target.value)}>
@@ -103,7 +122,6 @@ export default function RequestLabTest() {
                 </div>
                 <div className="caseFooter">
                   <button className="caseSave" onClick={requestLab}>Request</button>
-                  <button className="caseCancel">Cancel</button>
                 </div>
               </div>
             </div>
@@ -111,5 +129,6 @@ export default function RequestLabTest() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

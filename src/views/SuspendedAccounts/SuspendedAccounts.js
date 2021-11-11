@@ -48,8 +48,40 @@ const useStyles = makeStyles(styles);
 
 export default function SuspendedAccounts() {
   const classes = useStyles();
-  const { data } = useAccountStatus("suspended");
+  const [data, setData] = useState([])
+  const [search, setSearch] = useState("")
   const { loading } = useDataStatus(data);
+
+  const searchStaff = (e) => {
+    e.preventDefault()
+    setData(data.filter((item) => item.national_id == search))
+  }
+
+  const getAllSuspendedStaff = () => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/suspended`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Found") {
+                setData(data.data);
+            }
+            else{
+                console.log("no data");
+            }
+        })
+  }
+
+  useEffect(() => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/suspended`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setData(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }, [])
 
   return (
     <>
@@ -71,8 +103,16 @@ export default function SuspendedAccounts() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Employee"/>
-                <button className="btnSearch">Search</button>
+                <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getAllSuspendedStaff()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setData(data.filter((item) => item.national_id == e.target.value))
+                  }
+                }}/>
+                <button className="btnSearch" onClick={searchStaff}>Search</button>
               </div>
             </div>
             {loading ? 

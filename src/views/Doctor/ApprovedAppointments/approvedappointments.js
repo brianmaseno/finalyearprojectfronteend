@@ -50,6 +50,25 @@ export default function DoctorApprovedAppointments() {
   const [approved, setApproved] = useState([])
   const { loading } = useDataStatus(approved);
   const { currentUser } = useAuth();
+  const [search, setSearch] = useState("")
+
+  const searchAppointment = (e) => {
+    e.preventDefault()
+    setApproved(approved.filter((item) => item.patient_id == search))
+  }
+
+  const getAllApprovedAppointments = () => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message == "Found") {
+            setApproved(data.data)
+        }
+        else{
+            console.log("no Patient");
+        }
+    })
+  }
 
   useEffect(() => {
     fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
@@ -66,6 +85,12 @@ export default function DoctorApprovedAppointments() {
   }, [])
 
   return (
+    <>
+    <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Approved Appointments</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -78,8 +103,16 @@ export default function DoctorApprovedAppointments() {
           <CardBody>
             <div className="searchOut">
                   <div className="searchCont">
-                    <input type="text" className="searchInput" placeholder="Search Appointment"/>
-                    <button className="btnSearch">Search</button>
+                    <input type="text" className="searchInput" placeholder="Search Appointment By Patient ID" onChange={(e) => {
+                      if (e.target.value === "") {
+                        getAllApprovedAppointments()
+                      }
+                      else{
+                        setSearch(e.target.value)
+                        setApproved(approved.filter((item) => item.patient_id == e.target.value))
+                      }
+                    }}/>
+                    <button className="btnSearch" onClick={searchAppointment}>Search</button>
                   </div>
                 </div>
                 {approved.length > 0 ?
@@ -131,5 +164,6 @@ export default function DoctorApprovedAppointments() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

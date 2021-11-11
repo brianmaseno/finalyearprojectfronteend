@@ -50,8 +50,40 @@ const useStyles = makeStyles(styles);
 
 export default function ApprovedAppointments() {
   const classes = useStyles();
-  const { patients } = usePatients();
-  const approved = useAppointments("activated");
+  const [approved, setApproved] = useState([])
+  const [search, setSearch] = useState("")
+
+  const searchApproved = (e) => {
+    e.preventDefault()
+    setApproved(approved.filter((item) => item.patient_id === search))
+    console.log(approved)
+  }
+  
+  const getApprovedAppointments = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/appointments/all/activated")
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message === "Found") {
+            setApproved(data.data)
+        }
+        else{
+            console.log("no Appointment");
+        }
+    })
+  }
+
+  useEffect(() => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/appointments/all/activated")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message === "Found") {
+            setApproved(data.data)
+          }
+          else{
+            console.log("Not Found")
+          }
+      })
+  }, [])
 
   return (
     <>
@@ -73,8 +105,16 @@ export default function ApprovedAppointments() {
           <CardBody>
           <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Appointment"/>
-                <button className="btnSearch">Search</button>
+                <input type="text" className="searchInput" placeholder="Search Appointment By ID" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getApprovedAppointments()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setApproved(approved.filter((item) => item.patient_id === e.target.value))
+                  }
+                }}/>
+                <button className="btnSearch" onClick={searchApproved}>Search</button>
               </div>
               </div>
               <table className="styled-table">
@@ -89,7 +129,7 @@ export default function ApprovedAppointments() {
                   </tr>
                 </thead>
                 <tbody>
-                {approved.data.length > 0 ? approved.data.map((item) => (
+                {approved.length > 0 ? approved.map((item) => (
                       <tr>
                         <td>{item._id}</td>
                         <td>{item.appointment_due_date}</td>

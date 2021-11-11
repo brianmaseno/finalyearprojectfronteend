@@ -49,9 +49,40 @@ const useStyles = makeStyles(styles);
 
 export default function PendingAppointments() {
   const classes = useStyles();
-  const pending = useAppointments("pending");
+  const [pending, setPending] = useState([])
+  const [search, setSearch] = useState("")
 
-  console.log(pending);
+  const searchPending = (e) => {
+    e.preventDefault()
+    setPending(pending.filter((item) => item.patient_id == search))
+  }
+  
+  const getPendingAppointments = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/appointments/all/pending")
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message == "Found") {
+            setPending(data.data)
+            console.log(pending)
+        }
+        else{
+            console.log("no Appointment");
+        }
+    })
+  }
+
+  useEffect(() => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/all/pending`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+            setPending(data.data)
+          }
+          else{
+            console.log("No Data")
+          }
+      })
+  }, [])
 
   return (
     <>
@@ -73,8 +104,16 @@ export default function PendingAppointments() {
           <CardBody>
           <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Appointment"/>
-                <button className="btnSearch">Search</button>
+                <input type="text" className="searchInput" placeholder="Search Appointment By ID" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getPendingAppointments()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setPending(pending.filter((item) => item.patient_id == e.target.value))
+                  }
+                }}/>
+                <button className="btnSearch" onClick={searchPending}>Search</button>
               </div>
               </div>
               <table className="styled-table">
@@ -89,7 +128,7 @@ export default function PendingAppointments() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pending.data.length > 0 ? pending.data.map((item) => (
+                  {pending.length > 0 ? pending.map((item) => (
                       <tr>
                         <td>{item._id}</td>
                         <td>{item.appointment_due_date}</td>

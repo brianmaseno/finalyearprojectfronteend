@@ -115,6 +115,12 @@ export default function Prescription() {
   }
 
   return (
+    <>
+    <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Prescription</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -174,7 +180,6 @@ export default function Prescription() {
                 </div>
                 <div className="caseFooter">
                   <button className="caseSave" onClick={prescribeDrugs}>Add Prescription</button>
-                  <button className="caseCancel">Cancel</button>
                 </div>
               </div>
             </div>
@@ -182,5 +187,6 @@ export default function Prescription() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

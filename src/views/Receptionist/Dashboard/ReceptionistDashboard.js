@@ -48,9 +48,42 @@ const useStyles = makeStyles(styles);
 export default function ReceptionistDashboard() {
   const classes = useStyles();
   const { patients } = usePatients();
+  const [allPatients, setPatients] = useState([])
   const pending = useAppointments("pending");
   const approved = useAppointments("approved");
   const cancelled = useAppointments("cancelled");
+  const [search, setSearch] = useState("");
+
+  const searchPatient = (e) => {
+    e.preventDefault()
+    setPatients(patients.filter((item) => item.identity_no == search))
+  }
+
+  const getAllPatients = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/allpatients")
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message == "Patients Records available") {
+            setPatients(data.data)
+        }
+        else{
+            console.log("no Patient");
+        }
+    })
+  }
+
+  useEffect(() => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/allpatients")
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message == "Patients Records available") {
+            setPatients(data.data)
+        }
+        else{
+            console.log("no Patient");
+        }
+    })
+  }, [])
 
   return (
     <div>
@@ -138,8 +171,16 @@ export default function ReceptionistDashboard() {
             <CardBody>
               <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Patient"/>
-                  <button className="btnSearch">Search</button>
+                  <input type="text" className="searchInput" placeholder="Search Patient By ID" onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllPatients()
+                    }
+                    else{
+                      setSearch(e.target.value)
+                      setPatients(patients.filter((item) => item.identity_no == e.target.value))
+                    }
+                  }}/>
+                  <button className="btnSearch" onClick={searchPatient}>Search</button>
                 </div>
               </div>
               <table className="styled-table">
@@ -155,7 +196,7 @@ export default function ReceptionistDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                {patients.length > 0 ? patients.map((item) => (
+                {allPatients.length > 0 ? allPatients.map((item) => (
                       <tr>
                         <td>{item._id}</td>
                         <td>{item.firstname}</td>

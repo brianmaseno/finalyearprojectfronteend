@@ -48,6 +48,25 @@ export default function PharmacistDashboard() {
   const prescribed = usePrescribedDrugs("prescribed/all")
   const issued = usePrescribedDrugs("dispensingreport")
   const cancelled = usePrescribedDrugs("dispensingreport/cancelled")
+  const [search, setSearch] = useState("")
+
+  const searchPrescription = (e) => {
+    e.preventDefault()
+    setRows(rows.filter((item) => item.patient_id == search))
+  }
+
+  const getAllPrescriptions = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }
 
 
   useEffect(() => {
@@ -131,8 +150,16 @@ export default function PharmacistDashboard() {
             <CardBody>
               <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Prescription ID"/>
-                  <button className="btnSearch">Search</button>
+                  <input type="text" className="searchInput" placeholder="Search Prescription ID" onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllPrescriptions()
+                    }
+                    else{
+                      setSearch(e.target.value)
+                      setRows(rows.filter((item) => item.patient_id == e.target.value))
+                    }
+                  }}/>
+                  <button className="btnSearch" onClick={searchPrescription}>Search</button>
                 </div>
               </div>
               {rows ? 

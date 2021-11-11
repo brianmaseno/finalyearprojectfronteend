@@ -49,10 +49,40 @@ const useStyles = makeStyles(styles);
 
 export default function PendingAccounts() {
   const classes = useStyles();
-  const { data } = useAccountStatus("pending");
+  const [search, setSearch] = useState("")
+  const [data, setData] = useState([])
   const { loading } = useDataStatus(data);
 
-  console.log(loading)
+  const searchStaff = (e) => {
+    e.preventDefault()
+    setData(data.filter((item) => item.national_id == search))
+  }
+
+  const getAllPendingStaff = () => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/pending`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Found") {
+                setData(data.data);
+            }
+            else{
+                console.log("no data");
+            }
+        })
+  }
+
+  useEffect(() => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/pending`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setData(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }, [])
 
   return (
     <>
@@ -74,8 +104,16 @@ export default function PendingAccounts() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Employee"/>
-                <button className="btnSearch">Search</button>
+                <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getAllPendingStaff()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setData(data.filter((item) => item.national_id == e.target.value))
+                  }
+                }}/>
+                <button className="btnSearch" onClick={searchStaff}>Search</button>
               </div>
             </div>
             {!loading ? <div className="noData"><br /><ReactLoading type="spinningBubbles" color="#11b8cc" height={30} width={30} /></div> : <>

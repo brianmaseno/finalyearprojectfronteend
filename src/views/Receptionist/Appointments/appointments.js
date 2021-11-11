@@ -182,7 +182,6 @@ export default function BookAppointment() {
                             </div>
                             <div className="formBtn">
                                 <button className="btnUpdate" onClick={saveAppointment}>Save Appointment</button>
-                                <button className="btnDelete">Cancel</button>
                             </div>
                           </form>
                       </div>

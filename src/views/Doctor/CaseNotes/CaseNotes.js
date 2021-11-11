@@ -83,6 +83,12 @@ export default function CaseNotes() {
   }
 
   return (
+    <>
+    <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Case Notes</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -116,7 +122,6 @@ export default function CaseNotes() {
                 </div>
                 <div className="caseFooter">
                   <button className="caseSave" onClick={saveNotes}>Save Notes</button>
-                  <button className="caseCancel">Cancel</button>
                 </div>
               </div>
             </div>
@@ -124,5 +129,6 @@ export default function CaseNotes() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

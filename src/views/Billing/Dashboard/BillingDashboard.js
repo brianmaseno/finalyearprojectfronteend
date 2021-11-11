@@ -49,6 +49,26 @@ export default function BillingDashboard() {
   const unpaid = useBilling("pendingbills")
   const paid = useBilling("completedbills")
   const total = unpaid + paid
+  const [search, setSearch] = useState("")
+
+  const searchBilling = (e) => {
+    e.preventDefault()
+    rows.filter((item) => item.patient_id == search)
+  }
+
+  const allBillings = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/billing/completedbills/report/all")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data);
+              console.log(data.data)
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }
 
   useEffect(() => {
     fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/billing/completedbills/report/all")
@@ -134,8 +154,16 @@ export default function BillingDashboard() {
               <>
               <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Payments"/>
-                  <button className="btnSearch">Search</button>
+                  <input type="text" className="searchInput" placeholder="Search Payments By ID" onChange={(e) => {
+                    if (e.target.value === "") {
+                      allBillings()
+                    }
+                    else{
+                      setSearch(e.target.value)
+                      rows.filter((item) => item.patient_id == e.target.value)
+                    }
+                  }}/>
+                  <button className="btnSearch" onClick={searchBilling}>Search</button>
                 </div>
               </div>
               <Table

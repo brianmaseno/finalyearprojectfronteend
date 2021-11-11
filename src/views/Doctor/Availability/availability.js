@@ -90,6 +90,12 @@ export default function DoctorAvailability() {
   }
 
   return (
+    <>
+    <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Doctor Availability</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -124,7 +130,6 @@ export default function DoctorAvailability() {
                   </div>
                   <div className="caseFooter">
                     <button className="caseSave" onClick={addAvailability}>Add Availability</button>
-                    <button className="caseCancel">Cancel</button>
                   </div>
                 </div>
               </div>
@@ -132,5 +137,6 @@ export default function DoctorAvailability() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

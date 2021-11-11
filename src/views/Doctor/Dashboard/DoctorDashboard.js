@@ -54,6 +54,25 @@ export default function DoctorDashboard() {
   const pendingData = useDoctorAppointments("pending", currentUser.national_id)
   const cancelled = useDoctorAppointments("cancelled", currentUser.national_id)
   const { patients } = usePatients()
+  const [search, setSearch] = useState("")
+
+  const searchAppointment = (e) => {
+    e.preventDefault()
+    setPending(pending.filter((item) => item.patient_id == search))
+  }
+
+  const getAllPendingAppointments = () => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message == "Found") {
+            setPending(data.data)
+        }
+        else{
+            console.log("no Patient");
+        }
+    })
+  }
 
   useEffect(() => {
     fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
@@ -153,8 +172,16 @@ export default function DoctorDashboard() {
             <CardBody>
               <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Appointment"/>
-                  <button className="btnSearch">Search</button>
+                  <input type="text" className="searchInput" placeholder="Search Appointment By Patient ID" onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllPendingAppointments()
+                    }
+                    else{
+                      setSearch(e.target.value)
+                      setPending(pending.filter((item) => item.patient_id == e.target.value))
+                    }
+                  }}/>
+                  <button className="btnSearch" onClick={searchAppointment}>Search</button>
                 </div>
               </div>
               {pending.length > 0 ?
@@ -170,7 +197,7 @@ export default function DoctorDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                {pending ? pending.map((item) => (
+                {pending.length > 0 ? pending.map((item) => (
                         <tr>
                           <td>{item._id}</td>
                           <td>{item.appointment_due_date}</td>

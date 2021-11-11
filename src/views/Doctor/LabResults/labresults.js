@@ -68,6 +68,12 @@ export default function DoctorLabTestResults() {
   }
 
   return (
+    <>
+    <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Lab Results</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -86,7 +92,6 @@ export default function DoctorLabTestResults() {
                 </div>
                 <div className="caseFooter">
                   <button className="caseSave" onClick={checkPatient}>Search</button>
-                  <button className="caseCancel">Cancel</button>
                 </div>
                 {test.length > 0 ? 
                 <div>
@@ -123,5 +128,6 @@ export default function DoctorLabTestResults() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

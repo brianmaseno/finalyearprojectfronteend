@@ -49,6 +49,25 @@ const useStyles = makeStyles(styles);
 export default function DispensedDrugs() {
   const classes = useStyles();
   const [data, setData] = useState([])
+  const [search, setSearch] = useState("")
+
+  const searchPrescription = (e) => {
+    e.preventDefault()
+    setData(data.filter((item) => item.patient_id == search))
+  }
+
+  const getAllPrescriptions = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setData(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }
 
   useEffect(() => {
     fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
@@ -83,8 +102,16 @@ export default function DispensedDrugs() {
           <CardBody>
             <div className="searchOut">
               <div className="searchCont">
-                <input type="text" className="searchInput" placeholder="Search Prescription ID"/>
-                <button className="btnSearch">Search</button>
+                <input type="text" className="searchInput" placeholder="Search Patient ID" onChange={(e) => {
+                  if (e.target.value === "") {
+                    getAllPrescriptions()
+                  }
+                  else{
+                    setSearch(e.target.value)
+                    setData(data.filter((item) => item.patient_id == e.target.value))
+                  }
+                }}/>
+                <button className="btnSearch" onClick={searchPrescription}>Search</button>
               </div>
             </div>
             {data ? 

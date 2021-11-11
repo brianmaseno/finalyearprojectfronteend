@@ -49,6 +49,25 @@ export default function DoctorPendingAppointments() {
   const [pending, setPending] = useState([])
   const { loading } = useDataStatus(pending);
   const { currentUser } = useAuth();
+  const [search, setSearch] = useState("")
+
+  const searchAppointment = (e) => {
+    e.preventDefault()
+    setPending(pending.filter((item) => item.patient_id == search))
+  }
+
+  const getAllPendingAppointments = () => {
+    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    .then(response => response.json())
+    .then((data) => {
+        if (data.message == "Found") {
+            setPending(data.data)
+        }
+        else{
+            console.log("no Patient");
+        }
+    })
+  }
 
   useEffect(() => {
     fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
@@ -67,6 +86,12 @@ export default function DoctorPendingAppointments() {
   console.log(currentUser.national_id)
 
   return (
+    <div>
+      <div className="pathCont">
+        <div className="path">
+            <p className="pathName">Dashboard / <span>Pending Appointments</span></p>
+        </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -79,8 +104,16 @@ export default function DoctorPendingAppointments() {
           <CardBody>
             <div className="searchOut">
                   <div className="searchCont">
-                    <input type="text" className="searchInput" placeholder="Search Appointment"/>
-                    <button className="btnSearch">Search</button>
+                    <input type="text" className="searchInput" placeholder="Search Appointment By Patient ID" onChange={(e) => {
+                      if (e.target.value === "") {
+                        getAllPendingAppointments()
+                      }
+                      else{
+                        setSearch(e.target.value)
+                        setPending(pending.filter((item) => item.patient_id == e.target.value))
+                      }
+                    }}/>
+                    <button className="btnSearch" onClick={searchAppointment}>Search</button>
                   </div>
                 </div>
                 {pending.length > 0 ?
@@ -96,7 +129,7 @@ export default function DoctorPendingAppointments() {
                     </tr>
                   </thead>
                   <tbody>
-                    {pending ? pending.map((item) => (
+                    {pending.length > 0 ? pending.map((item) => (
                         <tr>
                           <td>{item._id}</td>
                           <td>{item.appointment_due_date}</td>
@@ -113,7 +146,7 @@ export default function DoctorPendingAppointments() {
                                       console.log("Approved")
                                     }
                                     else{
-                                      setUpdated(false)
+                                      console.log("Not Approved")
                                     }
                                 })
                                 }}>Approve</p>
@@ -132,5 +165,6 @@ export default function DoctorPendingAppointments() {
         </Card>
       </GridItem>
     </GridContainer>
+  </div>
   );
 }

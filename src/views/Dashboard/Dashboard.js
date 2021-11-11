@@ -46,12 +46,43 @@ const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
   const classes = useStyles();
-  const rows = useAllStaff();
+  const [rows, setRows] = useState([])
   const pending = useStatus("pending");
   const approved = useStatus("activated");
   const blocked = useStatus("suspended");
-  
+  const [search, setSearch] = useState("")
 
+  const searchStaff = (e) => {
+    e.preventDefault()
+    setRows(rows.filter((item) => item.national_id == search))
+  }
+
+  const getAllStaff = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+            setRows(data.data)
+          }
+          else{
+            console.log("Not Found")
+          }
+      })
+  }
+
+  useEffect(() => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+            setRows(data.data)
+          }
+          else{
+            console.log("Not Found")
+          }
+      })
+  }, [])
+  
   return (
     <div>
       <GridContainer>
@@ -138,8 +169,16 @@ export default function Dashboard() {
             <CardBody>
               <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Employee"/>
-                  <button className="btnSearch">Search</button>
+                  <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllStaff()
+                    }
+                    else{
+                      setSearch(e.target.value)
+                      setRows(rows.filter((item) => item.national_id == e.target.value))
+                    }
+                  }}/>
+                  <button className="btnSearch" onClick={searchStaff}>Search</button>
                 </div>
               </div>
               {rows.length > 0 ? 

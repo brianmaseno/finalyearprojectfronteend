@@ -49,9 +49,27 @@ export default function LabDashboard() {
   const [rows, setRows] = useState([])
   const { lab } = useLab()
   const { pending } = usePendingLab()
+  const [search, setSearch] = useState("")
+
+  const searchTests = (e) => {
+    e.preventDefault()
+    setRows(rows.filter((item) => item.patient_id == search))
+  }
+
+  const getAllTests = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Requests Found") {
+              setRows(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }
 
   useEffect(() => {
-    console.log(pending)
     fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
           .then(response => response.json())
           .then((data) => {
@@ -74,7 +92,7 @@ export default function LabDashboard() {
               </CardIcon>
               <p className={classes.cardCategory}>Total Lab Tests</p>
               <h3 className={classes.cardTitle}>
-                {pending ? pending + lab.length : 0} <small></small>
+                {pending + lab.length > 0 ? pending + lab.length : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -132,8 +150,16 @@ export default function LabDashboard() {
             <CardBody>
             <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Patient"/>
-                  <button className="btnSearch">Search</button>
+                  <input type="text" className="searchInput" placeholder="Search Test By ID" onChange={(e) => {
+                    if (e.target.value === "") {
+                      getAllTests()
+                    }
+                    else{
+                      setSearch(e.target.value)
+                      setRows(rows.filter((item) => item.patient_id == e.target.value))
+                    }
+                  }}/>
+                  <button className="btnSearch" onClick={searchTests}>Search</button>
                 </div>
               </div>
               <Table
