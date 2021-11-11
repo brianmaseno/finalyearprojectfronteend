@@ -57,10 +57,10 @@ export default function LabDashboard() {
   }
 
   const getAllTests = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
       .then(response => response.json())
       .then((data) => {
-          if (data.message == "Requests Found") {
+          if (data.message == "Report Found") {
               setRows(data.data);
           }
           else{
@@ -70,10 +70,10 @@ export default function LabDashboard() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
           .then(response => response.json())
           .then((data) => {
-              if (data.message == "Requests Found") {
+              if (data.message == "Report Found") {
                   setRows(data.data);
               }
               else{
@@ -126,7 +126,7 @@ export default function LabDashboard() {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Total Tests Done</p>
+              <p className={classes.cardCategory}>Completed Tests</p>
               <h3 className={classes.cardTitle}>{lab ? lab.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -163,9 +163,9 @@ export default function LabDashboard() {
                 </div>
               </div>
               <Table
-                tableHeaderColor="warning"
-                tableHead={["Test ID", "Test Name", "Patient ID", "Test Date"]}
-                tableData={rows.map((item) => ([item.lab_test_id, item.test_name, item.patient_id, item.lab_test_date]))}
+                tableHeaderColor="info"
+                tableHead={["Test ID", "Test Name", "Patient ID", "Test Date", "Test Cost (Ksh)"]}
+                tableData={rows.map((item) => ([item.lab_test_id, item.test_name, item.patient_id, item.lab_test_date, item.test_cost]))}
               />
             </CardBody>
           </Card>

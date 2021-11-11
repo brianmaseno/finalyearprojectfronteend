@@ -5,10 +5,10 @@ export const useLab = () => {
   const [lab, setLab] = useState([])
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
     .then(response => response.json())
     .then((data) => {
-        if (data.message == "Requests Found") {
+        if (data.message == "Report Found") {
             setLab(data.data)
             console.log(data.data);
         }

@@ -110,7 +110,7 @@ export default function CaseNotes() {
                   <select className="inCase" onChange={(e) => setTreatment_id(e.target.value)}>
                     <option>Select...</option>
                     {data.length > 0 ? data.map((item) => (
-                      <option value={item._id}>{item._id}</option>
+                      <option value={item.treatment_id}>{item._id}</option>
                     )): null}
                   </select>
                 </div>

@@ -51,6 +51,40 @@ const useStyles = makeStyles(styles);
 export default function DrugReports() {
   const classes = useStyles();
   const { patients } = usePatients();
+  const [rows, setRows] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const searchPrescription = (e) => {
+    e.preventDefault()
+    setRows(rows.filter((item) => item.patient_id == search))
+  }
+
+  const getAllPrescriptions = () => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }
+
+
+  useEffect(() => {
+    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data);
+          }
+          else{
+              console.log("no data");
+          }
+      })
+  }, [])
 
   return (
     <>
@@ -104,33 +138,33 @@ export default function DrugReports() {
                   </div>
                 </div>
                 <div>
+                  {rows.length > 0 ? 
                   <table className="styled-table">
                     <thead>
                       <tr>
                         <th>Date</th>
-                        <th>Lab Test</th>
-                        <th>Patient</th>
-                        <th>Results</th>
-                        <th>Prescription</th>
+                        <th>Treatment ID</th>
+                        <th>Patient ID</th>
+                        <th>Drug</th>
+                        <th>Usage</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="trBody">12/11/2021</td>
-                        <td className="trBody">Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria</td>
-                        <td className="trBody">Tom</td>
-                        <td className="trBody">Parasites seen</td>
-                        <td className="trBody">Prescription</td>
-                      </tr>
-                      <tr>
-                        <td className="trBody">12/11/2021</td>
-                        <td className="trBody">Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria</td>
-                        <td className="trBody">Tom</td>
-                        <td className="trBody">Parasites seen</td>
-                        <td className="trBody">Prescription</td>
-                      </tr>
+                      {rows.length > 0 ? rows.map((item) => (
+                        <tr>
+                          <td className="trBody">12/11/2021</td>
+                          <td className="trBody">{item.treatment_id}</td>
+                          <td className="trBody">{item.patient_id}</td>
+                          <td className="trBody">{item.drug}</td>
+                          <td className="trBody">{item.usage_per_day}</td>
+                        </tr>
+                      ))
+                    :
+                    null }
                     </tbody>
                   </table>
+                  :
+                  null }
                 </div>
               </div>
               <div className="print">
