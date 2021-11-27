@@ -21,6 +21,7 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 import { usePrescribedDrugs } from "hooks/usePrescribedDrugs";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { ToastContainer, toast } from "react-toastify";
 
 const useStyles = makeStyles(styles);
 
@@ -70,6 +71,7 @@ export default function PharmacistDashboard() {
   }, [])
   return (
     <div>
+      <ToastContainer />
       <GridContainer>
         <GridItem xs={12} sm={6} md={4}>
           <Card>
@@ -180,10 +182,14 @@ export default function PharmacistDashboard() {
                               .then(response => response.json())
                               .then((data) => {
                                   if (data.message == "Updated Successfully") {
-                                      console.log("Updated")
+                                    toast.success("Removed Successfully")
+                                    console.log("Updated")
+                                    setRows([])
+                                    getAllPrescriptions()
                                   }
                                   else{
-                                      console.log("no data");
+                                    toast.error("Not Removed")
+                                    console.log("no data");
                                   }
                               })
                             }}>Remove</p>

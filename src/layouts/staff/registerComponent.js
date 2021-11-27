@@ -479,9 +479,9 @@ export default function RegisterComponent() {
               </div>
 
               <div className="nameSection">
-                  <div className="firstN">
+                  <div className="confirmN">
                       <label className="labelText">Confirm Password</label><br/>
-                      <input type="password" name="confirmpassword" placeholder="Confirm Password" required className="inputRegister" onChange={(e) => setConfirmPassword(e.target.value)}/><br/>
+                      <input type="password" name="confirmpassword" placeholder="Confirm Password" required className="inputConfirm" onChange={(e) => setConfirmPassword(e.target.value)}/><br/>
                   </div>
               </div>
               <button type="submit" className="btnSubmitRegister">Submit</button><br/>

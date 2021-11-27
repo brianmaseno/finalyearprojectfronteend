@@ -17,6 +17,8 @@ import DoctorApprovedAppointments from "views/Doctor/ApprovedAppointments/approv
 import RequestLabTest from "views/Doctor/LabResults/requestlabresults";
 import DoctorLabTestResults from "views/Doctor/LabResults/labresults";
 import DoctorAvailability from "views/Doctor/Availability/availability";
+import FindInPageIcon from '@mui/icons-material/FindInPage';
+import RetrieveCaseNotes from "views/Doctor/RetrieveCaseNotes/retrieveCaseNotes";
 
 const DoctorRoutes = [
   {
@@ -33,6 +35,14 @@ const DoctorRoutes = [
     rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: CaseNotes,
+    layout: "/doctor",
+  },
+  {
+    path: "/retrievecasenotes",
+    name: "Retrieve Case Notes",
+    rtlName: "طباعة",
+    icon: FindInPageIcon,
+    component: RetrieveCaseNotes,
     layout: "/doctor",
   },
   {

@@ -56,6 +56,8 @@ export default function TreatmentReports() {
   const [firstDate, setFirstDate] = useState("")
   const [lastDate, setLastDate] = useState("")
   const base = useBaseUrl()
+  const date = new Date()
+  const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
 
   const searchPatientReport = (e) => {
     e.preventDefault();
@@ -141,7 +143,7 @@ export default function TreatmentReports() {
                       <p className="rDesc">Treatment Report</p>
                     </div>
                     <div className="imgCont">
-                      <p className="rDate">11/12/2020 - 12/12/2021</p>
+                      <p className="rDate">1/12/2021 - {today}</p>
                     </div>
                   </div>
                 </div>

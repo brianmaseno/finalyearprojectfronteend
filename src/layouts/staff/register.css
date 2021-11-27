@@ -47,7 +47,8 @@
   width: 100%;
   display: flex;
   flex-direction: row;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  margin: 5px;
 }
 
 @media screen and (max-width: 1000px) {
@@ -56,18 +57,20 @@
       flex-direction: column;
       justify-content: center;
   }
+  
+  .inputRegister{
+    width: 100%;
+  }
 }
 
 .firstN{
   width: 100%;
-  margin-right: 5px;
-
+  margin-right: 10px;
 }
 
 .lastN{
   width: 100%;
-  margin-right: 5px;
-
+  margin-right: 10px;
 }
 
 .userN{
@@ -75,7 +78,7 @@
 }
 
 .inputSelect{
-  width: 322px;
+  width: 100%;
   background-color: transparent;
   padding: 10px;
   justify-content: center;  
@@ -87,11 +90,22 @@
 }
 
 .inputRegister{
-  width: 100px;
+  width: 300px;
   background-color: transparent;
   padding: 10px;
   justify-content: center;  
-  margin-top: 2%; 
+  margin-top: 3%; 
+  border: 1px solid #3498db;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.inputConfirm{
+  width: 300px;
+  background-color: transparent;
+  padding: 10px;
+  justify-content: center;  
+  margin-top: 3%; 
   border: 1px solid #3498db;
   color: #3498db;
   font-weight: bold;
@@ -109,6 +123,7 @@
 .labelRegister{
   font-size: 15px;
   color: #3498db;
+  margin-top: 3%;
 
 }
 

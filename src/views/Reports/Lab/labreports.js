@@ -54,6 +54,8 @@ export default function LabReports() {
   const base = useBaseUrl()
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
+  const date = new Date()
+  const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -136,7 +138,7 @@ export default function LabReports() {
                       <p className="rDesc">Laboratory Report</p>
                     </div>
                     <div className="imgCont">
-                      <p className="rDate">11/12/2020 - 12/12/2021</p>
+                      <p className="rDate">1/12/2021 - {today}</p>
                     </div>
                   </div>
                 </div>

@@ -30,35 +30,37 @@ export default function LogComponent() {
       fetch(`${base}/KNH/staff/login?username=${username}&&password=${password}`)
           .then(response => response.json())
           .then((data) => {
+            console.log(data)
               if (data.message == "Not Found") {
                   toast.error("Wrong username or password");
                   console.log("Not Found")
                   setLogged(false);
               }
               else{                
-                if (data.data.status == "activated") {
+                if (data.data.details.status == "activated") {
                   toast.success("login successful redirecting.....");
                   setTimeout(() => {
                     setLogged(true);
-                    setUser(data.data)
-                    sessionStorage.setItem("user", data.data.username)
-                    sessionStorage.setItem("UserId", data.data.national_id)
-                    sessionStorage.setItem("status", data.data.status)
-                    setCurrentUser(data.data);
+                    setUser(data.data.details)
+                    sessionStorage.setItem("user", data.data.details.username)
+                    sessionStorage.setItem("UserId", data.data.details.national_id)
+                    sessionStorage.setItem("status", data.data.details.status)
+                    sessionStorage.setItem("password", data.data.password)
+                    setCurrentUser(data.data.details);
 
-                    if (data.data.access_level == "Doctor") {
+                    if (data.data.details.access_level == "Doctor") {
                       history.push('/doctor');
                     }
-                    else if (data.data.access_level == "Receptionist") {
+                    else if (data.data.details.access_level == "Receptionist") {
                       history.push('/receptionist');
                     }
-                    else if (data.data.access_level == "Pharmacist") {
+                    else if (data.data.details.access_level == "Pharmacist") {
                       history.push('/pharmacist');
                     }
-                    else if (data.data.access_level == "Lab Technician") {
+                    else if (data.data.details.access_level == "Lab Technician") {
                       history.push('/lab');
                     }
-                    else if (data.data.access_level == "Accountant") {
+                    else if (data.data.details.access_level == "Accountant") {
                       history.push('/billing');
                     }
                     else {

@@ -54,6 +54,8 @@ export default function DrugReports() {
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
   const base = useBaseUrl()
+  const date = new Date()
+  const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
 
   const searchPrescription = (e) => {
     e.preventDefault()
@@ -137,7 +139,7 @@ export default function DrugReports() {
                       <p className="rDesc">Drug Report</p>
                     </div>
                     <div className="imgCont">
-                      <p className="rDate">11/12/2020 - 12/12/2021</p>
+                      <p className="rDate">1/12/2021 - {today}</p>
                     </div>
                   </div>
                 </div>

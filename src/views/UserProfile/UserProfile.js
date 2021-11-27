@@ -54,12 +54,13 @@ export default function UserProfile() {
   const [country, setCountry] = useState(currentUser.country)
   const [residence, setResidence] = useState(currentUser.residence)
   const [county, setCounty] = useState(currentUser.county)
+  const [password, setPassword] = useState(sessionStorage.getItem("password"))
   
   const updateProfile = (e) => {
     e.preventDefault()
     setLoading(true)
 
-    fetch(`${base}/KNH/staff/profile/edit?national_id=${currentUser.national_id}&&username=${username}&&firstname=${firstName}&lastname=${lastName}&&country=${country}&county=${county}&&residence=${residence}`)
+    fetch(`${base}/KNH/staff/profile/edit?national_id=${currentUser.national_id}&&username=${username}&&firstname=${firstName}&&lastname=${lastName}&&country=${country}&&county=${county}&&residence=${residence}&&password=${password}`)
       .then(response => response.json())
       .then((data) => {
           if (data.message != "Updated Successfully") {
@@ -73,6 +74,7 @@ export default function UserProfile() {
             .then((data) => {
               if (data.message == "Found") {
                 setCurrentUser(data.data)
+                sessionStorage.setItem("password", password)
               }
             })      
             setLoading(false)
@@ -131,7 +133,7 @@ export default function UserProfile() {
                 </GridItem>
               </GridContainer>
               <GridContainer>
-                <GridItem xs={12} sm={12} md={12} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                <GridItem xs={12} sm={12} md={6} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
                   <Input
                     placeholder="Country"
                     id="last-name"
@@ -141,8 +143,6 @@ export default function UserProfile() {
                     onChange={(e) => setCountry(e.target.value)}
                   />
                 </GridItem>
-              </GridContainer>
-              <GridContainer>
                 <GridItem xs={12} sm={12} md={6} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
                   <Input
                     placeholder="County"
@@ -153,6 +153,8 @@ export default function UserProfile() {
                     onChange={(e) => setCounty(e.target.value)}
                   />
                 </GridItem>
+              </GridContainer>
+              <GridContainer>
                 <GridItem xs={12} sm={12} md={6} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
                   <Input
                     placeholder="Residence"
@@ -161,6 +163,17 @@ export default function UserProfile() {
                       fullWidth: true,
                     }}
                     onChange={(e) => setResidence(e.target.value)}
+                  />
+                </GridItem>
+                <GridItem xs={12} sm={12} md={6} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="New Password"
+                    type="password"
+                    id="password"
+                    formControlProps={{
+                      fullWidth: true,
+                    }}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </GridItem>
               </GridContainer>

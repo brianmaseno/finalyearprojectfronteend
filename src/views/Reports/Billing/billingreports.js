@@ -141,7 +141,7 @@ export default function BillingReports() {
                       <p className="rDesc">Billing Report</p>
                     </div>
                     <div className="imgCont">
-                      <p className="rDate">1/12/2020 - {today}</p>
+                      <p className="rDate">1/12/2021 - {today}</p>
                     </div>
                   </div>
                 </div>

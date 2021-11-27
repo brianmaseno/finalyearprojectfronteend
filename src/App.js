@@ -18,7 +18,7 @@ export default function App() {
   
   useEffect(() => {
     const currentUser = sessionStorage.getItem("user");
-    if (currentUser != null && !(currentUser === undefined)) {
+    if (currentUser != null && !(currentUser == undefined)) {
       setUser(currentUser);
     }
     else{
