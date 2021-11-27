@@ -34,15 +34,6 @@
   font-weight: bold;
 }
 
-.inputs{
-  
-
-}
-
-.formLogin{
-
-}
-
 .nameSection{
   width: 100%;
   display: flex;
@@ -109,10 +100,6 @@
   border: 1px solid #3498db;
   color: #3498db;
   font-weight: bold;
-}
-
-.inputRegister:focus{
-
 }
 
 .labelText{
