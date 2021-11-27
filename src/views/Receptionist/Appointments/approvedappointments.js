@@ -5,16 +5,12 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
-import { usePatients } from "hooks/usePatients";
-import { useAppointments } from "hooks/useAppointments";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -52,6 +48,8 @@ export default function ApprovedAppointments() {
   const classes = useStyles();
   const [approved, setApproved] = useState([])
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchApproved = (e) => {
     e.preventDefault()
@@ -60,7 +58,7 @@ export default function ApprovedAppointments() {
   }
   
   const getApprovedAppointments = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/appointments/all/activated")
+    fetch(`${base}/KNH/appointments/all/activated`)
     .then(response => response.json())
     .then((data) => {
         if (data.message === "Found") {
@@ -73,13 +71,16 @@ export default function ApprovedAppointments() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/appointments/all/activated")
+    setLoading(true)
+    fetch(`${base}/KNH/appointments/all/activated`)
       .then(response => response.json())
       .then((data) => {
           if (data.message === "Found") {
             setApproved(data.data)
+            setLoading(false);
           }
           else{
+            setLoading(false);
             console.log("Not Found")
           }
       })
@@ -117,6 +118,9 @@ export default function ApprovedAppointments() {
                 <button className="btnSearch" onClick={searchApproved}>Search</button>
               </div>
               </div>
+              {!loading ? 
+              <>
+              {approved.length > 0 ? 
               <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
@@ -145,6 +149,17 @@ export default function ApprovedAppointments() {
                     )) : null}
                 </tbody>
               </table>
+              :
+              <div className="noData">
+                <p className="txtNo">No Approved Appointments</p>
+              </div>
+              }
+              </>
+              :
+              <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
+            }
           </CardBody>
         </Card>
       </GridItem>

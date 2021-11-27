@@ -5,16 +5,15 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
 import { usePatients } from "hooks/usePatients";
 import logo from "assets/img/logoknh.jpg";
+import { useDrugs } from "hooks/useDrugs";
+import { CSVLink, CSVDownload } from "react-csv";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -51,6 +50,47 @@ const useStyles = makeStyles(styles);
 export default function TreatmentReports() {
   const classes = useStyles();
   const { patients } = usePatients();
+  const [rows, setRows] = useState([]);
+  const [patient_id, setPatientId] = useState("")
+  const { drug } = useDrugs();  
+  const [firstDate, setFirstDate] = useState("")
+  const [lastDate, setLastDate] = useState("")
+  const base = useBaseUrl()
+
+  const searchPatientReport = (e) => {
+    e.preventDefault();
+    /**fetch(`${base}/KNH/patient/treatment/report/patient?patient_id=${patient_id}`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Treatment Details Found") {
+              setRows(data.data);
+              //console.log(data.data)
+          }
+          else{
+              console.log("no data");
+          }
+      })
+      const first = new Date(firstDate);
+      const last = new Date(lastDate);
+      const diff = Math.abs(last - first);**/
+
+      console.log(Here);
+  }
+
+  useEffect(() => {
+    fetch(`${base}/KNH/patient/treatment/report/all`)
+          .then(response => response.json())
+          .then((data) => {
+            console.log(data);
+              if (data.message == "Treatment Details Found") {
+                  setRows(data.data);
+                  //console.log(data.data)
+              }
+              else{
+                  console.log("no data");
+              }
+          })
+  }, [])
 
   return (
     <>
@@ -75,17 +115,19 @@ export default function TreatmentReports() {
                 <div className="formCont">
                   <div className="formIn">
                     <label className="labelPat">From</label>
-                    <input type="date" className="patInput"/>
+                    <input type="date" className="patInput" onChange={(e) => setFirstDate(e.target.value)}/>
                   </div>
                   <div className="formIn">
                     <label className="labelPat">To</label>
-                    <input type="date" className="patInput"/>
+                    <input type="date" className="patInput" onChange={(e) => setLastDate(e.target.value)}/>
                   </div>
                   <div className="formBtnRep">
-                    <button className="btnReport">Go</button>
+                    <button className="btnReport" type="submit" onClick={searchPatientReport}>Go</button>
                   </div>
                 </div>
               </div>
+              {rows.length > 0 ? 
+              <>
               <div className="reportBody">
                 <div className="reportTitle">
                   <div className="rRow">
@@ -104,39 +146,61 @@ export default function TreatmentReports() {
                   </div>
                 </div>
                 <div>
+                  {rows.length > 0 ? 
                   <table className="styled-table">
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Lab Test</th>
-                        <th>Patient</th>
-                        <th>Results</th>
+                        <th>Treatment ID</th>
+                        <th>Lab</th>
+                        <th>Billing</th>
+                        <th>Case Notes</th>
                         <th>Prescription</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="trBody">12/11/2021</td>
-                        <td className="trBody">Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria</td>
-                        <td className="trBody">Tom</td>
-                        <td className="trBody">Parasites seen</td>
-                        <td className="trBody">Prescription</td>
-                      </tr>
-                      <tr>
-                        <td className="trBody">12/11/2021</td>
-                        <td className="trBody">Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria Blood sample for Malaria</td>
-                        <td className="trBody">Tom</td>
-                        <td className="trBody">Parasites seen</td>
-                        <td className="trBody">Prescription</td>
-                      </tr>
+                      {rows.length > 0 ? rows.map((item) => (
+                        <tr>
+                          <td className="trBody" style={{color: "gray"}}>{item.lab.treatment_id}</td>
+                          <td className="trBody" style={{color: "gray"}}>
+                            <div>
+                              <p>Test Name: {item.lab.test_name}</p>
+                              <p>Test Results: {item.lab.test_results}</p>
+                              <p>Test Cost: Ksh {item.lab.test_cost}</p>
+                              <p>Test Date: {item.lab.lab_test_date}</p>
+                            </div>
+                          </td>
+                          <td className="trBody" style={{color: "gray"}}>
+                          <div>
+                              <p>Service Name: {item.billing.service_name}</p>
+                              <p>Service Cost: Ksh {item.billing.service_cost}</p>
+                              <p>Service Department: {item.billing.service_department}</p>
+                              <p>Date: {item.billing.added_on}</p>
+                            </div>
+                          </td>
+                          <td className="trBody" style={{color: "gray"}}>{item.case.treatment_notes}</td>
+                          <td className="trBody" style={{color: "gray"}}>
+                            <div>
+                              <p>Drug Name: {item.drugdetails.drug_name}</p>
+                              <p>Drug Cost: Ksh {item.drugdetails.drug_cost}</p>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    :
+                    null }                     
                     </tbody>
                   </table>
+                  :
+                  null }
                 </div>
               </div>
               <div className="print">
                   <button className="pdf">PDF</button>
-                  <button className="excel">Excel</button>
+                  <CSVLink data={rows} className="excel" filename={"treatmentreport.csv"}>Excel</CSVLink>
               </div>
+              </>
+              :
+              null }
             </div>
           </CardBody>
         </Card>

@@ -1,4 +1,6 @@
 /* eslint-disable */
+import { useBaseUrl } from 'hooks/useBaseUrl';
+import { useDepartments } from 'hooks/useDepartments';
 import React, {useState, useEffect} from 'react'
 import {
     Link,
@@ -12,6 +14,10 @@ const axios = require('axios').default;
 import './register.css';
 
 export default function RegisterComponent() {
+    const { departments } = useDepartments()
+
+    console.log(departments.length)
+
     const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
     const [username, setUsername] = useState("");
@@ -29,12 +35,12 @@ export default function RegisterComponent() {
     const [nationalId, setNationalId] = useState("");
     const [confirmpassword, setConfirmPassword] = useState("");
     const history = useHistory();
+    const baseUrl = useBaseUrl()
 
     const checkUser = (e) => {
       e.preventDefault();
 
       const message = `${username} has created an account and is requesting for the acccount to be activated`;
-      const receiver_username = "admin";
 
       const pass = password === confirmpassword;
 
@@ -61,7 +67,7 @@ export default function RegisterComponent() {
 
           axios({
               method: 'post',
-              url: 'https://ehrsystembackend.herokuapp.com/KNH/staff/register',
+              url: `${baseUrl}/KNH/staff/register`,
               data: staffDetails})
               .then((data) => {
                   if (data.data.message != "Inserted Successfully") {
@@ -69,15 +75,16 @@ export default function RegisterComponent() {
                   }
                   else{
                       toast.success("Registration successful, wait for account activation");
-                      setTimeout(() => {
-                          history.push("/login");
-                      }, 3000);
-                      
-                      fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/addNotification?message=${message}&&sender_username=${username}&&category=${qualification}&&receiver_username=${receiver_username}`)
+                      const receiver_id = "9821";
+                      fetch(`${baseUrl}/KNH/staff/addNotification?message=${message}&&sender_id=${nationalId}&&category=${qualification}&&receiver_id=${receiver_id}`)
                       .then(response => response.json())
                       .then((data) => {
                           console.log(data);
                       })
+                      
+                      setTimeout(() => {
+                          history.push("/login");
+                      }, 3000);
                   }
               })
               .catch((error) => {
@@ -128,12 +135,10 @@ export default function RegisterComponent() {
                       <label className="labelText">Select Department</label><br/>
                       <select className="inputSelect" onChange={(e) => setDepartmentId(e.target.value)}>
                           <option>Select---</option>
-                          <option value="1">Nursing Department</option>
-                          <option value="2">Mental Health Department</option>
-                          <option value="3">Accident and Emergency Department</option>
-                          <option value="4">Infection, Prevention and Control Department</option>
-                          <option value="5">Nutrition Department</option>
-                          <option value="6">Finance Department</option>
+                          {departments.length > 0 ? departments.map((item) => (
+                              <option value={item.department_id}>{item.department_name}</option>
+                          ))
+                          : null}
                       </select>
                   </div>
                   <div className="userN">

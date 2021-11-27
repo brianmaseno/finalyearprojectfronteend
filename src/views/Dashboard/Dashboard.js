@@ -17,30 +17,23 @@ import Accessibility from "@material-ui/icons/Accessibility";
 import BugReport from "@material-ui/icons/BugReport";
 import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
+import PeopleIcon from '@mui/icons-material/People';
+import PendingIcon from '@mui/icons-material/Pending';
+import GppGoodIcon from '@mui/icons-material/GppGood';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import Table from "components/Table/Table.js";
-import Tasks from "components/Tasks/Tasks.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
 //import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
-import { bugs, website, server } from "variables/general.js";
-
-import {
-  dailySalesChart,
-  emailsSubscriptionChart,
-  completedTasksChart,
-} from "variables/charts.js";
-
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { useStatus } from "hooks/useStatus";
-import { useAllStaff } from "hooks/useAllStaff";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const useStyles = makeStyles(styles);
 
@@ -51,6 +44,8 @@ export default function Dashboard() {
   const approved = useStatus("activated");
   const blocked = useStatus("suspended");
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchStaff = (e) => {
     e.preventDefault()
@@ -58,7 +53,7 @@ export default function Dashboard() {
   }
 
   const getAllStaff = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+    fetch(`${base}/KNH/staff/all`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
@@ -71,14 +66,17 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/staff/all")
+    setLoading(true)
+    fetch(`${base}/KNH/staff/all`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
             setRows(data.data)
+            setLoading(false);
           }
           else{
             console.log("Not Found")
+            setLoading(false);
           }
       })
   }, [])
@@ -90,7 +88,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <Icon><PeopleIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Total Employees</p>
               <h3 className={classes.cardTitle}>
@@ -107,9 +105,9 @@ export default function Dashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="success" stats icon>
-              <CardIcon color="success">
-                <Store />
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <PendingIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Pending Accounts</p>
               <h3 className={classes.cardTitle}>{pending ? pending.length : 0}</h3>
@@ -141,9 +139,9 @@ export default function Dashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="info" stats icon>
-              <CardIcon color="info">
-                <Accessibility />
+            <CardHeader color="success" stats icon>
+              <CardIcon color="success">
+                <GppGoodIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Activated Accounts</p>
               <h3 className={classes.cardTitle}>{approved ? approved.length : 0}</h3>
@@ -181,6 +179,8 @@ export default function Dashboard() {
                   <button className="btnSearch" onClick={searchStaff}>Search</button>
                 </div>
               </div>
+              {!loading ? 
+              <>
               {rows.length > 0 ? 
               <Table
                 tableHeaderColor="info"
@@ -191,6 +191,12 @@ export default function Dashboard() {
               <div className="noData">
                 <p className="txtNo">No Employee Account</p>
               </div> 
+              }
+              </>
+              :
+              <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
               }
             </CardBody>
           </Card>

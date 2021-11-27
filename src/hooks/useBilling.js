@@ -1,11 +1,13 @@
 /* eslint-disable */
 import {useState, useEffect} from 'react';
+import { useBaseUrl } from './useBaseUrl';
 
 export const useBilling = (status) => {
   const [bill, setBill] = useState(0)
+  const base = useBaseUrl()
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/billing/${status}/report/all`)
+    fetch(`${base}/KNH/patient/billing/${status}/report/all`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -21,7 +23,7 @@ export const useBilling = (status) => {
             console.log("no Drug");
         }
     })
-  }, [status])
+  }, [status, base])
 
   return bill
 }

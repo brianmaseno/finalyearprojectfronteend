@@ -1,46 +1,29 @@
 /* eslint-disable */
 import React, {useEffect, useState} from "react";
-// react plugin for creating charts
-import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
-//import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
-//import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import AccessTime from "@material-ui/icons/AccessTime";
-import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import QuizIcon from '@mui/icons-material/Quiz';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ScienceIcon from '@mui/icons-material/Science';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import Table from "components/Table/Table.js";
-import Tasks from "components/Tasks/Tasks.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
 //import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
-import { bugs, website, server } from "variables/general.js";
-
-import {
-  dailySalesChart,
-  emailsSubscriptionChart,
-  completedTasksChart,
-} from "variables/charts.js";
-
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { useLab } from "hooks/useLab";
 import { usePendingLab } from "hooks/usePendingLab";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const useStyles = makeStyles(styles);
 
@@ -50,6 +33,8 @@ export default function LabDashboard() {
   const { lab } = useLab()
   const { pending } = usePendingLab()
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -57,7 +42,7 @@ export default function LabDashboard() {
   }
 
   const getAllTests = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
+    fetch(`${base}/KNH/patient/lab/tests/report`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Report Found") {
@@ -70,14 +55,17 @@ export default function LabDashboard() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
+    setLoading(true);
+    fetch(`${base}/KNH/patient/lab/tests/report`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Report Found") {
                   setRows(data.data);
+                  setLoading(false);
               }
               else{
                   console.log("no data");
+                  setLoading(false);
               }
           })
   }, [])
@@ -88,7 +76,7 @@ export default function LabDashboard() {
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <Icon><ScienceIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Total Lab Tests</p>
               <h3 className={classes.cardTitle}>
@@ -107,7 +95,7 @@ export default function LabDashboard() {
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
-                <Icon>info_outline</Icon>
+                <Icon><QuizIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Pending Requests</p>
               <h3 className={classes.cardTitle}>{pending ? pending : 0}</h3>
@@ -124,7 +112,7 @@ export default function LabDashboard() {
           <Card>
             <CardHeader color="info" stats icon>
               <CardIcon color="info">
-                <Accessibility />
+                <CheckCircleOutlineIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Completed Tests</p>
               <h3 className={classes.cardTitle}>{lab ? lab.length : 0}</h3>
@@ -162,11 +150,25 @@ export default function LabDashboard() {
                   <button className="btnSearch" onClick={searchTests}>Search</button>
                 </div>
               </div>
+              {!loading ? 
+              <>
+              {rows.length > 0 ? 
               <Table
                 tableHeaderColor="info"
                 tableHead={["Test ID", "Test Name", "Patient ID", "Test Date", "Test Cost (Ksh)"]}
                 tableData={rows.map((item) => ([item.lab_test_id, item.test_name, item.patient_id, item.lab_test_date, item.test_cost]))}
               />
+              :
+              <div className="noData">
+                <p className="txtNo">No Completed Tests</p>
+              </div>
+              }
+              </>
+              :
+              <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
+              }
             </CardBody>
           </Card>
         </GridItem>

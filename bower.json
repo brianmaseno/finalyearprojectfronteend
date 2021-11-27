@@ -1,10 +1,10 @@
 {
-  "name": "material-dashboard-react",
-  "homepage": "https://github.com/creativetimofficial/material-dashboard-react",
+  "name": "kenyatta-national-hospital",
+  "homepage": "http://www.kenyatta-national",
   "authors": [
-    "creative-tim"
+    "lumbert-omwaga"
   ],
-  "description": "A Badass Material-UI Kit based on Material Design",
+  "description": "Kenyatta National Hospital EHR System",
   "main": "public/index.html",
   "keywords": [
     "material",
@@ -15,7 +15,7 @@
     "google",
     "twitter"
   ],
-  "license": "Creative TIM License",
+  "license": "Lumbert Omwaga License",
   "ignore": [
     "**/.*",
     "node_modules",

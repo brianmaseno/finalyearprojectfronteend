@@ -5,42 +5,28 @@ import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import Store from "@material-ui/icons/Store";
 //import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
 //import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import AccessTime from "@material-ui/icons/AccessTime";
-import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
-import Tasks from "components/Tasks/Tasks.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
 //import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
-import { bugs, website, server } from "variables/general.js";
-
-import {
-  dailySalesChart,
-  emailsSubscriptionChart,
-  completedTasksChart,
-} from "variables/charts.js";
-
+import { ToastContainer, toast } from "react-toastify";
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { usePatients } from "hooks/usePatients";
 import { useAppointments } from "hooks/useAppointments";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const useStyles = makeStyles(styles);
@@ -53,6 +39,8 @@ export default function ReceptionistDashboard() {
   const approved = useAppointments("approved");
   const cancelled = useAppointments("cancelled");
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchPatient = (e) => {
     e.preventDefault()
@@ -60,7 +48,7 @@ export default function ReceptionistDashboard() {
   }
 
   const getAllPatients = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/allpatients")
+    fetch(`${base}/KNH/patient/allpatients`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Patients Records available") {
@@ -73,26 +61,30 @@ export default function ReceptionistDashboard() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/allpatients")
+    setLoading(true)
+    fetch(`${base}/KNH/patient/allpatients`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Patients Records available") {
             setPatients(data.data)
+            setLoading(false);
         }
         else{
             console.log("no Patient");
+            setLoading(false);
         }
     })
   }, [])
 
   return (
     <div>
+      <ToastContainer />
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <Icon><PeopleAltIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Total Patients</p>
               <h3 className={classes.cardTitle}>
@@ -109,9 +101,9 @@ export default function ReceptionistDashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="success" stats icon>
-              <CardIcon color="success">
-                <Store />
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <PendingActionsIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Pending Appointments</p>
               <h3 className={classes.cardTitle}>{pending ? pending.data.length : 0}</h3>
@@ -143,9 +135,9 @@ export default function ReceptionistDashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="info" stats icon>
-              <CardIcon color="info">
-                <Accessibility />
+            <CardHeader color="success" stats icon>
+              <CardIcon color="success">
+                <LibraryAddCheckIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Approved Appointments</p>
               <h3 className={classes.cardTitle}>{approved ? approved.data.length : 0}</h3>
@@ -183,6 +175,9 @@ export default function ReceptionistDashboard() {
                   <button className="btnSearch" onClick={searchPatient}>Search</button>
                 </div>
               </div>
+              {!loading ? 
+              <>
+              {allPatients.length > 0 ? 
               <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
@@ -207,13 +202,19 @@ export default function ReceptionistDashboard() {
                         <td>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                            axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/DeletePatientbyId?patient_id=${item.identity_no}`)
+                            axios.get(`${base}/KNH/patient/DeletePatientbyId?patient_id=${item.identity_no}`)
                             .then((data) => {
                                 if (data.data.message == "Deleted") {
-                                  console.log("Deleted")
+                                  toast.success("Deleted");
+                                  setLoading(true);
+                                  setTimeout(() => {
+                                    setPatients([])
+                                    setLoading(false);
+                                    getAllPatients()
+                                  }, 2000);
                                 }
                                 else{
-                                  console.log("Not Deleted")
+                                  toast.error("Not Deleted");
                                 }                
                             })
                             .catch((error) => {
@@ -226,6 +227,17 @@ export default function ReceptionistDashboard() {
                     )) : null}
                 </tbody>
               </table>
+              :
+              <div className="noData">
+                <p className="txtNo">No Patient Information</p>
+              </div>
+              }
+              </>
+              :
+              <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
+              }
             </CardBody>
           </Card>
         </GridItem>

@@ -5,17 +5,15 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
 import { usePatients } from "hooks/usePatients";
 import './lab.css';
 import logo from "assets/img/logoknh.jpg";
+import { CSVLink, CSVDownload } from "react-csv";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -53,6 +51,9 @@ export default function LabReports() {
   const classes = useStyles();
   const { patients } = usePatients();
   const [rows, setRows] = useState([])
+  const base = useBaseUrl()
+  const [from, setFrom] = useState("")
+  const [to, setTo] = useState("")
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -60,20 +61,21 @@ export default function LabReports() {
   }
 
   const getAllTests = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
+    fetch(`${base}/KNH/patient/lab/tests/report`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Report Found") {
               setRows(data.data);
           }
           else{
+            toast.error("No Record")
               console.log("no data");
           }
       })
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
+    fetch(`${base}/KNH/patient/lab/tests/report`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Report Found") {
@@ -108,17 +110,19 @@ export default function LabReports() {
                 <div className="formCont">
                   <div className="formIn">
                     <label className="labelPat">From</label>
-                    <input type="date" className="patInput"/>
+                    <input type="date" className="patInput" onChange={(e) => setFrom(e.target.value)}/>
                   </div>
                   <div className="formIn">
                     <label className="labelPat">To</label>
-                    <input type="date" className="patInput"/>
+                    <input type="date" className="patInput" onChange={(e) => setTo(e.target.value)}/>
                   </div>
                   <div className="formBtnRep">
-                    <button className="btnReport">Go</button>
+                    <button className="btnReport" onClick={getAllTests}>Go</button>
                   </div>
                 </div>
               </div>
+              {rows.length > 0 ?
+              <>
               <div className="reportBody">
                 <div className="reportTitle">
                   <div className="rRow">
@@ -168,8 +172,10 @@ export default function LabReports() {
               </div>
               <div className="print">
                   <button className="pdf">PDF</button>
-                  <button className="excel">Excel</button>
+                  <CSVLink data={rows} className="excel">Excel</CSVLink>
               </div>
+              </>
+              : null }
             </div>
           </CardBody>
         </Card>

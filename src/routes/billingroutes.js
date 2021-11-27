@@ -2,25 +2,14 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-//import BubbleChart from "@material-ui/icons/BubbleChart";
-//import LocationOn from "@material-ui/icons/LocationOn";
 import Notifications from "@material-ui/icons/Notifications";
-
-//import Unarchive from "@material-ui/icons/Unarchive";
-//import Language from "@material-ui/icons/Language";
-// core components/views for Admin layout
-import DashboardPage from "views/Dashboard/Dashboard.js";
+import PaymentIcon from '@mui/icons-material/Payment';
+import PaidIcon from '@mui/icons-material/Paid';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
-import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
-import EditAccounts from "views/EditAccounts/EditAccounts";
 import BillingDashboard from "views/Billing/Dashboard/BillingDashboard";
 import MakePayment from "views/Billing/Payments/MakePayment";
 import BillingReports from "views/Reports/Billing/billingreports";
-//import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
-// core components/views for RTL layout
-//import RTLPage from "views/RTLPage/RTLPage.js";
 
 const BillingRoutes = [
   {
@@ -35,7 +24,7 @@ const BillingRoutes = [
     path: "/makepayment",
     name: "Make Payment",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: PaymentIcon,
     component: MakePayment,
     layout: "/billing",
   },
@@ -43,7 +32,7 @@ const BillingRoutes = [
     path: "/billingreports",
     name: "Billing Reports",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: PaidIcon,
     component: BillingReports,
     layout: "/billing",
   },

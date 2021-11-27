@@ -5,15 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './editaccount.css';
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
-import { useUpdatedStaff } from "hooks/useUpdateStaff";
 import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -51,7 +49,8 @@ export default function EditAccounts() {
   const classes = useStyles();
   const [data, setData] = useState([])
   const [search, setSearch] = useState("")
-  const { loading } = useDataStatus(data);
+  const [loading, setLoading] = useState(false)
+  const base = useBaseUrl()
 
   const message = `Account suspended successfully`;
 
@@ -61,7 +60,7 @@ export default function EditAccounts() {
   }
 
   const getAllActivatedStaff = () => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/activated`)
+    fetch(`${base}/KNH/staff/accounts/activated`)
         .then(response => response.json())
         .then((data) => {
             if (data.message == "Found") {
@@ -74,14 +73,17 @@ export default function EditAccounts() {
   }
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/accounts/activated`)
+    setLoading(true);
+    fetch(`${base}/KNH/staff/accounts/activated`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
               setData(data.data);
+              setLoading(false);
           }
           else{
               console.log("no data");
+              setLoading(false);
           }
       })
   }, [])
@@ -118,7 +120,9 @@ export default function EditAccounts() {
                 <button className="btnSearch">Search</button>
               </div>
             </div>
-            {loading ?
+            {!loading ?
+            <>
+            {data.length > 0 ? 
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
@@ -143,13 +147,17 @@ export default function EditAccounts() {
                       <td>
                         <div className="editContainer">
                           <p className="editP" onClick={() => {
-                            fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/suspend?username=${item.username}`)
+                            fetch(`${base}/KNH/staff/suspend?username=${item.username}`)
                             .then(response => response.json())
                             .then((data) => {
                                 if (data.message == "Suspended") {
                                   toast.success("Account Suspended");
-                                  setUpdated(true);
-                                  console.log("Suspended")
+                                  setData([]);
+                                  setLoading(true);
+                                  setTimeout(() => {
+                                    setLoading(false);
+                                   getAllActivatedStaff() 
+                                  }, 2000);
                                 }
                                 else{
                                   toast.error("Account Not Suspended");
@@ -164,9 +172,15 @@ export default function EditAccounts() {
               </tbody>
             </table>
              : 
-              <div className="noData">
-              <p className="txtNo">No Approved Account</p>
+             <div className="noData">
+              <p className="txtNo">No Activated Accounts</p>
             </div>
+            }
+            </>
+            :
+             <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
             }
           </CardBody>
         </Card>

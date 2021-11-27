@@ -1,13 +1,15 @@
 /* eslint-disable */
 import {useState, useEffect} from 'react';
 import { useAuth } from '../hooks/AuthProvider';
+import { useBaseUrl } from './useBaseUrl';
 
 export const useNotification = () => {
   const { currentUser } = useAuth();
   const [notifications, setNotifications] = useState([]);
+  const base = useBaseUrl();
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/viewNotifications?id=${currentUser.username}`)
+    fetch(`${base}/KNH/staff/viewNotifications?id=${currentUser.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -18,7 +20,7 @@ export const useNotification = () => {
             console.log("no Notification");
         }
     })
-  }, [currentUser])
+  }, [currentUser, base])
 
   return { notifications }
 }

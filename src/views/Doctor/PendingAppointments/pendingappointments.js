@@ -5,12 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useDataStatus } from "hooks/useDataStatus";
 import { useAuth } from "hooks/AuthProvider";
+import ProjectLoading from "components/Loading/projectloading";
+import { ToastContainer, toast } from "react-toastify";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,9 +48,10 @@ const useStyles = makeStyles(styles);
 export default function DoctorPendingAppointments() {
   const classes = useStyles();
   const [pending, setPending] = useState([])
-  const { loading } = useDataStatus(pending);
   const { currentUser } = useAuth();
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchAppointment = (e) => {
     e.preventDefault()
@@ -57,7 +59,7 @@ export default function DoctorPendingAppointments() {
   }
 
   const getAllPendingAppointments = () => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -70,22 +72,24 @@ export default function DoctorPendingAppointments() {
   }
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    setLoading(true);
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setPending(data.data);
-                  console.log(data.data)
+                  setLoading(false);
               }
               else{
                   console.log("no data");
+                  setLoading(false);
               }
           })
   }, [])
 
-  console.log(currentUser.national_id)
-
   return (
+    <>
+    <ToastContainer />
     <div>
       <div className="pathCont">
         <div className="path">
@@ -116,6 +120,8 @@ export default function DoctorPendingAppointments() {
                     <button className="btnSearch" onClick={searchAppointment}>Search</button>
                   </div>
                 </div>
+                {!loading ?
+                <>
                 {pending.length > 0 ?
                 <table className="styled-table">
                   <thead>
@@ -139,14 +145,27 @@ export default function DoctorPendingAppointments() {
                           <td>
                             <div className="editContainer">
                               <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/approve?appointment_id=${item.appointment_id}`)
+                                fetch(`${base}/KNH/appointments/approve?appointment_id=${item.appointment_id}`)
                                 .then(response => response.json())
                                 .then((data) => {
-                                    if (data.message == "Appointment Approved Successfully") {
-                                      console.log("Approved")
+                                  if (data.message == "Appointment Approved Successfully") {
+                                    const message = `Appointment ${item.appointment_id} has been approved successfully`;
+                                    fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${item.appointment_created_by}`)
+                                      .then(response => response.json())
+                                      .then((data) => {
+                                          console.log(data);
+                                      })
+
+                                      toast.success("Appointment Approved Successfully");
+                                      setPending([]);
+                                      setLoading(true)
+                                      setTimeout(() => {
+                                        setLoading(false);
+                                        getAllPendingAppointments()
+                                      }, 2000);
                                     }
                                     else{
-                                      console.log("Not Approved")
+                                      toast.error("Appointment Not Approved");
                                     }
                                 })
                                 }}>Approve</p>
@@ -158,7 +177,13 @@ export default function DoctorPendingAppointments() {
                 </table>
                 : 
                   <div className="noData">
-                  <p className="txtNo">No Pending Appointment</p>
+                    <p className="txtNo">No Pending Appointment</p>
+                  </div>
+                }
+                </>
+                :
+                <div className="load">
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
                 </div>
                 }
           </CardBody>
@@ -166,5 +191,6 @@ export default function DoctorPendingAppointments() {
       </GridItem>
     </GridContainer>
   </div>
+  </>
   );
 }

@@ -2,26 +2,20 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-//import BubbleChart from "@material-ui/icons/BubbleChart";
-//import LocationOn from "@material-ui/icons/LocationOn";
 import Notifications from "@material-ui/icons/Notifications";
-
-//import Unarchive from "@material-ui/icons/Unarchive";
-//import Language from "@material-ui/icons/Language";
-// core components/views for Admin layout
-import DashboardPage from "views/Dashboard/Dashboard.js";
+import AddIcon from '@mui/icons-material/Add';
+import UpdateIcon from '@mui/icons-material/Update';
+import MedicationIcon from '@mui/icons-material/Medication';
+import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
-import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
-import EditAccounts from "views/EditAccounts/EditAccounts";
 import PharmacistDashboard from "views/Pharmacy/Dashboard/PharmacistDashboard";
 import PrescribedDrugs from "views/Pharmacy/PrescribedDrugs/PrescribedDrugs";
 import DrugReports from "views/Reports/Drugs/drugreport";
 import DispensedDrugs from "views/Pharmacy/DispensedDrugs/dispenseddrugs";
-//import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
-// core components/views for RTL layout
-//import RTLPage from "views/RTLPage/RTLPage.js";
+import AddDrugs from "views/Pharmacy/AddDrug/addDrug";
+import ManageInventory from "views/Pharmacy/ManageInventory/manageinventory";
 
 const PharmacistRoutes = [
   {
@@ -33,10 +27,26 @@ const PharmacistRoutes = [
     layout: "/pharmacist",
   },
   {
+    path: "/adddrugs",
+    name: "Add Drugs",
+    rtlName: "إخطارات",
+    icon: AddIcon,
+    component: AddDrugs,
+    layout: "/pharmacist",
+  },
+  {
+    path: "/updatedrug",
+    name: "Manage Drugs",
+    rtlName: "إخطارات",
+    icon: UpdateIcon,
+    component: ManageInventory,
+    layout: "/pharmacist",
+  },
+  {
     path: "/prescribeddrugs",
     name: "Prescribed Drugs",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: MedicationIcon,
     component: PrescribedDrugs,
     layout: "/pharmacist",
   },
@@ -44,7 +54,7 @@ const PharmacistRoutes = [
     path: "/dispenseddrugsreports",
     name: "Dispensed Drugs",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: LocalPharmacyIcon,
     component: DispensedDrugs,
     layout: "/pharmacist",
   },
@@ -52,7 +62,7 @@ const PharmacistRoutes = [
     path: "/drugreports",
     name: "Drugs Report",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: MedicalServicesIcon,
     component: DrugReports,
     layout: "/pharmacist",
   },

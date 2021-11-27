@@ -1,11 +1,13 @@
 /* eslint-disable */
 import {useState, useEffect} from 'react';
+import { useBaseUrl } from './useBaseUrl';
 
 export const useLab = () => {
   const [lab, setLab] = useState([])
+  const base = useBaseUrl()
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/report")
+    fetch(`${base}/KNH/patient/lab/tests/report`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Report Found") {
@@ -16,7 +18,7 @@ export const useLab = () => {
             console.log("no Lab Record");
         }
     })
-  }, [])
+  }, [base])
 
   return { lab }
 }

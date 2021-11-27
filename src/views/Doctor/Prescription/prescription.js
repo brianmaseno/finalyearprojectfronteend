@@ -5,7 +5,6 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
@@ -13,6 +12,9 @@ import './prescription.css'
 import { useDrugs } from "hooks/useDrugs";
 import { useApprovedTreatment } from "hooks/useApprovedTreatment";
 import { useAuth } from "hooks/AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -58,9 +60,12 @@ export default function Prescription() {
   const [notes, setNotes] = useState("")
   const [treatmentId, setTreatmentId] = useState("")
   const { currentUser } = useAuth()
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
   
   const prescribeDrugs = (e) => {
     e.preventDefault()
+    setLoading(true);
 
     const details = {
       patient_id: patientId,
@@ -84,13 +89,17 @@ export default function Prescription() {
 
     axios({
       method: 'post',
-      url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/prescribe',
+      url: `${base}/KNH/patient/drugs/prescribe`,
       data: details})
       .then((data) => {
           if (data.data.message == "Inserted Successfully") {
+            setLoading(false);
+            toast.success("Prescription added")
+
+            //billing
             axios({
               method: 'post',
-              url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/billing/set',
+              url: `${base}/KNH/patient/billing/set`,
               data: payDetails})
               .then((data) => {
                   if (data.data.message == "Added to Bill") {
@@ -105,17 +114,20 @@ export default function Prescription() {
           });
           }
           else{
-              console.log("Not Inserted")
+            setLoading(false);
+            console.log("Not Inserted")
+            toast.error("Prescription not added")
           }                
       })
       .catch((error) => {
-          console.log(error);
+        console.log(error);
   });
 
   }
 
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Prescription</span></p>
@@ -142,7 +154,7 @@ export default function Prescription() {
                   <select className="inCase" onChange={(e) => setTreatmentId(e.target.value)}>
                     <option>Select...</option>
                     {data.length > 0 ? data.map((item) => (
-                      <option value={item.treatment_id}>{item._id}</option>
+                      <option value={item.treatment_id}>{item.treatment_id} ({item.patient_id})</option>
                     )): null}
                   </select>
                 </div>
@@ -179,7 +191,10 @@ export default function Prescription() {
                   </table>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave" onClick={prescribeDrugs}>Add Prescription</button>
+                  {!loading ? <button className="caseSave" onClick={prescribeDrugs}>Add Prescription</button>
+                  :
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
+                  }
                 </div>
               </div>
             </div>

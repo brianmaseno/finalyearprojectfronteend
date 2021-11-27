@@ -1,11 +1,13 @@
 /* eslint-disable */
 import {useState, useEffect} from 'react';
+import { useBaseUrl } from './useBaseUrl';
 
 export const usePendingLab = () => {
   const [pending, setPending] = useState("")
+  const base = useBaseUrl()
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests`)
+    fetch(`${base}/KNH/patient/lab/tests/requests`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Requests Found") {
@@ -16,7 +18,7 @@ export const usePendingLab = () => {
             console.log("no Lab Record");
         }
     })
-  }, [])
+  }, [base])
 
   return { pending }
 }

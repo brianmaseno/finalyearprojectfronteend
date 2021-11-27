@@ -2,27 +2,18 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-//import BubbleChart from "@material-ui/icons/BubbleChart";
-//import LocationOn from "@material-ui/icons/LocationOn";
 import Notifications from "@material-ui/icons/Notifications";
-
-//import Unarchive from "@material-ui/icons/Unarchive";
-//import Language from "@material-ui/icons/Language";
-// core components/views for Admin layout
-import DashboardPage from "views/Dashboard/Dashboard.js";
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
+import AddIcon from '@mui/icons-material/Add';
+import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
-import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
-import EditAccounts from "views/EditAccounts/EditAccounts";
 import LabDashboard from "views/Lab/Dashboard/LabDashboard";
 import LabRequests from "views/Lab/Requests/LabRequests";
 import LabReports from "views/Reports/Lab/labreports";
 import TestServices from "views/Lab/TestServices/testservices";
 import TestResults from "views/Lab/TestResults/testresults";
-//import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
-// core components/views for RTL layout
-//import RTLPage from "views/RTLPage/RTLPage.js";
 
 const LabRoutes = [
   {
@@ -37,7 +28,7 @@ const LabRoutes = [
     path: "/labrequests",
     name: "Lab Requests",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: ContactSupportIcon,
     component: LabRequests,
     layout: "/lab",
   },
@@ -45,7 +36,7 @@ const LabRoutes = [
     path: "/addtestresult",
     name: "Add Test Result",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: AddIcon,
     component: TestResults,
     layout: "/lab",
   },
@@ -53,7 +44,7 @@ const LabRoutes = [
     path: "/testservices",
     name: "Test Services",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: HomeRepairServiceIcon,
     component: TestServices,
     layout: "/lab",
   },
@@ -61,7 +52,7 @@ const LabRoutes = [
     path: "/labtestreports",
     name: "Test Reports",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: TextSnippetIcon,
     component: LabReports,
     layout: "/lab",
   },

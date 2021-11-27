@@ -5,12 +5,15 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { useAuth } from "hooks/AuthProvider";
 import { useApprovedTreatment } from "hooks/useApprovedTreatment";
+import { useLabTechnicianIds } from "hooks/useLabTechnicianIDS";
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -50,31 +53,48 @@ export default function RequestLabTest() {
   const { currentUser } = useAuth()
   const [patientId, setPatientId] = useState("")
   const [treatmentId, setTreatmentId] = useState("");
+  const [labTechnician, setLabTechnician] = useState("");
   const [notes, setNotes] = useState("");
   const { data } = useApprovedTreatment();
+  const labTech = useLabTechnicianIds();
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
+
+  console.log(labTech);
 
   const requestLab = (e) => {
     e.preventDefault()
+    setLoading(true);
 
     const details = {
       patient_id: patientId,
       staff_id: currentUser.national_id,
       treatment_id: treatmentId,
+      lab_technician_id: labTechnician,
       test_notes: notes
     }
 
-    console.log(details)
-
     axios({
       method: 'post',
-      url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/treatment/labrequest',
+      url: `${base}/KNH/patient/treatment/labrequest`,
       data: details})
       .then((data) => {
           if (data.data.message == "Inserted Successfully") {
               console.log("inserted")
+              setLoading(false);
+              toast.success("Request Successful");
+
+              const message = `${currentUser.national_id} has requested for a lab test to be conducted, check notifications for details`;
+              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${labTechnician}`)
+                .then(response => response.json())
+                .then((data) => {
+                    console.log(data);
+                })
           }
           else{
-              console.log("Not Inserted")
+            setLoading(false);
+            console.log("Not Inserted")
+            toast.error("Request Not Successful");
           }                
       })
       .catch((error) => {
@@ -84,6 +104,7 @@ export default function RequestLabTest() {
 
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Request Lab Results</span></p>
@@ -110,7 +131,16 @@ export default function RequestLabTest() {
                   <select className="inCase" onChange={(e) => setTreatmentId(e.target.value)}>
                     <option>Select...</option>
                     {data.length > 0 ? data.map((item) => (
-                      <option value={item.treatment_id}>{item._id}</option>
+                      <option value={item.treatment_id}>{item.treatment_id} ({item.patient_id})</option>
+                    )): null}
+                  </select>
+                </div>
+                <div className="caseId" style={{marginTop: "10px"}}>
+                  <label className="idC">Lab Tech ID*</label>
+                  <select className="inCase" onChange={(e) => setLabTechnician(e.target.value)}>
+                    <option>Select...</option>
+                    {labTech.length > 0 ? labTech.map((item) => (
+                      <option value={item.national_id}>{item.national_id}</option>
                     )): null}
                   </select>
                 </div>
@@ -121,7 +151,10 @@ export default function RequestLabTest() {
                   </textarea>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave" onClick={requestLab}>Request</button>
+                  {!loading ? <button className="caseSave" onClick={requestLab}>Request</button>
+                  :
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
+                  }
                 </div>
               </div>
             </div>

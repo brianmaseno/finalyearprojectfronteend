@@ -1,0 +1,39 @@
+.offlineContainer{
+  width: 100%;
+  height: 750px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.cont2{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.cont3{
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.imgInner{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.offlineimg{
+  width: 70px;
+  height: 70px;
+  text-align: center;
+}
+
+.offlinetxt{
+  text-align: center;
+  font-weight: bold;
+}

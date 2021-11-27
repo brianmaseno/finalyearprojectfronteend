@@ -19,7 +19,7 @@
 }
 
 .idC{
-  width: 100px;
+  width: 120px;
   margin-right: 10px;
   font-weight: bold;
 
@@ -29,7 +29,6 @@
   padding: 10px;
   width: 100%;
   font-weight: bold;
-
 }
 
 .caseText{
@@ -40,7 +39,7 @@
 }
 
 .noteC{
-  width: 100px;
+  width: 120px;
   margin-right: 10px;
   font-weight: bold;
 
@@ -58,12 +57,12 @@
   display: flex;
   flex-direction: row;
   margin-top: 20px;
-  margin-left: 95px;
+  margin-left: 108px;
 
 }
 
 .caseSave{
-  background-color: green;
+  background-color: #11b8cc;
   color: white;
   font-weight: bold;
   padding: 10px;

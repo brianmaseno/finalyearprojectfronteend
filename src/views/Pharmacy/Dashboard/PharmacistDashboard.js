@@ -5,40 +5,22 @@ import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import Store from "@material-ui/icons/Store";
 //import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
-//import LocalOffer from "@material-ui/icons/LocalOffer";
-import Update from "@material-ui/icons/Update";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import AccessTime from "@material-ui/icons/AccessTime";
-import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
-import Tasks from "components/Tasks/Tasks.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
-//import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import { bugs, website, server } from "variables/general.js";
-
-import {
-  dailySalesChart,
-  emailsSubscriptionChart,
-  completedTasksChart,
-} from "variables/charts.js";
-
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { usePrescribedDrugs } from "hooks/usePrescribedDrugs";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const useStyles = makeStyles(styles);
 
@@ -49,6 +31,8 @@ export default function PharmacistDashboard() {
   const issued = usePrescribedDrugs("dispensingreport")
   const cancelled = usePrescribedDrugs("dispensingreport/cancelled")
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchPrescription = (e) => {
     e.preventDefault()
@@ -56,7 +40,7 @@ export default function PharmacistDashboard() {
   }
 
   const getAllPrescriptions = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+    fetch(`${base}/KNH/patient/drugs/dispensingreport`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
@@ -70,14 +54,17 @@ export default function PharmacistDashboard() {
 
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+    setLoading(true);
+    fetch(`${base}/KNH/patient/drugs/dispensingreport`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
               setRows(data.data);
+              setLoading(false);
           }
           else{
               console.log("no data");
+              setLoading(false);
           }
       })
   }, [])
@@ -88,11 +75,11 @@ export default function PharmacistDashboard() {
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <Icon><MedicalServicesIcon /></Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Prescribed Drugs</p>
+              <p className={classes.cardCategory}>Drugs Dispensed</p>
               <h3 className={classes.cardTitle}>
-                {prescribed > 0 ? prescribed : 0} <small></small>
+              {issued > 0 ? issued : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -107,10 +94,10 @@ export default function PharmacistDashboard() {
           <Card>
             <CardHeader color="success" stats icon>
               <CardIcon color="success">
-                <Store />
+                <PendingActionsIcon />
               </CardIcon>
-              <p className={classes.cardCategory}>Drugs Dispensed</p>
-              <h3 className={classes.cardTitle}>{issued > 0 ? issued : 0}</h3>
+              <p className={classes.cardCategory}>Prescribed Dispensed</p>
+              <h3 className={classes.cardTitle}>{prescribed > 0 ? prescribed : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -162,7 +149,9 @@ export default function PharmacistDashboard() {
                   <button className="btnSearch" onClick={searchPrescription}>Search</button>
                 </div>
               </div>
-              {rows ? 
+              {!loading ? 
+              <>
+              {rows.length > 0 ? 
               <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
@@ -187,7 +176,7 @@ export default function PharmacistDashboard() {
                         <td>
                           <div className="editContainer">
                             <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                              fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/cancel?drug_id=${item._id}`)
+                              fetch(`${base}/KNH/patient/drugs/cancel?drug_id=${item._id}`)
                               .then(response => response.json())
                               .then((data) => {
                                   if (data.message == "Updated Successfully") {
@@ -206,8 +195,14 @@ export default function PharmacistDashboard() {
               </table>
               : 
               <div className="noData">
-              <p className="txtNo">No Dispensed Drugs</p>
-            </div>
+                <p className="txtNo">No Dispensed Drugs</p>
+              </div>
+              }
+              </>
+              :
+              <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
               }
             </CardBody>
           </Card>

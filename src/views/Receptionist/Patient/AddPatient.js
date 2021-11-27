@@ -5,12 +5,14 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 const axios = require('axios').default;
 import './styles/add.css';
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -47,6 +49,9 @@ const useStyles = makeStyles(styles);
 export default function AddPatient() {
   const classes = useStyles();
   const [showNok, setShowNok] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [kinLoading, setKinLoading] = useState(false)
+  const base = useBaseUrl()
 
   //patient
   const [firstname, setFirstname] = useState("");
@@ -65,6 +70,7 @@ export default function AddPatient() {
 
   const addPatient = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const details = {
         firstname: firstname,
@@ -85,15 +91,19 @@ export default function AddPatient() {
 
     axios({
         method: 'post',
-        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/register',
+        url: `${base}/KNH/patient/register`,
         data: details})
         .then((data) => {
             if (data.data.message == "Inserted Successfully") {
                 console.log("inserted")
                 setShowNok(true);
+                setLoading(false);
+                toast.success("Patient Added Successfully")
             }
             else{
                 console.log("Not Inserted")
+                setLoading(false);
+                toast.error("Patient not added")
             }                
         })
         .catch((error) => {
@@ -114,6 +124,7 @@ export default function AddPatient() {
 
   const addNextOfKin = (e) => {
     e.preventDefault();
+    setKinLoading(true)
 
     const details = {
         firstname: kinFirstname,
@@ -129,14 +140,18 @@ export default function AddPatient() {
 
     axios({
         method: 'post',
-        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/register/nok',
+        url: `${base}/KNH/patient/register/nok`,
         data: details})
         .then((data) => {
             if (data.data.message == "Inserted Successfully") {
                 console.log("inserted")
+                setKinLoading(false);
+                toast.success("Next of kin added successfully");
             }
             else{
                 console.log("Not Inserted")
+                setKinLoading(false);
+                toast.error("Next of kin not added");
             }                
         })
         .catch((error) => {
@@ -146,6 +161,13 @@ export default function AddPatient() {
 
 
   return (
+    <>
+    <ToastContainer />
+    <div className="pathCont">
+      <div className="path">
+        <p className="pathName">Dashboard / <span>Add Patient</span></p>
+      </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -237,7 +259,10 @@ export default function AddPatient() {
                       <input type="text" required placeholder="Enter Blood Pressure" class="patInput" onChange={(e) => setPressure(e.target.value)}/>
                     </div>
                     <div className="patRow">
-                      <button className="patBtn" onClick={addPatient}>Submit</button>
+                      {!loading ? <button className="patBtn" onClick={addPatient}>Submit</button>
+                      :
+                      <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                      }
                       </div>
                   </div>
                 </div>
@@ -329,7 +354,10 @@ export default function AddPatient() {
                       </select>
                     </div>
                     <div className="patRow">
-                      <button className="patBtn" onClick={addNextOfKin}>Submit</button>
+                      {!kinLoading ? <button className="patBtn" onClick={addNextOfKin}>Submit</button>
+                      :
+                      <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                      }
                       </div>
                   </div>
                 </div>
@@ -341,5 +369,6 @@ export default function AddPatient() {
       :
       null }
     </GridContainer>
+    </>
   );
 }

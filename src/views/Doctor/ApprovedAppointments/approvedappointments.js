@@ -5,13 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useDataStatus } from "hooks/useDataStatus";
 import { useAuth } from "hooks/AuthProvider";
-
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -48,9 +48,10 @@ const useStyles = makeStyles(styles);
 export default function DoctorApprovedAppointments() {
   const classes = useStyles();
   const [approved, setApproved] = useState([])
-  const { loading } = useDataStatus(approved);
   const { currentUser } = useAuth();
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchAppointment = (e) => {
     e.preventDefault()
@@ -58,7 +59,7 @@ export default function DoctorApprovedAppointments() {
   }
 
   const getAllApprovedAppointments = () => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -71,21 +72,25 @@ export default function DoctorApprovedAppointments() {
   }
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
+    setLoading(true);
+    fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setApproved(data.data);
                   console.log(data.data);
+                  setLoading(false);
               }
               else{
                   console.log("no data");
+                  setLoading(false);
               }
           })
   }, [])
 
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Approved Appointments</span></p>
@@ -115,6 +120,8 @@ export default function DoctorApprovedAppointments() {
                     <button className="btnSearch" onClick={searchAppointment}>Search</button>
                   </div>
                 </div>
+                {!loading ? 
+                <>
                 {approved.length > 0 ?
                 <table className="styled-table">
                   <thead>
@@ -138,14 +145,20 @@ export default function DoctorApprovedAppointments() {
                           <td>
                             <div className="editContainer">
                               <p className="editP" style={{backgroundColor: "red"}} onClick={() => {
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/cancel?appointment_id=${item.appointment_id}`)
+                                fetch(`${base}/KNH/appointments/cancel?appointment_id=${item.appointment_id}`)
                                 .then(response => response.json())
                                 .then((data) => {
                                     if (data.message == "Appointment Cancelled Successfully") {
-                                      console.log("Cancelled")
+                                      toast.success("Appointment Cancelled Successfully");
+                                      setApproved([])
+                                      setLoading(true)
+                                      setTimeout(() => {
+                                        setLoading(false);
+                                        getAllApprovedAppointments()
+                                      }, 2000);
                                     }
                                     else{
-                                      console.log("Not Cancelled")
+                                      toast.error("Appointment Not Cancelled");
                                     }
                                 })
                                 }}>Cancel</p>
@@ -158,6 +171,12 @@ export default function DoctorApprovedAppointments() {
                 : 
                   <div className="noData">
                   <p className="txtNo">No Approved Appointment</p>
+                </div>
+                }
+                </>
+                :
+                <div className="load">
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
                 </div>
                 }
           </CardBody>

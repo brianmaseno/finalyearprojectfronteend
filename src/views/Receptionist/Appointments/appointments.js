@@ -5,12 +5,14 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { useAuth } from "hooks/AuthProvider";
 const axios = require('axios').default;
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -49,11 +51,14 @@ export default function BookAppointment() {
   const [date, setDate] = useState("");
   const [clinicians, setClinicians] = useState("");
   const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(false)
+  const [saveLoading, setSaveLoading] = useState(false)
 
   const [patientId, setPatientId] = useState("");
   const [clinicianId, setClinicianId] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [reason, setReason] = useState("");
+  const base = useBaseUrl()
 
   const check = (e) => {
     e.preventDefault();
@@ -61,14 +66,19 @@ export default function BookAppointment() {
     const status = date === "";
 
     if (!status) {
-      axios.get(`https://ehrsystembackend.herokuapp.com/KNH/appointments/slots/available/date?date=${date}`)
+      setLoading(true);
+      axios.get(`${base}/KNH/appointments/slots/available/date?date=${date}`)
       .then((data) => {
           if (data.data.message == "Found") {
             setClinicians(data.data.data)
             console.log(data.data.data)
+            setLoading(false);
+            toast.success("Clinician available")
           }
           else{
             console.log("Not Found")
+            setLoading(false);
+            toast.error("No clinician available")
           }                
       })
       .catch((error) => {
@@ -83,6 +93,7 @@ export default function BookAppointment() {
 
   const saveAppointment = (e) => {
     e.preventDefault();
+    setSaveLoading(true);
     const currDate = new Date();
     const newDate = currDate.getDate() + "/" + currDate.getMonth() + "/" + currDate.getFullYear();
 
@@ -93,20 +104,33 @@ export default function BookAppointment() {
       appointment_reason: reason,
       appointment_due_date: date,
       appointment_created_date: newDate,
-      department_id: currentUser.department_id
+      department_id: currentUser.department_id,
+      appointment_created_by: currentUser.national_id
   }
 
 
   axios({
       method: 'post',
-      url: 'https://ehrsystembackend.herokuapp.com/KNH/appointments/add',
+      url: `${base}/KNH/appointments/add`,
       data: details})
       .then((data) => {
           if (data.data.message == "Appointment Placed Successfully") {
               console.log("inserted")
+              setSaveLoading(false);
+              toast.success("Appointment booked successfully")
+
+              //notification
+              const message = `New appointment for ${patientId} needs approval`;
+              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${clinicianId}`)
+                .then(response => response.json())
+                .then((data) => {
+                    console.log(data);
+                })
           }
           else{
-              console.log("Not Inserted")
+            setSaveLoading(false);
+            console.log("Not Inserted")
+            toast.error("Appointment not booked")
           }                
       })
       .catch((error) => {
@@ -115,6 +139,13 @@ export default function BookAppointment() {
   }
 
   return (
+    <>
+    <ToastContainer />
+    <div className="pathCont">
+      <div className="path">
+        <p className="pathName">Dashboard / <span>Book Appointment</span></p>
+      </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -181,7 +212,10 @@ export default function BookAppointment() {
                               </div>
                             </div>
                             <div className="formBtn">
-                                <button className="btnUpdate" onClick={saveAppointment}>Save Appointment</button>
+                                {!saveLoading ? <button className="btnUpdate" onClick={saveAppointment}>Save Appointment</button>
+                                :
+                                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                                }
                             </div>
                           </form>
                       </div>
@@ -192,5 +226,6 @@ export default function BookAppointment() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

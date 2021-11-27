@@ -5,17 +5,15 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
 import { usePatients } from "hooks/usePatients";
-import logo from "assets/img/logoknh.jpg";
 import { useLab } from "hooks/useLab";
+import { CSVLink, CSVDownload } from "react-csv";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -53,6 +51,14 @@ export default function TestServices() {
   const classes = useStyles();
   const { patients } = usePatients();
   const { lab } = useLab()
+  const [loading, setLoading] = useState(true);
+  const base = useBaseUrl()
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, [])
 
   return (
     <>
@@ -75,10 +81,13 @@ export default function TestServices() {
             <div className="servContainer">
               <div className="print">
                     <button className="pdf">PDF</button>
-                    <button className="excel">Excel</button>
+                    <CSVLink className="excel" data={lab}>Excel</CSVLink>
                 </div>
               <div className="reportBody">
                 <div>
+                  {!loading ? 
+                  <>
+                  {lab.length > 0 ? 
                   <table className="styled-table">
                     <thead>
                       <tr>
@@ -99,6 +108,17 @@ export default function TestServices() {
                       )): null}
                     </tbody>
                   </table>
+                  :
+                  <div className="noData">
+                    <p className="txtNo">No Test Conducted</p>
+                  </div>
+                  }
+                  </>
+                  :
+                  <div className="load">
+                    <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                  </div>
+                  }
                 </div>
               </div>              
             </div>

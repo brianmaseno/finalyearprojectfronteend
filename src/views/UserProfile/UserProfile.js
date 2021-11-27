@@ -1,21 +1,25 @@
 /* eslint-disable */
-import React from "react";
+import React, {useState} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-import InputLabel from "@material-ui/core/InputLabel";
+import { ToastContainer, toast } from "react-toastify";
+//import ReactLoading from "react-loading";
+import "react-toastify/dist/ReactToastify.css";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
-import avatar from "assets/img/faces/marc.jpg";
+import Input from "@material-ui/core/Input";
+import avatar from "assets/img/faces/personaccount.png";
 import { useAuth } from '../../hooks/AuthProvider';
+import './profile.css'
+import { useBaseUrl } from "hooks/useBaseUrl";
+import ProjectLoading from "components/Loading/projectloading";
 
 const styles = {
   cardCategoryWhite: {
@@ -40,9 +44,48 @@ const useStyles = makeStyles(styles);
 
 export default function UserProfile() {
   const classes = useStyles();
-  const { currentUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
+  const base = useBaseUrl()
+  const [loading, setLoading] = useState(false)
+
+  const [firstName, setFirstName] = useState(currentUser.firstname)
+  const [lastName, setLastName] = useState(currentUser.lastname)
+  const [username, setUsername] = useState(currentUser.username)
+  const [country, setCountry] = useState(currentUser.country)
+  const [residence, setResidence] = useState(currentUser.residence)
+  const [county, setCounty] = useState(currentUser.county)
+  
+  const updateProfile = (e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    fetch(`${base}/KNH/staff/profile/edit?national_id=${currentUser.national_id}&&username=${username}&&firstname=${firstName}&lastname=${lastName}&&country=${country}&county=${county}&&residence=${residence}`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message != "Updated Successfully") {
+              toast.error("Not Updated");
+              setLoading(false)
+          }
+          else{  
+            toast.success("Updated Successfully");   
+            fetch(`${base}/KNH/staff/details?national_id=${currentUser.national_id}`)
+            .then(response => response.json())
+            .then((data) => {
+              if (data.message == "Found") {
+                setCurrentUser(data.data)
+              }
+            })      
+            setLoading(false)
+          }
+      })
+      .catch((error) => {
+          console.log(error);
+      });
+  }
+
   return (
     <div>
+      <ToastContainer />
       <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Profile</span></p>
@@ -56,101 +99,90 @@ export default function UserProfile() {
               <p className={classes.cardCategoryWhite}>Complete your profile</p>
             </CardHeader>
             <CardBody>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={5}>
-                  <CustomInput
-                    labelText="First Name"
-                    id="company-disabled"
+              <GridContainer style={{marginTop: "100px", marginBottom: "100px"}}>
+                <GridItem xs={12} sm={12} md={5} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="First Name"
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e) => setFirstName(e.target.value)}
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
-                  <CustomInput
-                    labelText="Last Name"
+                <GridItem xs={12} sm={12} md={3} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="Last Name"
                     id="username"
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e) => setLastName(e.target.value)}
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <CustomInput
-                    labelText="Username"
+                <GridItem xs={12} sm={12} md={4} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="Username"
                     id="email-address"
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </GridItem>
               </GridContainer>
               <GridContainer>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText="Department"
-                    id="first-name"
-                    formControlProps={{
-                      fullWidth: true,
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <CustomInput
-                    labelText="County"
+                <GridItem xs={12} sm={12} md={12} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="Country"
                     id="last-name"
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e) => setCountry(e.target.value)}
                   />
                 </GridItem>
               </GridContainer>
               <GridContainer>
-                <GridItem xs={12} sm={12} md={4}>
-                  <CustomInput
-                    labelText="City"
+                <GridItem xs={12} sm={12} md={6} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="County"
                     id="city"
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e) => setCounty(e.target.value)}
                   />
                 </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <CustomInput
-                    labelText="Country"
+                <GridItem xs={12} sm={12} md={6} style={{display: "flex", flexDirection: "column", justifyContent: "center", marginBottom: "20px", marginTop: "20px"}}>
+                  <Input
+                    placeholder="Residence"
                     id="country"
                     formControlProps={{
                       fullWidth: true,
                     }}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <CustomInput
-                    labelText="ID Number"
-                    id="postal-code"
-                    formControlProps={{
-                      fullWidth: true,
-                    }}
+                    onChange={(e) => setResidence(e.target.value)}
                   />
                 </GridItem>
               </GridContainer>
             </CardBody>
             <CardFooter>
-              <Button color="info">Update Profile</Button>
+              {!loading ? <Button color="info" onClick={updateProfile}>Update Profile</Button>
+              :
+              <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
+              }
             </CardFooter>
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
             <CardAvatar profile>
-              <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                <img src={avatar} alt="..." />
+              <a href="#" onClick={(e) => e.preventDefault()}>
+                <img src={avatar} alt="..." style={{padding: "15px"}}/>
               </a>
             </CardAvatar>
             <CardBody profile>
-              <h6 className={classes.cardCategory}>{currentUser.qualification}</h6>
-              <h4 className={classes.cardTitle}>{currentUser.firstname + " " + currentUser.lastname}</h4>
-              
+              <h6 className="profileQualification">{currentUser.qualification}</h6>
+              <h4 className="profileName">{currentUser.firstname + " " + currentUser.lastname}</h4>
             </CardBody>
           </Card>
         </GridItem>

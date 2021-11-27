@@ -5,12 +5,14 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { usePatients } from "hooks/usePatients";
 import './makepayments.css';
+import ProjectLoading from "components/Loading/projectloading";
+import { ToastContainer, toast } from "react-toastify";
+import { useAuth } from "hooks/AuthProvider";
+import { useBaseUrl } from "../../../hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -49,16 +51,22 @@ export default function MakePayment() {
   const [patientId, setPatientId] = useState([])
   const [data, setData] = useState([])
   const [total, setTotal] = useState("")
+  const [loading, setLoading] = useState(false);
+  const [payLoad, setPayLoad] = useState(false);
+  const { currentUser } = useAuth();
+  const base = useBaseUrl()
 
   const checkPatient = (e) => {
     e.preventDefault()
+    setLoading(true);
 
     if (!(patientId === "")) {
-      fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/billing/${patientId}/total`)
+      fetch(`${base}/KNH/patient/billing/${patientId}/total`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setData(data.data)
+                  setLoading(false);
                   if (data.data.length > 0) {
                     let totalCost = 0
                     for (let index = 0; index < data.data.length; index++) {
@@ -69,7 +77,8 @@ export default function MakePayment() {
                   }
               }
               else{
-                  console.log("no data");
+                setLoading(false);
+                console.log("no data");
               }
           })
     }
@@ -79,18 +88,31 @@ export default function MakePayment() {
     e.preventDefault()
 
     if (data.length > 0) {
+      setPayLoad(true);
       for (let index = 0; index < data.length; index++) {
         const bill_id = data[index]._id
         
         if (bill_id != null) {
-          fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/billing/pay?bill_id=${bill_id}`)
+          fetch(`${base}/KNH/patient/billing/pay?bill_id=${bill_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Bill Payed") {
                   console.log("Bill Payed")
+                  setPayLoad(false)
+                  toast.success("Bill Paid");
+
+                  //notification
+                  const message = `Bill ${bill_id} for patient ${patientId} has been settled successfully`;
+                  fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                    .then(response => response.json())
+                    .then((data) => {
+                        console.log(data);
+                    })
               }
               else{
                   console.log("not payed");
+                  setPayLoad(false);
+                  toast.error("Bill not paid")
               }
           })
         }
@@ -102,6 +124,13 @@ export default function MakePayment() {
   }
 
   return (
+    <>
+    <ToastContainer />
+    <div className="pathCont">
+      <div className="path">
+        <p className="pathName">Dashboard / <span>Make Payment</span></p>
+      </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -134,6 +163,9 @@ export default function MakePayment() {
                         <p className="titleTxt">Billing Items for Patient</p>
                     </div>
                     <div className="checkBody">
+                      {!loading ? 
+                      <>
+                      {data.length > 0 ? 
                       <table className="styled-table">
                         <thead>
                           <tr style={{marginBottom: "20px"}}>
@@ -158,17 +190,31 @@ export default function MakePayment() {
                               </td>
                           </tr>
                           ))
-                            :
-                            null}
+                          :
+                          null}
                         </tbody>
                       </table>
+                      :
+                      <div className="noData">
+                        <p className="txtNo">No Billing Items</p>
+                      </div>
+                      }
+                      </>
+                      :
+                      <div className="load">
+                        <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                      </div>
+                      }
                     </div>
                     {data.length > 0 ? 
                     <div className="recContainer">
                       <div>
                         <p className="txtReceive">Total Amount Ksh.{total}</p>
                       </div>
-                      <button className="btnReceive" onClick={makeAllPayments}>Receive Payment</button>
+                      {!payLoad ? <button className="btnReceive" onClick={makeAllPayments}>Receive Payment</button>
+                      :
+                      <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
+                      }
                     </div>
                     :
                     null}
@@ -178,5 +224,6 @@ export default function MakePayment() {
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

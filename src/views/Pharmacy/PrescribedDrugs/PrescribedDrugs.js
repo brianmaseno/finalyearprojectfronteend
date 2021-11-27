@@ -5,13 +5,14 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { usePatients } from "hooks/usePatients";
 import { useAuth } from "hooks/AuthProvider";
 import { useDrugs } from "hooks/useDrugs";
+import ProjectLoading from "components/Loading/projectloading";
+import { ToastContainer, toast } from "react-toastify";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -52,11 +53,15 @@ export default function PrescribedDrugs() {
   const [data, setData] = useState([])
   const { currentUser } = useAuth()
   const { drug } = useDrugs()
+  const [loading, setLoading] = useState(false);
+  const [disLoading, setDisLoading] = useState(false);
+  const base = useBaseUrl()
 
   const dispenseDrugs = (e) => {
     e.preventDefault()
 
     if (data.length > 0) {
+      setDisLoading(true);
       const drug_id = data[0]._id
       const treatment_id = data[0].treatment_id
 
@@ -69,29 +74,43 @@ export default function PrescribedDrugs() {
         added_by: currentUser.national_id
       }
 
-      fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/issue?drug_id=${drug_id}`)
+      fetch(`${base}/KNH/patient/drugs/issue?drug_id=${drug_id}`)
       .then(response => response.json())
       .then((data) => {
-          if (data.message == "Found") {
+          if (data.message == "Updated Successfully") {
               console.log(data.message)
-              axios({
-                method: 'post',
-                url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/billing/set',
-                data: payDetails})
+              setDisLoading(false);
+              toast.success("Drug Issued");
+              //notification
+              const message = `${drug.filter((item) => item._id == drug_id).drug_name} has been dispensed to ${patientId}`;
+              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                .then(response => response.json())
                 .then((data) => {
-                    if (data.data.message == "Added to Bill") {
-                        console.log("Added to Bill")
-                    }
-                    else{
-                        console.log("Not Added")
-                    }                
+                    console.log(data);
                 })
-                .catch((error) => {
-                    console.log(error);
-            });
+
+                //billing
+                axios({
+                  method: 'post',
+                  url: `${base}/KNH/patient/billing/set`,
+                  data: payDetails})
+                  .then((data) => {
+                      if (data.data.message == "Added to Bill") {
+                          console.log("Added to Bill")
+                      }
+                      else{
+                          console.log("Not Added")
+                      }                
+                  })
+                  .catch((error) => {
+                      console.log(error);
+                });
+
+                setData([]);
           }
           else{
-              console.log("no data");
+            setDisLoading(false);
+            toast.error("Error");
           }
       })
     }
@@ -102,16 +121,19 @@ export default function PrescribedDrugs() {
 
   const checkPatient = (e) => {
     e.preventDefault()
+    setLoading(true);
 
     if (!(patientId === "")) {
-      fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/prescribed/patient?patient_id=${patientId}`)
+      fetch(`${base}/KNH/patient/drugs/prescribed/patient?patient_id=${patientId}`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
+            setLoading(false);
               setData(data.data);
           }
           else{
-              console.log("no data");
+            setLoading(false);
+            console.log("no data");
           }
       })
     }
@@ -121,6 +143,8 @@ export default function PrescribedDrugs() {
   }
 
   return (
+    <>
+    <ToastContainer />
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -144,7 +168,10 @@ export default function PrescribedDrugs() {
                             <input type="text" placeholder="Enter Patient ID" className="patText" onChange={(e) => setPatientId(e.target.value)}/>
                         </div>
                         <div className="checkAv">
-                            <button className="btnPay" onClick={checkPatient}>Check Patient</button>
+                            {!loading ? <button className="btnPay" onClick={checkPatient}>Check Patient</button>
+                            :
+                            <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                            }
                         </div>
                       </div>
                   </div>
@@ -153,6 +180,7 @@ export default function PrescribedDrugs() {
                           <p className="titleTxt">Drugs Prescribed</p>
                       </div>
                       <div className="checkBody">
+                        {data.length > 0 ? 
                         <table className="styled-table">
                           <thead>
                             <tr style={{marginBottom: "20px"}}>
@@ -164,7 +192,7 @@ export default function PrescribedDrugs() {
                             </tr>
                           </thead>
                           <tbody>
-                            {data.length > 0 ? data.map((item) => (
+                            {data.map((item) => (
                                 <tr>
                                     <td>{item._id}</td>
                                     <td>{item.treatment_id}</td>
@@ -176,18 +204,31 @@ export default function PrescribedDrugs() {
                                     </div>
                                   </td>
                                 </tr>
-                            )): null}   
+                            ))}   
                           </tbody>
                         </table>
+                        :
+                        <div className="noData">
+                          <p className="txtNo">No Drug</p>
+                        </div>
+                        }
+                        
                       </div>
+                      {data.length > 0 ? 
                       <div className="recContainer">
-                        <button className="btnReceive" onClick={dispenseDrugs}>Dispense Drug</button>
+                        {!disLoading ? <button className="btnReceive" onClick={dispenseDrugs}>Dispense Drug</button>
+                        :
+                        <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                        }
                       </div>
+                      :
+                      null}
                   </div>
                 </div>
           </CardBody>
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

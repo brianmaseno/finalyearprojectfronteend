@@ -5,15 +5,12 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
-import { useAppointments } from "hooks/useAppointments";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -51,6 +48,8 @@ export default function PendingAppointments() {
   const classes = useStyles();
   const [pending, setPending] = useState([])
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchPending = (e) => {
     e.preventDefault()
@@ -58,7 +57,7 @@ export default function PendingAppointments() {
   }
   
   const getPendingAppointments = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/appointments/all/pending")
+    fetch(`${base}/KNH/appointments/all/pending`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -72,14 +71,17 @@ export default function PendingAppointments() {
   }
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/all/pending`)
+    setLoading(true);
+    fetch(`${base}/KNH/appointments/all/pending`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
             setPending(data.data)
+            setLoading(false);
           }
           else{
             console.log("No Data")
+            setLoading(false);
           }
       })
   }, [])
@@ -116,6 +118,9 @@ export default function PendingAppointments() {
                 <button className="btnSearch" onClick={searchPending}>Search</button>
               </div>
               </div>
+              {!loading ? 
+              <>
+              {pending.length > 0 ?
               <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
@@ -144,6 +149,16 @@ export default function PendingAppointments() {
                     )) : null}
                 </tbody>
               </table>
+              :
+              <div className="noData">
+                <p className="txtNo">No Pending Appointments</p>
+              </div>}
+              </>
+              :
+              <div className="load">
+                <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+              </div>
+            }
           </CardBody>
         </Card>
       </GridItem>

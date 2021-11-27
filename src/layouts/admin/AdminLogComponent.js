@@ -5,9 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useHistory } from "react-router-dom";
 import logo from '../../assets/img/logoknh.jpg';
-import { nullLiteral } from "@babel/types";
 import { useAuth } from "hooks/AuthProvider";
 import '../staff/login.css';
+import { useBaseUrl } from '../../hooks/useBaseUrl';
 
 export default function AdminLogComponent() {
   const [password, setPassword] = useState("");
@@ -15,6 +15,7 @@ export default function AdminLogComponent() {
   const [logged, setLogged] = useState(false);
   const history = useHistory();
   const { setCurrentUser } = useAuth();
+  const base = useBaseUrl()
 
   const checkUser = (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ export default function AdminLogComponent() {
 
     if (!status) {
       logged ? toast.info("Validating credentials.....") : null;
-      fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/login?username=admin&&password=${password}`)
+      fetch(`${base}/KNH/staff/login?username=admin&&password=${password}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Not Found") {
@@ -63,6 +64,8 @@ export default function AdminLogComponent() {
       };
 
   return (
+    <>
+    <ToastContainer position="top-center"/>
     <div className="containerLogin">
       <div className="avatar">
           <img src={logo} className="imageLogo"/>
@@ -79,5 +82,6 @@ export default function AdminLogComponent() {
           <p href="" className="admin"><Link to="/login" className="admin">Login as Staff</Link></p>
       </div>
     </div>
+    </>
   )
 }

@@ -5,13 +5,15 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './case.css'
 import { useAuth } from "hooks/AuthProvider";
 import { useApprovedTreatment } from "hooks/useApprovedTreatment";
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -53,9 +55,12 @@ export default function CaseNotes() {
   const [notes, setNotes] = useState("")
   const [treatment_id, setTreatment_id] = useState("")
   const { data } = useApprovedTreatment()
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const saveNotes = (e) => {
     e.preventDefault()
+    setLoading(true);
 
     const details = {
       patient_id: patientId,
@@ -66,14 +71,18 @@ export default function CaseNotes() {
 
     axios({
       method: 'post',
-      url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/treatment/add',
+      url: `${base}/KNH/patient/treatment/add`,
       data: details})
       .then((data) => {
           if (data.data.message == "Inserted Successfully") {
               console.log("inserted")
+              setLoading(false)
+              toast.success("Case Added Successfully");
           }
           else{
               console.log("Not Inserted")
+              setLoading(false)
+              toast.error("Case Addition Failed");
           }                
       })
       .catch((error) => {
@@ -84,6 +93,7 @@ export default function CaseNotes() {
 
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Case Notes</span></p>
@@ -110,7 +120,7 @@ export default function CaseNotes() {
                   <select className="inCase" onChange={(e) => setTreatment_id(e.target.value)}>
                     <option>Select...</option>
                     {data.length > 0 ? data.map((item) => (
-                      <option value={item.treatment_id}>{item._id}</option>
+                      <option value={item.treatment_id}>{item.treatment_id} ({item.patient_id})</option>
                     )): null}
                   </select>
                 </div>
@@ -121,7 +131,10 @@ export default function CaseNotes() {
                   </textarea>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave" onClick={saveNotes}>Save Notes</button>
+                  {!loading ? <button className="caseSave" onClick={saveNotes}>Save Notes</button>
+                  :
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
+                  }
                 </div>
               </div>
             </div>

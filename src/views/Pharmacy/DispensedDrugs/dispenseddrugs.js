@@ -5,14 +5,12 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -50,6 +48,8 @@ export default function DispensedDrugs() {
   const classes = useStyles();
   const [data, setData] = useState([])
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false)
+  const base = useBaseUrl()
 
   const searchPrescription = (e) => {
     e.preventDefault()
@@ -57,7 +57,7 @@ export default function DispensedDrugs() {
   }
 
   const getAllPrescriptions = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+    fetch(`${base}/KNH/patient/drugs/dispensingreport`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
@@ -70,14 +70,17 @@ export default function DispensedDrugs() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/dispensingreport")
+    setLoading(true);
+    fetch(`${base}/KNH/patient/drugs/dispensingreport`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setData(data.data);
+                  setLoading(false);
               }
               else{
                   console.log("no data");
+                  setLoading(false);
               }
           })
   }, [])
@@ -114,7 +117,9 @@ export default function DispensedDrugs() {
                 <button className="btnSearch" onClick={searchPrescription}>Search</button>
               </div>
             </div>
-            {data ? 
+            {!loading ? 
+            <>
+            {data.length > 0 ? 
             <table className="styled-table">
               <thead>
                 <tr style={{marginBottom: "20px"}}>
@@ -139,14 +144,21 @@ export default function DispensedDrugs() {
                       <td>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                              fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/drugs/cancel?drug_id=${item._id}`)
+                              fetch(`${base}/KNH/patient/drugs/cancel?drug_id=${item._id}`)
                               .then(response => response.json())
                               .then((data) => {
                                   if (data.message == "Updated Successfully") {
-                                      console.log("Updated")
+                                    toast.success("Removed Successfully");
+                                    setLoading(true);
+                                    setTimeout(() => {
+                                      setData([])
+                                      setLoading(false);
+                                      getAllPrescriptions();
+                                    }, 2000);
+
                                   }
                                   else{
-                                      console.log("no data");
+                                    toast.error("Not Removed");
                                   }
                               })
                             }}>Remove</p>
@@ -160,6 +172,12 @@ export default function DispensedDrugs() {
             <div className="noData">
             <p className="txtNo">No Drug</p>
           </div>
+            }
+            </>
+            :
+            <div className="load">
+              <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+            </div>
             }
           </CardBody>
         </Card>

@@ -18,7 +18,7 @@ export default function App() {
   
   useEffect(() => {
     const currentUser = sessionStorage.getItem("user");
-    if (currentUser != null) {
+    if (currentUser != null && !(currentUser === undefined)) {
       setUser(currentUser);
     }
     else{
@@ -26,6 +26,7 @@ export default function App() {
     }
   }, [user])
   return (
+    <>
     <AuthProvider user={user}>
       <BrowserRouter>
         <Switch>
@@ -42,5 +43,6 @@ export default function App() {
         </Switch>
       </BrowserRouter>
   </AuthProvider>
+  </>
   )
 }

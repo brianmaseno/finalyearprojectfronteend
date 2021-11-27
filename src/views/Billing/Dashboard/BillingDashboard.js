@@ -1,45 +1,26 @@
 /* eslint-disable */
 import React, {useEffect, useState} from "react";
-// react plugin for creating charts
-import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
-//import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
-//import LocalOffer from "@material-ui/icons/LocalOffer";
-import Update from "@material-ui/icons/Update";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import AccessTime from "@material-ui/icons/AccessTime";
-import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import PaidIcon from '@mui/icons-material/Paid';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PaymentsIcon from '@mui/icons-material/Payments';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import Table from "components/Table/Table.js";
-import Tasks from "components/Tasks/Tasks.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
-//import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
-import { bugs, website, server } from "variables/general.js";
-
-import {
-  dailySalesChart,
-  emailsSubscriptionChart,
-  completedTasksChart,
-} from "variables/charts.js";
-
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { useBilling } from "hooks/useBilling";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "../../../hooks/useBaseUrl";
 
 const useStyles = makeStyles(styles);
 
@@ -50,6 +31,8 @@ export default function BillingDashboard() {
   const paid = useBilling("completedbills")
   const total = unpaid + paid
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchBilling = (e) => {
     e.preventDefault()
@@ -57,7 +40,7 @@ export default function BillingDashboard() {
   }
 
   const allBillings = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/billing/completedbills/report/all")
+    fetch(`${base}/KNH/patient/billing/completedbills/report/all`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
@@ -71,15 +54,17 @@ export default function BillingDashboard() {
   }
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/billing/completedbills/report/all")
+    setLoading(true);
+    fetch(`${base}/KNH/patient/billing/completedbills/report/all`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setRows(data.data);
-                  console.log(data.data)
+                  setLoading(false);
               }
               else{
                   console.log("no data");
+                  setLoading(false)
               }
           })
   }, [])
@@ -90,7 +75,7 @@ export default function BillingDashboard() {
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <Icon><PaidIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Total</p>
               <h3 className={classes.cardTitle}>$ 
@@ -109,7 +94,7 @@ export default function BillingDashboard() {
           <Card>
             <CardHeader color="success" stats icon>
               <CardIcon color="success">
-                <Store />
+                <AttachMoneyIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Paid Amount</p>
               <h3 className={classes.cardTitle}>$ {paid > 0 ? paid : 0}</h3>
@@ -126,7 +111,7 @@ export default function BillingDashboard() {
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
-                <Icon>info_outline</Icon>
+                <Icon><PaymentsIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Unpaid Amount</p>
               <h3 className={classes.cardTitle}>$ {unpaid > 0 ? unpaid : 0}</h3>
@@ -150,8 +135,6 @@ export default function BillingDashboard() {
               </p>
             </CardHeader>
             <CardBody>
-              {rows.length > 0 ? 
-              <>
               <div className="searchOut">
                 <div className="searchCont">
                   <input type="text" className="searchInput" placeholder="Search Payments By ID" onChange={(e) => {
@@ -166,14 +149,23 @@ export default function BillingDashboard() {
                   <button className="btnSearch" onClick={searchBilling}>Search</button>
                 </div>
               </div>
+              {!loading ? 
+              <>
+              {rows.length > 0 ?
               <Table
-                tableHeaderColor="warning"
+                tableHeaderColor="info"
                 tableHead={["Patient ID", "Service Name", "Service Cost", "Date"]}
                 tableData={rows.map((item) => ([item.patient_id, item.service_name, item.service_cost, item.added_on]))}
               />
+              :
+              <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}><p>No Data</p></div>
+              }
               </>
               :
-              <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}><p>No Data</p></div>}
+              <div className="load">
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                </div>
+                }
             </CardBody>
           </Card>
         </GridItem>

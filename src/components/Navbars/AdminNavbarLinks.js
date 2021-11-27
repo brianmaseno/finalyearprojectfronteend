@@ -21,15 +21,21 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
+import { useBaseUrl } from "hooks/useBaseUrl";
+import { useHistory } from "react-router";
+import { useAuth } from "hooks/AuthProvider";
 
 const useStyles = makeStyles(styles);
 
 export default function AdminNavbarLinks() {
   const classes = useStyles();
+  const history = useHistory();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
   const [user, setUser] = useState("");
   const [notification, setNotifications] = useState([]);
+  const base = useBaseUrl()
+  const { currentUser } = useAuth();
 
 
   const handleClickNotification = (event) => {
@@ -40,7 +46,7 @@ export default function AdminNavbarLinks() {
     }
   };
   const handleCloseNotification = () => {
-    setOpenNotification(null);
+   
   };
   const handleClickProfile = (event) => {
     if (openProfile && openProfile.contains(event.target)) {
@@ -50,12 +56,11 @@ export default function AdminNavbarLinks() {
     }
   };
   const handleCloseProfile = () => {
-    setOpenProfile(null);
+    history.push("/login");
   };
 
   useEffect(() => {
-    const currentUser = sessionStorage.getItem("user");
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/staff/viewNotifications?id=${currentUser}`)
+    fetch(`${base}/KNH/staff/viewNotifications?id=${currentUser.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
@@ -85,18 +90,7 @@ export default function AdminNavbarLinks() {
           <Search />
         </Button>
       </div>
-      <Button
-        color={window.innerWidth > 959 ? "transparent" : "white"}
-        justIcon={window.innerWidth > 959}
-        simple={!(window.innerWidth > 959)}
-        aria-label="Dashboard"
-        className={classes.buttonLink}
-      >
-        <Dashboard className={classes.icons} />
-        <Hidden mdUp implementation="css">
-          <p className={classes.linkText}>Dashboard</p>
-        </Hidden>
-      </Button>
+      
       <div className={classes.manager}>
         <Button
           color={window.innerWidth > 959 ? "transparent" : "white"}
@@ -189,19 +183,12 @@ export default function AdminNavbarLinks() {
               }}
             >
               <Paper>
-                <ClickAwayListener onClickAway={handleCloseProfile}>
+                <ClickAwayListener>
                   <MenuList role="menu">
                     <MenuItem
-                      onClick={handleCloseProfile}
                       className={classes.dropdownItem}
                     >
                       Profile
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Settings
                     </MenuItem>
                     <Divider light />
                     <MenuItem

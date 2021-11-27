@@ -5,11 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { useAuth } from "hooks/AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -53,12 +55,16 @@ export default function DoctorAvailability() {
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("");
   const [slots, setSlots] = useState("");
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const addAvailability = (e) => {
     e.preventDefault();
 
     const status = date === "" && id === "" && from === "" && to === "" && slots === "";
     if (!status) {
+      setLoading(true);
+
       const details = {
         date: date,
         doctor_id: id,
@@ -69,15 +75,19 @@ export default function DoctorAvailability() {
   
       axios({
         method: 'post',
-        url: 'https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/availability',
+        url: `${base}/KNH/appointments/doctor/availability`,
         data: details})
         .then((data) => {
           console.log(data.data)
             if (data.data.message == "Availability Placed Successfully") {
                 console.log("inserted")
+                setLoading(false);
+                toast.success("Availability details added")
             }
             else{
+              setLoading(false);
                 console.log("Not Inserted")
+                toast.error("Availability not added");
             }                
         })
         .catch((error) => {
@@ -86,11 +96,13 @@ export default function DoctorAvailability() {
     }
     else{
       console.log("Parameter Missing")
+      toast.error("Parameter Missing");
     }
   }
 
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Doctor Availability</span></p>
@@ -129,7 +141,13 @@ export default function DoctorAvailability() {
                     <input type="number" placeholder="Slots" className="inCase" onChange={(e) => setSlots(e.target.value)}/>
                   </div>
                   <div className="caseFooter">
-                    <button className="caseSave" onClick={addAvailability}>Add Availability</button>
+                    {!loading ? <button className="caseSave" onClick={addAvailability}>Add Availability</button> 
+                    :
+                    <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                    } 
+                  </div>
+                  <div className="load">
+                    
                   </div>
                 </div>
               </div>

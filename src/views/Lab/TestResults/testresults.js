@@ -5,15 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
 import { useAuth } from "hooks/AuthProvider";
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -55,6 +53,8 @@ export default function TestResults() {
   const [result, setResult] = useState("")
   const { currentUser } = useAuth()
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false)
+  const base = useBaseUrl()
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -62,7 +62,7 @@ export default function TestResults() {
   }
 
   const getAllTests = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved")
+    fetch(`${base}/KNH/patient/lab/tests/requests/approved`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Requests Found") {
@@ -75,14 +75,16 @@ export default function TestResults() {
   }
 
   useEffect(() => {
-    axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/approved`)
+    setLoading(true)
+    axios.get(`${base}/KNH/patient/lab/tests/requests/approved`)
       .then((data) => {
           if (data.data.message == "Requests Found") {
             setData(data.data.data)
-            console.log(data.data.data)
+            setLoading(false)
           }
           else{
             console.log("Not Found")
+            setLoading(false)
           }                
       })
       .catch((error) => {
@@ -122,6 +124,8 @@ export default function TestResults() {
                 <button className="btnSearch" onClick={searchTests}>Search</button>
               </div>
             </div>
+            {!loading ? 
+            <>
             {data.length > 0 ? 
             <table className="styled-table">
               <thead>
@@ -150,11 +154,28 @@ export default function TestResults() {
                       <td>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)
+                                fetch(`${base}/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)
                                 .then(response => response.json())
                                 .then((data) => {
                                     if (data.message == "Inserted Successfully") {
-                                      console.log("Updated")
+                                      toast.success("Result submitted successfully")
+                                      setLoading(true);
+                                      setTimeout(() => {
+                                        setData([]);
+                                        setLoading(false);
+                                        getAllTests();
+                                      }, 2000);
+
+                                      //notifications 
+                                      const message = `Test ${item.lab_test_id} has been completed, check for results`;
+                                      fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${item.staff_id}`)
+                                        .then(response => response.json())
+                                        .then((data) => {
+                                            console.log(data);
+                                        })
+
+                                      //billing
+
                                       const payDetails = {
                                         patient_id: item.patient_id,
                                         treatment_id: item.treatment_id,
@@ -165,7 +186,7 @@ export default function TestResults() {
                                       }
                                       axios({
                                         method: 'post',
-                                        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/billing/set',
+                                        url: `${base}/KNH/patient/billing/set`,
                                         data: payDetails})
                                         .then((data) => {
                                             if (data.data.message == "Added to Bill") {
@@ -180,6 +201,7 @@ export default function TestResults() {
                                     });
                                     }
                                     else{
+                                      toast.error("Result not submitted");
                                       console.log("Not Updated")
                                     }
                                 })
@@ -194,6 +216,12 @@ export default function TestResults() {
             <div className="noData">
             <p className="txtNo">No Test Results</p>
           </div>
+            }
+            </>
+            :
+            <div className="load">
+              <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+            </div>
             }
           </CardBody>
         </Card>

@@ -5,12 +5,14 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './styles/find.css';
+import ProjectLoading from "components/Loading/projectloading";
 const axios = require('axios').default;
+import { ToastContainer, toast } from "react-toastify";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const styles = {
   cardCategoryWhite: {
@@ -46,9 +48,13 @@ const useStyles = makeStyles(styles);
 
 export default function FindPatient() {
   const classes = useStyles();
+  const base = useBaseUrl()
   const [available, setAvailable] = useState(false);
   const [patientID, setPatientID] = useState("")
   const [item, setItem] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [updateLoading, setUpdateLoading] = useState(false)
 
   const [firstname, setFirstname] = useState("")
   const [lastname, setLastname] = useState("")
@@ -99,6 +105,8 @@ export default function FindPatient() {
       setPressure(item[0].pressure)
     }
 
+    setUpdateLoading(true);
+
     const details = {
       patient_Id: patientID,
       firstname: firstname,
@@ -116,15 +124,19 @@ export default function FindPatient() {
 
     axios({
         method: 'post',
-        url: 'https://ehrsystembackend.herokuapp.com/KNH/patient/Profile/EditProfile',
+        url: `${base}/KNH/patient/Profile/EditProfile`,
         data: details})
         .then((data) => {
           console.log(data)
             if (data.data.message == "Edited Successfully") {
                 console.log("Edited Successfully")
+                setUpdateLoading(false);
+                toast.success("Updated Successfully");
             }
             else{
-                console.log("Not Edited")
+              setUpdateLoading(false);
+              console.log("Not Edited")
+              toast.error("Not Updated");
             }                
         })
         .catch((error) => {
@@ -138,12 +150,14 @@ export default function FindPatient() {
     const check = patientID === "";
 
     if (!check) {
-      axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/CheckPatientbyId?patient_id=${patientID}`)
+      setLoading(true);
+      axios.get(`${base}/KNH/patient/CheckPatientbyId?patient_id=${patientID}`)
       .then((data) => {
           if (data.data.message == "Patient Details Found") {
             console.log(data.data.data)
             setItem(data.data.data)
             setAvailable(true);
+            setLoading(false)
 
             setFirstname(data.data.data[0].firstname)
             setLastname(data.data.data[0].lastname)
@@ -158,6 +172,7 @@ export default function FindPatient() {
             setPressure(data.data.data[0].pressure)
           }
           else{
+            setLoading(false)
             console.log("Not Found")
           }                
       })
@@ -178,14 +193,19 @@ export default function FindPatient() {
     const check = patientID === "";
 
     if (!check) {
-      axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/DeletePatientbyId?patient_id=${patientID}`)
+      setDeleteLoading(true)
+      axios.get(`${base}/KNH/patient/DeletePatientbyId?patient_id=${patientID}`)
       .then((data) => {
           if (data.data.message == "Deleted") {
             console.log("Deleted")
             setItem([]);
+            setDeleteLoading(false);
+            toast.success("Deleted");
           }
           else{
             console.log("Not Deleted")
+            setDeleteLoading(false);
+            toast.error("Not deleted")
           }                
       })
       .catch((error) => {
@@ -200,6 +220,13 @@ export default function FindPatient() {
   }
 
   return (
+    <>
+    <ToastContainer />
+    <div className="pathCont">
+      <div className="path">
+        <p className="pathName">Dashboard / <span>Find Patient</span></p>
+      </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -231,6 +258,8 @@ export default function FindPatient() {
                 <div className="titlePatient">
                       <p className="titleTxt">Patient Details</p>
                   </div>
+                  {!loading ? 
+                  <>
                   {item.length > 0 ? 
                   <div className="checkBody">
                     {item.map((data) => (
@@ -298,8 +327,14 @@ export default function FindPatient() {
                           </div>
 
                           <div className="formBtn">
-                              <button className="btnUpdate" onClick={updatePatient}>Update Patient</button>
-                              <button className="btnDelete" onClick={deletePatient}>Delete Patient</button>
+                              {!updateLoading ? <button className="btnUpdate" onClick={updatePatient}>Update Patient</button>
+                              :
+                              <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                              }
+                              {!deleteLoading ? <button className="btnDelete" onClick={deletePatient}>Delete Patient</button>
+                              :
+                              <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                              }
                           </div>
                         </form>
                     </div>
@@ -310,11 +345,18 @@ export default function FindPatient() {
                     <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                       <p style={{fontWeight: "bold", fontSize: "17px"}}>No Details</p>
                     </div> }
+                    </>
+                    :
+                    <div className="load">
+                      <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                    </div>
+                    }
               </div>
             </div>
           </CardBody>
         </Card>
       </GridItem>
     </GridContainer>
+    </>
   );
 }

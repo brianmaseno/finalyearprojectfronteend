@@ -1,48 +1,29 @@
 /* eslint-disable */
 import React, {useEffect, useState} from "react";
-// react plugin for creating charts
-import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
-//import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
-//import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import AccessTime from "@material-ui/icons/AccessTime";
-import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import PendingIcon from '@mui/icons-material/Pending';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
-import Tasks from "components/Tasks/Tasks.js";
-import CustomTabs from "components/CustomTabs/CustomTabs.js";
-//import Danger from "components/Typography/Danger.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-
-import { bugs, website, server } from "variables/general.js";
-
-import {
-  dailySalesChart,
-  emailsSubscriptionChart,
-  completedTasksChart,
-} from "variables/charts.js";
-
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
-import { useDataStatus } from "hooks/useDataStatus";
 import { useDoctorAppointments } from "hooks/useDoctorAppointments";
 import { useAuth } from "hooks/AuthProvider";
 import { usePatients } from "hooks/usePatients";
+import ProjectLoading from "components/Loading/projectloading";
+import { ToastContainer, toast } from "react-toastify";
+import { useBaseUrl } from "hooks/useBaseUrl";
 
 const useStyles = makeStyles(styles);
 
@@ -55,6 +36,8 @@ export default function DoctorDashboard() {
   const cancelled = useDoctorAppointments("cancelled", currentUser.national_id)
   const { patients } = usePatients()
   const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const searchAppointment = (e) => {
     e.preventDefault()
@@ -62,7 +45,7 @@ export default function DoctorDashboard() {
   }
 
   const getAllPendingAppointments = () => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -75,29 +58,32 @@ export default function DoctorDashboard() {
   }
 
   useEffect(() => {
-    fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    setLoading(true);
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
                   setPending(data.data);
+                  setLoading(false);
               }
               else{
-                  console.log("no data");
+                  setLoading(false);
               }
           })
   }, [])
   return (
     <div>
+      <ToastContainer />
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <Icon><AccessTimeFilledIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Total Appointments</p>
               <h3 className={classes.cardTitle}>
-                {patients ? patients.length : 0} <small></small>
+                {(pendingData.data.length + cancelled.data.length + approved.data.length) > 0  ? (pendingData.data.length + cancelled.data.length + approved.data.length) : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -110,9 +96,9 @@ export default function DoctorDashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="success" stats icon>
-              <CardIcon color="success">
-                <Store />
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <PendingIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Pending Appointments</p>
               <h3 className={classes.cardTitle}>{pendingData.data ? pendingData.data.length : 0}</h3>
@@ -144,9 +130,9 @@ export default function DoctorDashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="info" stats icon>
-              <CardIcon color="info">
-                <Accessibility />
+            <CardHeader color="success" stats icon>
+              <CardIcon color="success">
+                <CheckCircleIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Approved Appointments</p>
               <h3 className={classes.cardTitle}>{approved.data ? approved.data.length : 0}</h3>
@@ -184,6 +170,8 @@ export default function DoctorDashboard() {
                   <button className="btnSearch" onClick={searchAppointment}>Search</button>
                 </div>
               </div>
+              {!loading ? 
+              <>
               {pending.length > 0 ?
               <table className="styled-table">
                 <thead>
@@ -207,14 +195,27 @@ export default function DoctorDashboard() {
                           <td>
                             <div className="editContainer">
                               <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/appointments/approve?appointment_id=${item.appointment_id}`)
+                                fetch(`${base}/KNH/appointments/approve?appointment_id=${item.appointment_id}`)
                                 .then(response => response.json())
                                 .then((data) => {
                                     if (data.message == "Appointment Approved Successfully") {
-                                      console.log("Approved")
+                                      const message = `Appointment ${item.appointment_id} has been approved successfully`;
+                                      fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${item.appointment_created_by}`)
+                                        .then(response => response.json())
+                                        .then((data) => {
+                                            console.log(data);
+                                        })
+
+                                      toast.success("Appointment Approved Successfully");
+                                      setPending([]);
+                                      setLoading(true)
+                                      setTimeout(() => {
+                                        setLoading(false);
+                                        getAllPendingAppointments()
+                                      }, 2000);
                                     }
                                     else{
-                                      console.log("Not")
+                                      toast.error("Appointment Not Approved");
                                     }
                                 })
                                 }}>Approve</p>
@@ -225,10 +226,16 @@ export default function DoctorDashboard() {
                 </tbody>
               </table>
               : 
-                <div className="noData">
+              <div className="noData">
                 <p className="txtNo">No Pending Appointment</p>
               </div>
               }
+              </>
+              :
+              <div className="load">
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+                </div>
+                }
             </CardBody>
           </Card>
         </GridItem>

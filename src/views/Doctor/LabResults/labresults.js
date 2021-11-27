@@ -5,11 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './results.css'
+import ProjectLoading from "components/Loading/projectloading";
+import { ToastContainer, toast } from "react-toastify";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -48,17 +50,24 @@ export default function DoctorLabTestResults() {
   const classes = useStyles();
   const [patientId, setPatientId] = useState("")
   const [test, setTest] = useState([])
+  const [loading, setLoading] = useState(false);
+  const base = useBaseUrl()
 
   const checkPatient = (e) => {
     e.preventDefault()
+    setLoading(true);
+    setTest([]);
 
-    axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests/patient?patient_id=${patientId}`)
+    axios.get(`${base}/KNH/patient/lab/tests/requests/patient?patient_id=${patientId}`)
       .then((data) => {
           if (data.data.message == "Requests Found") {
             setTest(data.data.data)
+            setLoading(false)
             console.log("Found")
           }
           else{
+            setLoading(false);
+            toast.error("No Result Found")
             console.log("Not Found")
           }                
       })
@@ -69,6 +78,7 @@ export default function DoctorLabTestResults() {
 
   return (
     <>
+    <ToastContainer />
     <div className="pathCont">
         <div className="path">
             <p className="pathName">Dashboard / <span>Lab Results</span></p>
@@ -91,7 +101,10 @@ export default function DoctorLabTestResults() {
                   <input placeholder="Patient ID" className="inCase" onChange={(e) => setPatientId(e.target.value)}/>
                 </div>
                 <div className="caseFooter">
-                  <button className="caseSave" onClick={checkPatient}>Search</button>
+                  {!loading ? <button className="caseSave" onClick={checkPatient}>Search</button>
+                  :
+                  <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
+                  }
                 </div>
                 {test.length > 0 ? 
                 <div>
@@ -121,7 +134,8 @@ export default function DoctorLabTestResults() {
                   </div>
                 </div>
                 :
-                null }
+                null
+                }
               </div>
             </div>
           </CardBody>

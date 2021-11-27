@@ -5,14 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { useAccountStatus } from "hooks/useAccountStatus";
-import { useDataStatus } from "hooks/useDataStatus";
 import { ToastContainer, toast } from "react-toastify";
-import ReactLoading from 'react-loading';
+import ProjectLoading from "components/Loading/projectloading";
+import { useBaseUrl } from "hooks/useBaseUrl";
 const axios = require('axios').default;
 
 const styles = {
@@ -50,9 +49,10 @@ const useStyles = makeStyles(styles);
 export default function LabRequests() {
   const classes = useStyles();
   const { data } = useAccountStatus("suspended");
-  const { loading } = useDataStatus(data);
+ const [loading, setLoading] = useState(false)
   const [test, setTest] = useState([])
   const [search, setSearch] = useState("")
+  const base = useBaseUrl()
 
   const searchTests = (e) => {
     e.preventDefault()
@@ -60,7 +60,7 @@ export default function LabRequests() {
   }
 
   const getAllTests = () => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests")
+    fetch(`${base}/KNH/patient/lab/tests/requests`)
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Requests Found") {
@@ -73,13 +73,16 @@ export default function LabRequests() {
   }
 
   useEffect(() => {
-    axios.get(`https://ehrsystembackend.herokuapp.com/KNH/patient/lab/tests/requests`)
+    setLoading(true);
+    axios.get(`${base}/KNH/patient/lab/tests/requests`)
       .then((data) => {
           if (data.data.message == "Requests Found") {
             setTest(data.data.data)
+            setLoading(false)
           }
           else{
             console.log("Not Found")
+            setLoading(false);
           }                
       })
       .catch((error) => {
@@ -119,6 +122,8 @@ export default function LabRequests() {
                 <button className="btnSearch" onClick={searchTests}>Search</button>
               </div>
             </div>
+            {!loading ? 
+            <>
             {test.length > 0 ? 
             <table className="styled-table">
               <thead>
@@ -139,13 +144,20 @@ export default function LabRequests() {
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
                             console.log(item.lab_test_id)
-                                fetch(`https://ehrsystembackend.herokuapp.com/KNH/patient/treatment/labrequest/approve?lab_test_id=${item.lab_test_id}`)
+                                fetch(`${base}/KNH/patient/treatment/labrequest/approve?lab_test_id=${item.lab_test_id}`)
                                 .then(response => response.json())
                                 .then((data) => {
                                     if (data.message == "Approved Successfully") {
-                                      console.log("Approved")
+                                      toast.success("Test Approved Successfully")
+                                      setLoading(true);
+                                      setTimeout(() => {
+                                        setTest([]);
+                                        setLoading(false);
+                                        getAllTests()
+                                      }, 2000);
                                     }
                                     else{
+                                      toast.error("Not Approved");
                                       console.log("Not Approved")
                                     }
                                 })
@@ -158,8 +170,14 @@ export default function LabRequests() {
             </table>
             : 
             <div className="noData">
-            <p className="txtNo">No Pending Test Requests</p>
-          </div>
+              <p className="txtNo">No Pending Test Requests</p>
+            </div>
+            }
+            </>
+            :
+            <div className="load">
+              <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
+            </div>
             }
           </CardBody>
         </Card>

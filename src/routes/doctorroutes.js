@@ -2,22 +2,13 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
-import LibraryBooks from "@material-ui/icons/LibraryBooks";
-//import BubbleChart from "@material-ui/icons/BubbleChart";
-//import LocationOn from "@material-ui/icons/LocationOn";
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import Notifications from "@material-ui/icons/Notifications";
-
-//import Unarchive from "@material-ui/icons/Unarchive";
-//import Language from "@material-ui/icons/Language";
-// core components/views for Admin layout
-import DashboardPage from "views/Dashboard/Dashboard.js";
+import LiveHelpIcon from '@material-ui/icons/LiveHelp';
+import FeedbackIcon from '@material-ui/icons/Feedback';
+import AssignmentReturnedIcon from '@material-ui/icons/AssignmentReturned';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
-import PendingAccounts from "views/PendingAccounts/PendingAccounts";
-import ApprovedAccounts from "views/ApprovedAccounts/ApprovedAccounts";
-import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
-import EditAccounts from "views/EditAccounts/EditAccounts";
-import TypographyPage from "views/Typography/Typography";
 import DoctorDashboard from "views/Doctor/Dashboard/DoctorDashboard";
 import CaseNotes from "views/Doctor/CaseNotes/CaseNotes";
 import Prescription from "views/Doctor/Prescription/prescription";
@@ -26,9 +17,6 @@ import DoctorApprovedAppointments from "views/Doctor/ApprovedAppointments/approv
 import RequestLabTest from "views/Doctor/LabResults/requestlabresults";
 import DoctorLabTestResults from "views/Doctor/LabResults/labresults";
 import DoctorAvailability from "views/Doctor/Availability/availability";
-//import UpgradeToPro from "views/UpgradeToPro/UpgradeToPro.js";
-// core components/views for RTL layout
-//import RTLPage from "views/RTLPage/RTLPage.js";
 
 const DoctorRoutes = [
   {
@@ -51,7 +39,7 @@ const DoctorRoutes = [
     path: "/availability",
     name: "Doctor Availability",
     rtlName: "طباعة",
-    icon: LibraryBooks,
+    icon: AccessTimeIcon,
     component: DoctorAvailability,
     layout: "/doctor",
   },
@@ -59,7 +47,7 @@ const DoctorRoutes = [
     path: "/pendingappointments",
     name: "Pending Appointment",
     rtlName: "الرموز",
-    icon: "check",
+    icon: "pending",
     component: DoctorPendingAppointments,
     layout: "/doctor",
   },
@@ -67,7 +55,7 @@ const DoctorRoutes = [
     path: "/approvedappointments",
     name: "Approved Appointment",
     rtlName: "خرائط",
-    icon: "pending",
+    icon: "check",
     component: DoctorApprovedAppointments,
     layout: "/doctor",
   },
@@ -75,7 +63,7 @@ const DoctorRoutes = [
     path: "/labtests",
     name: "Request LabTest",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: LiveHelpIcon,
     component: RequestLabTest,
     layout: "/doctor",
   },
@@ -83,7 +71,7 @@ const DoctorRoutes = [
     path: "/labtestresults",
     name: "LabTest Results",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: FeedbackIcon,
     component: DoctorLabTestResults,
     layout: "/doctor",
   },
@@ -91,7 +79,7 @@ const DoctorRoutes = [
     path: "/prescription",
     name: "Prescription",
     rtlName: "إخطارات",
-    icon: "error",
+    icon: AssignmentReturnedIcon,
     component: Prescription,
     layout: "/doctor",
   },
@@ -116,7 +104,7 @@ const DoctorRoutes = [
     name: "Log Out",
     rtlName: "ملف تعريفي للمستخدم",
     icon: "logout",
-    component: TypographyPage,
+    component: UserProfile,
     layout: "/login",
   },
 ];

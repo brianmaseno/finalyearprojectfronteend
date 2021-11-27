@@ -1,11 +1,13 @@
 /* eslint-disable */
 import {useState, useEffect} from 'react';
+import { useBaseUrl } from './useBaseUrl';
 
 export const usePatients = () => {
   const [patients, setPatients] = useState([])
+  const base = useBaseUrl()
 
   useEffect(() => {
-    fetch("https://ehrsystembackend.herokuapp.com/KNH/patient/allpatients")
+    fetch(`${base}/KNH/patient/allpatients`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Patients Records available") {
@@ -16,7 +18,7 @@ export const usePatients = () => {
             console.log("no Patient");
         }
     })
-  }, [])
+  }, [base])
 
   return { patients }
 }
