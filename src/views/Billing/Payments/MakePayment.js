@@ -57,7 +57,7 @@ export default function MakePayment() {
   const base = useBaseUrl()
 
   const checkPatient = (e) => {
-    e.preventDefault()
+    //e.preventDefault()
     setLoading(true);
 
     if (!(patientId === "")) {
@@ -184,8 +184,33 @@ export default function MakePayment() {
                               <td>Ksh {item.service_cost}</td>
                               <td>{item.added_on}</td>
                               <td>
-                                <div className="editContainer">
-                                  <p className="editP" style={{backgroundColor: "red"}}>Remove</p>
+                                <div className="editContainer" onClick={(e) => {
+                                  if (item._id != null) {
+                                    fetch(`${base}/KNH/patient/billing/pay?bill_id=${item._id}`)
+                                    .then(response => response.json())
+                                    .then((data) => {
+                                        if (data.message == "Bill Payed") {
+                                            console.log("Bill Payed")
+                                            setPayLoad(false)
+                                            toast.success("Bill Paid");
+                          
+                                            //notification
+                                            const message = `Bill ${item._id} for patient ${patientId} has been settled successfully`;
+                                            fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                                              .then(response => response.json())
+                                              .then((data) => {
+                                                  console.log(data);
+                                                  checkPatient()
+                                              })
+                                        }
+                                        else{
+                                            console.log("not payed");
+                                            setPayLoad(false);
+                                            toast.error("Bill not paid")
+                                        }
+                                    })
+                                }}}>
+                                  <p className="editP" style={{backgroundColor: "red"}} >Pay</p>
                                 </div>
                               </td>
                           </tr>

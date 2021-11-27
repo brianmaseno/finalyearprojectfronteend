@@ -19,15 +19,11 @@ export default function AdminLogComponent() {
 
   const checkUser = (e) => {
     e.preventDefault();
-    const resolveAfterSec = new Promise((resolve, reject) => {
-      setTimeout(logged !== true ? reject: resolve, 3000);
-    });
 
-    //toast.promise(resolveAfterSec, {pending: 'Loading', success: 'Login Successful Redirecting.....', error: "Wrong username or password"});
     const status = password === "";
 
     if (!status) {
-      logged ? toast.info("Validating credentials.....") : null;
+      toast.info("Validating credentials.....")
       fetch(`${base}/KNH/staff/login?username=admin&&password=${password}`)
           .then(response => response.json())
           .then((data) => {
@@ -46,9 +42,12 @@ export default function AdminLogComponent() {
                   sessionStorage.setItem("user", data.data.username)
                   sessionStorage.setItem("status", data.data.status)
                   setCurrentUser(data.data);
-                  history.push('/admin');
+                  setTimeout(() => {
+                    history.push('/admin');
+                  }, 2000);
                 }
                 else{
+                  toast.error("Not Activated")
                   console.log("Not Passed");
                 
                 }  

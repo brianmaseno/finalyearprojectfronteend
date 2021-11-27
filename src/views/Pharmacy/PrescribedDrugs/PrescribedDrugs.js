@@ -56,63 +56,69 @@ export default function PrescribedDrugs() {
   const [loading, setLoading] = useState(false);
   const [disLoading, setDisLoading] = useState(false);
   const base = useBaseUrl()
+  const userId = sessionStorage.getItem("UserId")
 
   const dispenseDrugs = (e) => {
     e.preventDefault()
 
     if (data.length > 0) {
       setDisLoading(true);
-      const drug_id = data[0]._id
-      const treatment_id = data[0].treatment_id
 
-      const payDetails = {
-        patient_id: patientId,
-        treatment_id: treatment_id,
-        service_name: "Drug Dispensation",
-        service_cost: drug.filter((item) => item._id == drug_id).drug_cost,
-        service_department: currentUser.department_id,
-        added_by: currentUser.national_id
-      }
+      for (let index = 0; index < data.length; index++) {
+        const drug_id = data[index].drug
+        const treatment_id = data[index].treatment_id
+        const prescription_id = data[index]._id
 
-      fetch(`${base}/KNH/patient/drugs/issue?drug_id=${drug_id}`)
-      .then(response => response.json())
-      .then((data) => {
-          if (data.message == "Updated Successfully") {
-              console.log(data.message)
-              setDisLoading(false);
-              toast.success("Drug Issued");
-              //notification
-              const message = `${drug.filter((item) => item._id == drug_id).drug_name} has been dispensed to ${patientId}`;
-              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
-                .then(response => response.json())
-                .then((data) => {
-                    console.log(data);
-                })
+        const payDetails = {
+          patient_id: patientId,
+          treatment_id: treatment_id,
+          service_name: "Drug Dispensation",
+          service_cost: drug.filter((item) => item._id == drug_id)[0].drug_cost,
+          service_department: currentUser.department_id,
+          added_by: currentUser.national_id
+        }
 
-                //billing
-                axios({
-                  method: 'post',
-                  url: `${base}/KNH/patient/billing/set`,
-                  data: payDetails})
+        fetch(`${base}/KNH/patient/drugs/issue?drug_id=${prescription_id}`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Updated Successfully") {
+                console.log(data.message)
+                setDisLoading(false);
+                toast.success(`${drug.filter((item) => item._id == drug_id)[0].drug_name} Issued`);
+                //notification
+                const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
+                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${userId}&&category=${currentUser.qualification}&&receiver_id=${userId}`)
+                  .then(response => response.json())
                   .then((data) => {
-                      if (data.data.message == "Added to Bill") {
-                          console.log("Added to Bill")
-                      }
-                      else{
-                          console.log("Not Added")
-                      }                
+                      console.log(data);
                   })
-                  .catch((error) => {
-                      console.log(error);
-                });
 
-                setData([]);
-          }
-          else{
-            setDisLoading(false);
-            toast.error("Error");
-          }
-      })
+                  //billing
+                  axios({
+                    method: 'post',
+                    url: `${base}/KNH/patient/billing/set`,
+                    data: payDetails})
+                    .then((data) => {
+                        if (data.data.message == "Added to Bill") {
+                            console.log("Added to Bill")
+                        }
+                        else{
+                            console.log("Not Added")
+                        }                
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                  });
+
+                  setData([]);
+            }
+            else{
+              setDisLoading(false);
+              toast.error("Error");
+            }
+        })
+        
+      }
     }
     else{
       console.log("no id")
@@ -120,7 +126,7 @@ export default function PrescribedDrugs() {
   }
 
   const checkPatient = (e) => {
-    e.preventDefault()
+    //e.preventDefault()
     setLoading(true);
 
     if (!(patientId === "")) {
@@ -145,6 +151,11 @@ export default function PrescribedDrugs() {
   return (
     <>
     <ToastContainer />
+    <div className="pathCont">
+      <div className="path">
+        <p className="pathName">Dashboard / <span>Prescribed Drugs</span></p>
+      </div>
+    </div>
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
@@ -200,7 +211,62 @@ export default function PrescribedDrugs() {
                                     <td>{item.drug}</td>
                                     <td>
                                     <div className="editContainer">
-                                      <p className="editP" style={{backgroundColor: "red"}}>Remove</p>
+                                      <p className="editP" style={{backgroundColor: "green"}} onClick={(e) => {
+                                        const prescription_id = item._id
+                                        const treatment_id = item.treatment_id
+                                        const drug_id = item.drug
+                                
+                                        const payDetails = {
+                                          patient_id: patientId,
+                                          treatment_id: treatment_id,
+                                          service_name: "Drug Dispensation",
+                                          service_cost: drug.filter((item) => item._id == drug_id)[0].drug_cost,
+                                          service_department: currentUser.department_id,
+                                          added_by: currentUser.national_id
+                                        }
+                                
+                                        fetch(`${base}/KNH/patient/drugs/issue?drug_id=${prescription_id}`)
+                                        .then(response => response.json())
+                                        .then((data) => {
+                                            if (data.message == "Updated Successfully") {
+                                                console.log(data.message)
+                                                setDisLoading(false);
+                                                toast.success("Drug Issued");
+                                                //notification
+                                                const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
+                                                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                                                  .then(response => response.json())
+                                                  .then((data) => {
+                                                      console.log(data);
+                                                      
+                                                  })
+                                
+                                                  //billing
+                                                  axios({
+                                                    method: 'post',
+                                                    url: `${base}/KNH/patient/billing/set`,
+                                                    data: payDetails})
+                                                    .then((data) => {
+                                                        if (data.data.message == "Added to Bill") {
+                                                            console.log("Added to Bill")
+                                                            checkPatient();
+                                                        }
+                                                        else{
+                                                            console.log("Not Added")
+                                                        }                
+                                                    })
+                                                    .catch((error) => {
+                                                        console.log(error);
+                                                  });
+                                
+                                                  setData([]);
+                                            }
+                                            else{
+                                              setDisLoading(false);
+                                              toast.error("Error");
+                                            }
+                                        })
+                                      }}>Dispense</p>
                                     </div>
                                   </td>
                                 </tr>
@@ -216,7 +282,7 @@ export default function PrescribedDrugs() {
                       </div>
                       {data.length > 0 ? 
                       <div className="recContainer">
-                        {!disLoading ? <button className="btnReceive" onClick={dispenseDrugs}>Dispense Drug</button>
+                        {!disLoading ? <button className="btnReceive" onClick={dispenseDrugs}>Dispense Drugs</button>
                         :
                         <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/>
                         }

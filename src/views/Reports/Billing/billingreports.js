@@ -54,6 +54,9 @@ export default function BillingReports() {
   const base = useBaseUrl()
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
+  const date = new Date()
+  const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
+
 
   const searchBilling = (e) => {
     e.preventDefault()
@@ -138,7 +141,7 @@ export default function BillingReports() {
                       <p className="rDesc">Billing Report</p>
                     </div>
                     <div className="imgCont">
-                      <p className="rDate">11/12/2020 - 12/12/2021</p>
+                      <p className="rDate">1/12/2020 - {today}</p>
                     </div>
                   </div>
                 </div>

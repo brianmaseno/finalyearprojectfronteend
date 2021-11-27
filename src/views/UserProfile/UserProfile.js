@@ -177,7 +177,9 @@ export default function UserProfile() {
           <Card profile>
             <CardAvatar profile>
               <a href="#" onClick={(e) => e.preventDefault()}>
-                <img src={avatar} alt="..." style={{padding: "15px"}}/>
+                <div style={{display: "flex", flexDirection: "row", justifyContent: "center", padding: "15px"}}>
+                  <img src={avatar} alt="..."/>
+                </div>
               </a>
             </CardAvatar>
             <CardBody profile>

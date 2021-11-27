@@ -42,6 +42,7 @@ export default function LogComponent() {
                     setLogged(true);
                     setUser(data.data)
                     sessionStorage.setItem("user", data.data.username)
+                    sessionStorage.setItem("UserId", data.data.national_id)
                     sessionStorage.setItem("status", data.data.status)
                     setCurrentUser(data.data);
 
