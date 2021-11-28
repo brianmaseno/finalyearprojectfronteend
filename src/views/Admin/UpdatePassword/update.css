@@ -1,0 +1,64 @@
+.availableCont{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 15%;
+  margin-top:30px;
+  margin-bottom:30px;
+}
+
+.avCont{
+  display: flex;
+  flex-direction: row;
+
+}
+
+.avVerify{
+  padding-left: 10px;
+  color: green;
+  font-weight: bold;
+
+}
+
+.avContPass{
+  display: flex;
+  flex-direction: row;
+  margin-top: 15px;
+
+}
+
+.inpUpdateInput{
+  padding: 10px;
+  width: 400px;
+  font-weight: bold;
+
+}
+
+.btnUpdatePass{
+  background-color:#11b8cc;
+  border: none;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left:5px;
+  color: white !important;
+  font-weight: bold;
+
+}
+
+.btnUpdatePass:hover{
+  cursor: pointer;
+}
+
+.iconGood{
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+
+}
+
+.avTxt{
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+
+}

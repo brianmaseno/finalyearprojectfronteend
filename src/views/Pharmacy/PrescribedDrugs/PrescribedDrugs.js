@@ -65,9 +65,9 @@ export default function PrescribedDrugs() {
       setDisLoading(true);
 
       for (let index = 0; index < data.length; index++) {
-        const drug_id = data[index].drug
+        const drug_id = data[index].drug_id
         const treatment_id = data[index].treatment_id
-        const prescription_id = data[index]._id
+        const prescription_id = data[index].prescription_id
 
         const payDetails = {
           patient_id: patientId,
@@ -78,11 +78,10 @@ export default function PrescribedDrugs() {
           added_by: currentUser.national_id
         }
 
-        fetch(`${base}/KNH/patient/drugs/issue?drug_id=${prescription_id}`)
+        fetch(`${base}/KNH/patient/drugs/issue?prescription_id=${prescription_id}&&drug_id=${drug_id}&&quantity=${"10"}`)
         .then(response => response.json())
         .then((data) => {
             if (data.message == "Updated Successfully") {
-                console.log(data.message)
                 setDisLoading(false);
                 toast.success(`${drug.filter((item) => item._id == drug_id)[0].drug_name} Issued`);
                 //notification
@@ -135,7 +134,7 @@ export default function PrescribedDrugs() {
       .then((data) => {
           if (data.message == "Found") {
             setLoading(false);
-              setData(data.data);
+            setData(data.data);
           }
           else{
             setLoading(false);
@@ -196,25 +195,27 @@ export default function PrescribedDrugs() {
                           <thead>
                             <tr style={{marginBottom: "20px"}}>
                               <th>Prescription ID</th>
-                              <th>Treatment ID</th>
                               <th>Patient ID</th>
                               <th>Drug</th>
+                              <th>Usage</th>
+                              <th>Notes</th>
                               <th style={{textAlign: "center"}}>Action</th>
                             </tr>
                           </thead>
                           <tbody>
                             {data.map((item) => (
                                 <tr>
-                                    <td>{item._id}</td>
-                                    <td>{item.treatment_id}</td>
+                                    <td>{item.prescription_id}</td>
                                     <td>{item.patient_id}</td>
-                                    <td>{item.drug}</td>
+                                    <td>{item.drug_name}</td>
+                                    <td>{item.usage}</td>
+                                    <td>{item.notes}</td>
                                     <td>
                                     <div className="editContainer">
                                       <p className="editP" style={{backgroundColor: "green"}} onClick={(e) => {
-                                        const prescription_id = item._id
+                                        const prescription_id = item.prescription_id
                                         const treatment_id = item.treatment_id
-                                        const drug_id = item.drug
+                                        const drug_id = item.drug_id
                                 
                                         const payDetails = {
                                           patient_id: patientId,
@@ -225,7 +226,7 @@ export default function PrescribedDrugs() {
                                           added_by: currentUser.national_id
                                         }
                                 
-                                        fetch(`${base}/KNH/patient/drugs/issue?drug_id=${prescription_id}`)
+                                        fetch(`${base}/KNH/patient/drugs/issue?prescription_id=${prescription_id}&&drug_id=${drug_id}&&quantity=${"3"}`)
                                         .then(response => response.json())
                                         .then((data) => {
                                             if (data.message == "Updated Successfully") {

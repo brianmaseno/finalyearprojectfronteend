@@ -4,6 +4,7 @@ import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
 import AddIcon from '@material-ui/icons/Add';
 import Notifications from "@material-ui/icons/Notifications";
+import LockIcon from '@mui/icons-material/Lock';
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
@@ -11,6 +12,7 @@ import PendingAccounts from "views/PendingAccounts/PendingAccounts";
 import SuspendedAccounts from "views/SuspendedAccounts/SuspendedAccounts";
 import EditAccounts from "views/EditAccounts/EditAccounts";
 import AddDepartment from "views/Admin/AddDepartment";
+import ChangePassword from "views/Admin/UpdatePassword/updatePassword";
 
 const dashboardRoutes = [
   {
@@ -43,6 +45,14 @@ const dashboardRoutes = [
     rtlName: "إخطارات",
     icon: "error",
     component: SuspendedAccounts,
+    layout: "/admin",
+  },
+  {
+    path: "/changepassword",
+    name: "Change Password",
+    rtlName: "إخطارات",
+    icon: LockIcon,
+    component: ChangePassword,
     layout: "/admin",
   },
   {

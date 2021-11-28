@@ -35,13 +35,14 @@ export default function AdminLogComponent() {
               else{
                 toast.success("login successful redirecting.....");
                 setLogged(true);
-                setUser(data.data)
-                console.log(data.data.status);
+                setUser(data.data.details)
                 
-                if (data.data.status == "activated") {
-                  sessionStorage.setItem("user", data.data.username)
-                  sessionStorage.setItem("status", data.data.status)
-                  setCurrentUser(data.data);
+                if (data.data.details.status == "activated") {
+                  sessionStorage.setItem("user", data.data.details.username)
+                  sessionStorage.setItem("UserId", data.data.details.national_id)
+                    sessionStorage.setItem("status", data.data.details.status)
+                    sessionStorage.setItem("password", data.data.password)
+                  setCurrentUser(data.data.details);
                   setTimeout(() => {
                     history.push('/admin');
                   }, 2000);
