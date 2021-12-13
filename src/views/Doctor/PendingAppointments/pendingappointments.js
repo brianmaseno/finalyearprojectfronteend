@@ -142,7 +142,7 @@ export default function DoctorPendingAppointments() {
                           <td>{item.patient_id}</td>
                           <td>{item.doctor_id}</td>
                           <td>{item.department_id}</td>
-                          <td>
+                          <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                             <div className="editContainer">
                               <p className="editP" style={{backgroundColor: "green"}} onClick={() => {
                                 fetch(`${base}/KNH/appointments/approve?appointment_id=${item.appointment_id}`)

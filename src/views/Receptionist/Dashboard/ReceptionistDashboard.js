@@ -193,13 +193,13 @@ export default function ReceptionistDashboard() {
                 <tbody>
                 {allPatients.length > 0 ? allPatients.map((item) => (
                       <tr>
-                        <td>{item._id}</td>
+                        <td>{item.identity_no}</td>
                         <td>{item.firstname}</td>
                         <td>{item.lastname}</td>
                         <td>{item.identity_no}</td>
                         <td>{item.telephone}</td>
                         <td>{item.gender}</td>
-                        <td>
+                        <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
                             axios.get(`${base}/KNH/patient/DeletePatientbyId?patient_id=${item.identity_no}`)

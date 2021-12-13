@@ -13,6 +13,8 @@ import ProjectLoading from "components/Loading/projectloading";
 import { ToastContainer, toast } from "react-toastify";
 import { useAuth } from "hooks/AuthProvider";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
+import StripeCheckout from "react-stripe-checkout";
+const axios = require('axios').default;
 
 const styles = {
   cardCategoryWhite: {
@@ -55,6 +57,8 @@ export default function MakePayment() {
   const [payLoad, setPayLoad] = useState(false);
   const { currentUser } = useAuth();
   const base = useBaseUrl()
+  const [product, setProduct] = useState({})
+  const [item, setItem] = useState({})
 
   const checkPatient = (e) => {
     //e.preventDefault()
@@ -73,6 +77,9 @@ export default function MakePayment() {
                       totalCost += parseInt(data.data[index].service_cost)
                     }
                     setTotal(totalCost)
+                    setProduct({
+                      amount: totalCost,
+                    })
                     console.log(totalCost)
                   }
               }
@@ -83,6 +90,53 @@ export default function MakePayment() {
           })
     }
   }
+
+  const sendStripePayment = token => {
+  
+    const details = {
+      token: token,
+      product: product
+    }
+  
+    axios.post(`${base}/KNH/patient/create-checkout-session`, details)
+    .then(function (response) {
+      if (response.status === 200) {
+        //makeAllPayments()
+      }
+      else{
+        toast.error("Payment Not Successful")
+      }
+    })
+    .catch(function (error) {
+      console.log(error)
+    })
+  
+  }
+
+  const sendStripePaymentForSingleItem = token => {
+  
+    const details = {
+      token: token,
+      product: item
+    }
+
+    console.log(item)
+  
+    /**axios.post(`${base}/KNH/patient/create-checkout-session`, details)
+    .then(function (response) {
+      if (response.status === 200) {
+        //makeAllPayments()
+      }
+      else{
+        toast.error("Payment Not Successful")
+      }
+    })
+    .catch(function (error) {
+      console.log(error)
+    })**/
+  
+  }
+
 
   const makeAllPayments = (e) => {
     e.preventDefault()
@@ -183,34 +237,46 @@ export default function MakePayment() {
                               <td>{item.service_name}</td>
                               <td>Ksh {item.service_cost}</td>
                               <td>{item.added_on}</td>
-                              <td>
-                                <div className="editContainer" onClick={(e) => {
-                                  if (item._id != null) {
-                                    fetch(`${base}/KNH/patient/billing/pay?bill_id=${item._id}`)
-                                    .then(response => response.json())
-                                    .then((data) => {
-                                        if (data.message == "Bill Payed") {
-                                            console.log("Bill Payed")
-                                            setPayLoad(false)
-                                            toast.success("Bill Paid");
-                          
-                                            //notification
-                                            const message = `Bill ${item._id} for patient ${patientId} has been settled successfully`;
-                                            fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
-                                              .then(response => response.json())
-                                              .then((data) => {
-                                                  console.log(data);
-                                                  checkPatient()
-                                              })
-                                        }
-                                        else{
-                                            console.log("not payed");
-                                            setPayLoad(false);
-                                            toast.error("Bill not paid")
-                                        }
-                                    })
-                                }}}>
-                                  <p className="editP" style={{backgroundColor: "red"}} >Pay</p>
+                              <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                                <div class="constCoverBtn">
+                                  <div className="editContainer" onClick={(e) => {
+                                    if (item._id != null) {
+                                      fetch(`${base}/KNH/patient/billing/pay?bill_id=${item._id}`)
+                                      .then(response => response.json())
+                                      .then((data) => {
+                                          if (data.message == "Bill Payed") {
+                                              console.log("Bill Payed")
+                                              setPayLoad(false)
+                                              toast.success("Bill Paid");
+                            
+                                              //notification
+                                              const message = `Bill ${item._id} for patient ${patientId} has been settled successfully`;
+                                              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                                                .then(response => response.json())
+                                                .then((data) => {
+                                                    console.log(data);
+                                                    checkPatient()
+                                                })
+                                          }
+                                          else{
+                                              console.log("not payed");
+                                              setPayLoad(false);
+                                              toast.error("Bill not paid")
+                                          }
+                                      })
+                                  }}}>
+                                    <p className="editP" style={{backgroundColor: "green"}} >Pay on discharge</p>
+                                  </div>
+                                  <div className="stripeBtn">
+                                    <StripeCheckout 
+                                      stripeKey={process.env.REACT_APP_KEY} 
+                                      token={sendStripePaymentForSingleItem} 
+                                      amount={parseInt(item.service_cost)}
+                                      name="Make Payment" 
+                                      >
+                                        <button className="editContainerCard">Pay with card</button>
+                                      </StripeCheckout>
+                                  </div>
                                 </div>
                               </td>
                           </tr>
@@ -236,7 +302,17 @@ export default function MakePayment() {
                       <div>
                         <p className="txtReceive">Total Amount Ksh.{total}</p>
                       </div>
-                      {!payLoad ? <button className="btnReceive" onClick={makeAllPayments}>Receive Payment</button>
+                      {!payLoad ? <>
+                      <button className="btnReceive" onClick={makeAllPayments}>Pay on discharge</button><br/>
+                      <StripeCheckout 
+                          stripeKey={process.env.REACT_APP_KEY} 
+                          token={sendStripePayment} 
+                          amount={product.amount}
+                          name="Make Payment" 
+                          >
+                            <button className="btnPayViaCard">Pay with card</button>
+                          </StripeCheckout>
+                      </>
                       :
                       <ProjectLoading type="spinningBubbles" color="#11b8cc" height="30px" width="30px"/> 
                       }

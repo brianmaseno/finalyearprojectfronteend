@@ -151,7 +151,7 @@ export default function TestResults() {
                           </textarea>
                         </div>
                       </td>
-                      <td>
+                      <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
                                 fetch(`${base}/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)

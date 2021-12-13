@@ -125,7 +125,7 @@ export default function EditAccounts() {
             {data.length > 0 ? 
             <table className="styled-table">
               <thead>
-                <tr style={{marginBottom: "20px"}}>
+                <tr style={{marginBottom: "10px"}}>
                   <th>ID</th>
                   <th>First Name</th>
                   <th>Last Name</th>
@@ -138,13 +138,13 @@ export default function EditAccounts() {
               <tbody>
                 {data ? data.map((item) => (
                     <tr>
-                      <td>{item._id}</td>
+                      <td>{item.national_id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.lastname}</td>
                       <td>{item.username}</td>
                       <td>{item.qualification}</td>
                       <td>{item.status}</td>
-                      <td>
+                      <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" onClick={() => {
                             fetch(`${base}/KNH/staff/suspend?username=${item.username}`)

@@ -11,6 +11,7 @@ import CardBody from "components/Card/CardBody.js";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useDepartments } from "hooks/useDepartments";
 
 const styles = {
   cardCategoryWhite: {
@@ -50,6 +51,7 @@ export default function PendingAppointments() {
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
   const base = useBaseUrl()
+  const { departments } = useDepartments()
 
   const searchPending = (e) => {
     e.preventDefault()
@@ -140,7 +142,7 @@ export default function PendingAppointments() {
                         <td>{item.patient_id}</td>
                         <td>{item.doctor_id}</td>
                         <td>{item.department_id}</td>
-                        <td>
+                        <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}}>pending</p>
                         </div>

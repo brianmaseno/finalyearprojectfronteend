@@ -137,6 +137,7 @@ export default function PrescribedDrugs() {
             setData(data.data);
           }
           else{
+            toast.error("No Prescribed Drugs")
             setLoading(false);
             console.log("no data");
           }

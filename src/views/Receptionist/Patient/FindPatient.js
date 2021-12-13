@@ -172,6 +172,7 @@ export default function FindPatient() {
             setPressure(data.data.data[0].pressure)
           }
           else{
+            toast.error("No patient details")
             setLoading(false)
             console.log("Not Found")
           }                

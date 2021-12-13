@@ -49,13 +49,14 @@ const useStyles = makeStyles(styles);
 export default function BookAppointment() {
   const classes = useStyles();
   const [date, setDate] = useState("");
-  const [clinicians, setClinicians] = useState("");
+  const [clinicians, setClinicians] = useState([]);
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
 
   const [patientId, setPatientId] = useState("");
   const [clinicianId, setClinicianId] = useState("");
+  const [doctorId, setDoctorId] = useState("")
   const [appointmentDate, setAppointmentDate] = useState("");
   const [reason, setReason] = useState("");
   const base = useBaseUrl()
@@ -97,45 +98,58 @@ export default function BookAppointment() {
     const currDate = new Date();
     const newDate = currDate.getDate() + "/" + currDate.getMonth() + "/" + currDate.getFullYear();
 
-    const details = {
-      patient_id: patientId,
-      doctor_id: clinicianId,
-      date: appointmentDate,
-      appointment_reason: reason,
-      appointment_due_date: date,
-      appointment_created_date: newDate,
-      department_id: currentUser.department_id,
-      appointment_created_by: currentUser.national_id
-  }
+    if (clinicianId !== "") {
+      let finL;
+      for (let index = 0; index < clinicians.length; index++) {
+        if (clinicians[index]._id === clinicianId) {
+          finL = clinicians[index].doctor_id;
+        }
+        else{
+          console.log("Not Found")
+        }
+        
+      }
 
-
-  axios({
-      method: 'post',
-      url: `${base}/KNH/appointments/add`,
-      data: details})
-      .then((data) => {
-          if (data.data.message == "Appointment Placed Successfully") {
-              console.log("inserted")
+      const details = {
+        patient_id: patientId,
+        doctor_id: finL,
+        date: appointmentDate,
+        appointment_reason: reason,
+        appointment_due_date: date,
+        appointment_created_date: newDate,
+        department_id: currentUser.department_id,
+        appointment_created_by: currentUser.national_id,
+        availability_id: clinicianId
+    }
+  
+    axios({
+        method: 'post',
+        url: `${base}/KNH/appointments/add`,
+        data: details})
+        .then((data) => {
+            if (data.data.message == "Appointment Placed Successfully") {
+                console.log("inserted")
+                setSaveLoading(false);
+                toast.success("Appointment booked successfully")
+  
+                //notification
+                const message = `New appointment for ${patientId} needs approval`;
+                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${clinicianId}`)
+                  .then(response => response.json())
+                  .then((data) => {
+                      console.log(data);
+                  })
+            }
+            else{
               setSaveLoading(false);
-              toast.success("Appointment booked successfully")
-
-              //notification
-              const message = `New appointment for ${patientId} needs approval`;
-              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${clinicianId}`)
-                .then(response => response.json())
-                .then((data) => {
-                    console.log(data);
-                })
-          }
-          else{
-            setSaveLoading(false);
-            console.log("Not Inserted")
-            toast.error("Appointment not booked")
-          }                
-      })
-      .catch((error) => {
-          console.log(error);
-  });
+              console.log("Not Inserted")
+              toast.error("Appointment not booked")
+            }                
+        })
+        .catch((error) => {
+            console.log(error);
+    });
+    }
   }
 
   return (
@@ -189,7 +203,7 @@ export default function BookAppointment() {
                                 <select type="text" className="patInput" style={{width: "100%"}} onChange={(e) => setClinicianId(e.target.value)}>
                                   <option>Select...</option>
                                   {clinicians.length > 0 ? clinicians.map((item) => (
-                                    <option value={item.doctor_id}>{item.doctor_id}</option>
+                                    <option value={item._id}>{item.doctor_id}</option>
                                   ))
                                   :
                                   <option>Select...</option>

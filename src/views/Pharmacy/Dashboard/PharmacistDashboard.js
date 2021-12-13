@@ -175,7 +175,7 @@ export default function PharmacistDashboard() {
                         <td>{item.drug}</td>
                         <td>{item.usage_per_day}</td>
                         <td>{item.notes}</td>
-                        <td>
+                        <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                           <div className="editContainer">
                             <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
                               fetch(`${base}/KNH/patient/drugs/cancel?drug_id=${item._id}`)

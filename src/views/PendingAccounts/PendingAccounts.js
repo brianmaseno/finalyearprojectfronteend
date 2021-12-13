@@ -135,13 +135,13 @@ export default function PendingAccounts() {
               <tbody>
                 {data.length > 0 ? data.map((item) => (
                     <tr>                        
-                      <td>{item._id}</td>
+                      <td>{item.national_id}</td>
                       <td>{item.firstname}</td>
                       <td>{item.lastname}</td>
                       <td>{item.username}</td>
                       <td>{item.qualification}</td>
                       <td>{item.status}</td>
-                      <td>
+                      <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
                             fetch(`${base}/KNH/staff/activate?username=${item.username}`)

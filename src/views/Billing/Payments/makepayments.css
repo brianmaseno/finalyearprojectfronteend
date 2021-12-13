@@ -9,11 +9,57 @@
 
 }
 
+.editContainer{
+  width: 120px;
+}
+
+.editContainerCard{
+  background-color: green;
+  font-weight: bold;
+  color: white;
+  padding: 5px;
+  border: none;
+  cursor: pointer;
+  border-radius:3px;
+  width: 120px;
+}
+
+.constCoverBtn{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.stripeBtn{
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left:5px;
+
+}
+
 .btnReceive{
   background-color: green;
   font-weight: bold;
   color: white;
   border: none;
   padding: 10px;
+  margin-top: 10px;
   cursor: pointer;
+  border-radius:3px;
+  width: 200px;
+}
+
+.btnPayViaCard{
+  background-color: green;
+  font-weight: bold;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius:3px;
+  width: 200px;
+
 }

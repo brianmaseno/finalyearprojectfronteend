@@ -129,6 +129,7 @@ export default function LabRequests() {
               <thead>
                 <tr style={{marginBottom: "20px"}}>
                   <th>Patient ID</th>
+                  <th>Treatment ID</th>
                   <th>Doctor ID</th>
                   <th>Test</th>
                   <th style={{textAlign: "center"}}>Action</th>
@@ -138,9 +139,10 @@ export default function LabRequests() {
                 {test.length > 0 ? test.map((item) => (
                     <tr>
                       <td>{item.patient_id}</td>
+                      <td>{item.treatment_id}</td>
                       <td>{item.staff_id}</td>
                       <td>{item.test_name}</td>
-                      <td>
+                      <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
                             console.log(item.lab_test_id)

@@ -17,13 +17,14 @@ thead th{
 
 tbody td{
   border-bottom: 0.01px solid #E1E1E1;
-  padding: 10px 20px;
+  padding: 2px 20px;
   text-align: start;
   font-weight: bold;
 }
 
 .editContainer{
   cursor: pointer;
+
 }
 
 .editP{

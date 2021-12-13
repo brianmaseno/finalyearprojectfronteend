@@ -28,8 +28,10 @@
     "react-loading": "^2.0.3",
     "react-router-dom": "5.2.0",
     "react-scripts": "4.0.3",
+    "react-stripe-checkout": "^2.6.3",
     "react-swipeable-views": "0.13.9",
-    "react-toastify": "^8.0.3"
+    "react-toastify": "^8.0.3",
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "start": "react-scripts start",
