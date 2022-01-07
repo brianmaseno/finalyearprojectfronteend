@@ -5,6 +5,7 @@ import Person from "@material-ui/icons/Person";
 import Notifications from "@material-ui/icons/Notifications";
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaidIcon from '@mui/icons-material/Paid';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 import BillingDashboard from "views/Billing/Dashboard/BillingDashboard";
@@ -15,7 +16,7 @@ const BillingRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName: "Dashboard",
     icon: Dashboard,
     component: BillingDashboard,
     layout: "/billing",
@@ -23,7 +24,7 @@ const BillingRoutes = [
   {
     path: "/makepayment",
     name: "Make Payment",
-    rtlName: "إخطارات",
+    rtlName: "Make Payment",
     icon: PaymentIcon,
     component: MakePayment,
     layout: "/billing",
@@ -31,7 +32,7 @@ const BillingRoutes = [
   {
     path: "/billingreports",
     name: "Billing Reports",
-    rtlName: "إخطارات",
+    rtlName: "Billing Reports",
     icon: PaidIcon,
     component: BillingReports,
     layout: "/billing",
@@ -39,7 +40,7 @@ const BillingRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
+    rtlName: "Notifications",
     icon: Notifications,
     component: NotificationsPage,
     layout: "/billing",
@@ -47,7 +48,7 @@ const BillingRoutes = [
   {
     path: "/user",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
+    rtlName: "User Profile",
     icon: Person,
     component: UserProfile,
     layout: "/billing",
@@ -55,8 +56,8 @@ const BillingRoutes = [
   {
     path: "/logout",
     name: "Log Out",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: "logout",
+    rtlName: "Log Out",
+    icon: ExitToAppIcon,
     component: UserProfile,
     layout: "/login",
   },

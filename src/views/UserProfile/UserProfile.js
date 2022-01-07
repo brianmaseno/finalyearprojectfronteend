@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, {useState} from "react";
+import React, {useState, useEffect} from 'react';
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import { ToastContainer, toast } from "react-toastify";
@@ -16,10 +16,11 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import Input from "@material-ui/core/Input";
 import avatar from "assets/img/faces/personaccount.png";
-import { useAuth } from '../../hooks/AuthProvider';
 import './profile.css'
 import { useBaseUrl } from "hooks/useBaseUrl";
 import ProjectLoading from "components/Loading/projectloading";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -44,23 +45,23 @@ const useStyles = makeStyles(styles);
 
 export default function UserProfile() {
   const classes = useStyles();
-  const { currentUser, setCurrentUser } = useAuth();
+  const { user } = useLoggedInUser();
+
   const base = useBaseUrl()
   const [loading, setLoading] = useState(false)
-
-  const [firstName, setFirstName] = useState(currentUser.firstname)
-  const [lastName, setLastName] = useState(currentUser.lastname)
-  const [username, setUsername] = useState(currentUser.username)
-  const [country, setCountry] = useState(currentUser.country)
-  const [residence, setResidence] = useState(currentUser.residence)
-  const [county, setCounty] = useState(currentUser.county)
-  const [password, setPassword] = useState(sessionStorage.getItem("password"))
+  const [firstName, setFirstName] = useState(user.firstname)
+  const [lastName, setLastName] = useState(user.lastname)
+  const [username, setUsername] = useState(user.username)
+  const [country, setCountry] = useState(user.country)
+  const [residence, setResidence] = useState(user.residence)
+  const [county, setCounty] = useState(user.county)
+  const [password, setPassword] = useState(user.password)
   
   const updateProfile = (e) => {
     e.preventDefault()
     setLoading(true)
 
-    fetch(`${base}/KNH/staff/profile/edit?national_id=${currentUser.national_id}&&username=${username}&&firstname=${firstName}&&lastname=${lastName}&&country=${country}&&county=${county}&&residence=${residence}&&password=${password}`)
+    fetch(`${base}/KNH/staff/profile/edit?national_id=${user.national_id}&&username=${username}&&firstname=${firstName}&&lastname=${lastName}&&country=${country}&&county=${county}&&residence=${residence}&&password=${password}`)
       .then(response => response.json())
       .then((data) => {
           if (data.message != "Updated Successfully") {
@@ -69,7 +70,7 @@ export default function UserProfile() {
           }
           else{  
             toast.success("Updated Successfully");   
-            fetch(`${base}/KNH/staff/details?national_id=${currentUser.national_id}`)
+            fetch(`${base}/KNH/staff/details?national_id=${user.national_id}`)
             .then(response => response.json())
             .then((data) => {
               if (data.message == "Found") {
@@ -196,8 +197,8 @@ export default function UserProfile() {
               </a>
             </CardAvatar>
             <CardBody profile>
-              <h6 className="profileQualification">{currentUser.qualification}</h6>
-              <h4 className="profileName">{currentUser.firstname + " " + currentUser.lastname}</h4>
+              <h6 className="profileQualification">{user.qualification}</h6>
+              <h4 className="profileName">{user.username + " " + user.lastname}</h4>
             </CardBody>
           </Card>
         </GridItem>

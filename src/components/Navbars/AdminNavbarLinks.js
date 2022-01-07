@@ -23,7 +23,7 @@ import Button from "components/CustomButtons/Button.js";
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 import { useBaseUrl } from "hooks/useBaseUrl";
 import { useHistory } from "react-router";
-import { useAuth } from "hooks/AuthProvider";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 
 const useStyles = makeStyles(styles);
 
@@ -32,10 +32,9 @@ export default function AdminNavbarLinks() {
   const history = useHistory();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
-  const [user, setUser] = useState("");
   const [notification, setNotifications] = useState([]);
   const base = useBaseUrl()
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
 
 
   const handleClickNotification = (event) => {
@@ -60,7 +59,7 @@ export default function AdminNavbarLinks() {
   };
 
   useEffect(() => {
-    fetch(`${base}/KNH/staff/viewNotifications?id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/staff/viewNotifications?id=${user.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {

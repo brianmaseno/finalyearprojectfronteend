@@ -70,45 +70,55 @@ export default function AddPatient() {
 
   const addPatient = (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    const details = {
-        firstname: firstname,
-        lastname: lastname,
-        gender: gender,
-        age: age,
-        village: village,
-        telephone: telephone,
-        county: county,
-        sub_county: subCounty,
-        identityNo: identityNumber,
-        weight: weight,
-        height: height,
-        temperature: temperature,
-        pressure: pressure
+    const check = firstname == "" || lastname == "" || county == "" || age == "" || identityNumber == "" || 
+    subCounty == "" || village == "" || gender == "" || telephone == "" || weight == "" || height == "" || temperature == "" ||
+    pressure == "";
 
+    if (check) {
+      toast.error("Parameter Missing");
     }
+    else {
+      setLoading(true);
 
-    axios({
-        method: 'post',
-        url: `${base}/KNH/patient/register`,
-        data: details})
-        .then((data) => {
-            if (data.data.message == "Inserted Successfully") {
-                console.log("inserted")
-                setShowNok(true);
-                setLoading(false);
-                toast.success("Patient Added Successfully")
-            }
-            else{
-                console.log("Not Inserted")
-                setLoading(false);
-                toast.error("Patient not added")
-            }                
-        })
-        .catch((error) => {
-            console.log(error);
-    });
+      const details = {
+          firstname: firstname,
+          lastname: lastname,
+          gender: gender,
+          age: age,
+          village: village,
+          telephone: telephone,
+          county: county,
+          sub_county: subCounty,
+          identityNo: identityNumber,
+          weight: weight,
+          height: height,
+          temperature: temperature,
+          pressure: pressure
+
+      }
+
+      axios({
+          method: 'post',
+          url: `${base}/KNH/patient/register`,
+          data: details})
+          .then((data) => {
+              if (data.data.message == "Inserted Successfully") {
+                  console.log("inserted")
+                  setShowNok(true);
+                  setLoading(false);
+                  toast.success("Patient Added Successfully")
+              }
+              else{
+                  console.log("Not Inserted")
+                  setLoading(false);
+                  toast.error("Patient not added")
+              }                
+          })
+          .catch((error) => {
+              console.log(error);
+      });
+    }
 }
 
   //next of kin
@@ -124,39 +134,48 @@ export default function AddPatient() {
 
   const addNextOfKin = (e) => {
     e.preventDefault();
-    setKinLoading(true)
 
-    const details = {
-        firstname: kinFirstname,
-        lastname: kinLastname,
-        gender: kinGender,
-        village: kinVillage,
-        telephone: kinPhoneNumber,
-        county: kinCounty,
-        sub_county: kinSubCounty,
-        national_id: kinID,
-        patientId: patientID
+    const check = kinFirstname == "" || kinLastname == "" || kinCounty == "" || kinSubCounty == "" ||
+    kinGender == "" || kinVillage == "" || kinID == "" || kinPhoneNumber == "" || patientID == "";
+
+    if (check) {
+      toast.error("Parameter Missing");
     }
+    else {
+      setKinLoading(true)
 
-    axios({
-        method: 'post',
-        url: `${base}/KNH/patient/register/nok`,
-        data: details})
-        .then((data) => {
-            if (data.data.message == "Inserted Successfully") {
-                console.log("inserted")
-                setKinLoading(false);
-                toast.success("Next of kin added successfully");
-            }
-            else{
-                console.log("Not Inserted")
-                setKinLoading(false);
-                toast.error("Next of kin not added");
-            }                
-        })
-        .catch((error) => {
+      const details = {
+          firstname: kinFirstname,
+          lastname: kinLastname,
+          gender: kinGender,
+          village: kinVillage,
+          telephone: kinPhoneNumber,
+          county: kinCounty,
+          sub_county: kinSubCounty,
+          national_id: kinID,
+          patientId: patientID
+      }
+
+      axios({
+          method: 'post',
+          url: `${base}/KNH/patient/register/nok`,
+          data: details})
+          .then((data) => {
+              if (data.data.message == "Inserted Successfully") {
+                  console.log("inserted")
+                  setKinLoading(false);
+                  toast.success("Next of kin added successfully");
+              }
+              else{
+                  console.log("Not Inserted")
+                  setKinLoading(false);
+                  toast.error("Next of kin not added");
+              }                
+          })
+          .catch((error) => {
             console.log(error);
-    });
+      });
+    }
 }
 
 
@@ -183,7 +202,7 @@ export default function AddPatient() {
                 <div class="patBody">
                   <div class="patColumn">
                     <div class="patRow">
-                      <input type="text" required placeholder="Enter First Name" class="patInput" onChange={(e) => setFirstname(e.target.value)}/>
+                      <input type="text" required placeholder="Enter First Name" required class="patInput" onChange={(e) => setFirstname(e.target.value)}/>
                       <input type="text" required placeholder="Enter Last Name" class="patInput" onChange={(e) => setLastname(e.target.value)}/>
                       <input type="text" required placeholder="Enter Age" class="patInput" onChange={(e) => setAge(e.target.value)}/>
                     </div>

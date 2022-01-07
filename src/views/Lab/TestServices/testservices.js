@@ -80,7 +80,6 @@ export default function TestServices() {
           <CardBody>
             <div className="servContainer">
               <div className="print">
-                    <button className="pdf">PDF</button>
                     <CSVLink className="excel" data={lab}>Excel</CSVLink>
                 </div>
               <div className="reportBody">

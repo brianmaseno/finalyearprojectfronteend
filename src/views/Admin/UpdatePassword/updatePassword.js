@@ -59,45 +59,64 @@ export default function ChangePassword() {
 
   const checkStaff = (e) => {
     e.preventDefault()
-    setLoading(true);
-    setStaff({})
 
-    axios.get(`${base}/KNH/staff/details?national_id=${nationalId}`)
-      .then((data) => {
-          if (data.data.message == "Found") {
-            setStaff(data.data.data)
-            setLoading(false)
-          }
-          else{
-            setLoading(false)
-          }                
-      })
-      .catch((error) => {
-        setLoading(false)
-        console.log(error);
-      });
+    const check = nationalId == "";
+
+    if (check) {
+      toast.error("Parameter Missing");
+    }
+    else {
+      setLoading(true);
+      setStaff({})
+
+      axios.get(`${base}/KNH/staff/details?national_id=${nationalId}`)
+        .then((data) => {
+          console.log(data.data)
+            if (data.data.message == "Found") {
+              setStaff(data.data.data)
+              setLoading(false)
+            }
+            else{
+              toast.error("Not found");
+              setLoading(false)
+            }                
+        })
+        .catch((error) => {
+          toast.error("Error");
+          setLoading(false)
+          console.log(error);
+        });
+      }
   }
 
   const updatePassword = (e) => {
     e.preventDefault()
-    setUpdateLoading(true);
 
-    axios.get(`${base}/KNH/staff/staff/password/update?national_id=${nationalId}&&password=${password}`)
-      .then((data) => {
-          if (data.data.message == "Updated") {
-            toast.success("Password Updated Successfully")
-            setUpdateLoading(false)
-          }
-          else{
-            toast.error("Not Updated")
-            setLoading(false)
-          }                
-      })
-      .catch((error) => {
-        toast.error("Error")
-        setLoading(false)
-        console.log(error);
-      });
+    const check = nationalId == "" || password == "";
+
+    if (check) {
+      toast.error("Parameter missing")
+    }
+    else {
+      setUpdateLoading(true);
+
+      axios.get(`${base}/KNH/staff/staff/password/update?national_id=${nationalId}&&password=${password}`)
+        .then((data) => {
+            if (data.data.message == "Updated") {
+              toast.success("Password Updated Successfully")
+              setUpdateLoading(false)
+            }
+            else{
+              toast.error("Not Updated")
+              setUpdateLoading(false)
+            }                
+        })
+        .catch((error) => {
+          toast.error("Error")
+          setUpdateLoading(false)
+          console.log(error);
+        });
+    }
   }
 
   return (

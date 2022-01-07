@@ -8,11 +8,11 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 const axios = require('axios').default;
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 
 const styles = {
   cardCategoryWhite: {
@@ -50,7 +50,7 @@ export default function BookAppointment() {
   const classes = useStyles();
   const [date, setDate] = useState("");
   const [clinicians, setClinicians] = useState([]);
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
   const [loading, setLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
 
@@ -64,7 +64,7 @@ export default function BookAppointment() {
   const check = (e) => {
     e.preventDefault();
 
-    const status = date === "";
+    const status = date == "";
 
     if (!status) {
       setLoading(true);
@@ -83,7 +83,9 @@ export default function BookAppointment() {
           }                
       })
       .catch((error) => {
-          console.log(error);
+        toast.error("No date selected");
+        setLoading(false);
+        console.log(error);
       });
     }
     else{
@@ -94,63 +96,71 @@ export default function BookAppointment() {
 
   const saveAppointment = (e) => {
     e.preventDefault();
-    setSaveLoading(true);
-    const currDate = new Date();
-    const newDate = currDate.getDate() + "/" + currDate.getMonth() + "/" + currDate.getFullYear();
 
-    if (clinicianId !== "") {
-      let finL;
-      for (let index = 0; index < clinicians.length; index++) {
-        if (clinicians[index]._id === clinicianId) {
-          finL = clinicians[index].doctor_id;
-        }
-        else{
-          console.log("Not Found")
-        }
-        
-      }
+    const check = clinicianId == "" || patientId == "" || appointmentDate == "" || reason == "";
 
-      const details = {
-        patient_id: patientId,
-        doctor_id: finL,
-        date: appointmentDate,
-        appointment_reason: reason,
-        appointment_due_date: date,
-        appointment_created_date: newDate,
-        department_id: currentUser.department_id,
-        appointment_created_by: currentUser.national_id,
-        availability_id: clinicianId
+    if (check) {
+      toast.error("Parameter Missing")
     }
+    else {
+      setSaveLoading(true);
+      const currDate = new Date();
+      const newDate = currDate.getDate() + "/" + currDate.getMonth() + "/" + currDate.getFullYear();
+
+      if (clinicianId !== "") {
+        let finL;
+        for (let index = 0; index < clinicians.length; index++) {
+          if (clinicians[index]._id === clinicianId) {
+            finL = clinicians[index].doctor_id;
+          }
+          else{
+            console.log("Not Found")
+          }
+          
+        }
+
+        const details = {
+          patient_id: patientId,
+          doctor_id: finL,
+          date: appointmentDate,
+          appointment_reason: reason,
+          appointment_due_date: date,
+          appointment_created_date: newDate,
+          department_id: user.department_id,
+          appointment_created_by: user.national_id,
+          availability_id: clinicianId
+      }
   
-    axios({
-        method: 'post',
-        url: `${base}/KNH/appointments/add`,
-        data: details})
-        .then((data) => {
-            if (data.data.message == "Appointment Placed Successfully") {
-                console.log("inserted")
+      axios({
+          method: 'post',
+          url: `${base}/KNH/appointments/add`,
+          data: details})
+          .then((data) => {
+              if (data.data.message == "Appointment Placed Successfully") {
+                  console.log("inserted")
+                  setSaveLoading(false);
+                  toast.success("Appointment booked successfully")
+    
+                  //notification
+                  const message = `New appointment for ${patientId} needs approval`;
+                  fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${clinicianId}`)
+                    .then(response => response.json())
+                    .then((data) => {
+                        console.log(data);
+                    })
+              }
+              else{
                 setSaveLoading(false);
-                toast.success("Appointment booked successfully")
-  
-                //notification
-                const message = `New appointment for ${patientId} needs approval`;
-                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${clinicianId}`)
-                  .then(response => response.json())
-                  .then((data) => {
-                      console.log(data);
-                  })
-            }
-            else{
-              setSaveLoading(false);
-              console.log("Not Inserted")
-              toast.error("Appointment not booked")
-            }                
-        })
-        .catch((error) => {
-            console.log(error);
-    });
+                console.log("Not Inserted")
+                toast.error("Appointment not booked")
+              }                
+          })
+          .catch((error) => {
+              console.log(error);
+      });
     }
   }
+}
 
   return (
     <>

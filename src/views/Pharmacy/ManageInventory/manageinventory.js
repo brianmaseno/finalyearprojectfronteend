@@ -94,7 +94,7 @@ export default function ManageInventory() {
               else{
                 setUpdateLoading(false);
                 console.log("Not Edited")
-                toast.error("Not Updated");
+                toast.error("No Changes");
               }                
           })
           .catch((error) => {

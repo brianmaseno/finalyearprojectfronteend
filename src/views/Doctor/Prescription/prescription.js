@@ -11,10 +11,10 @@ import CardBody from "components/Card/CardBody.js";
 import './prescription.css'
 import { useDrugs } from "hooks/useDrugs";
 import { useApprovedTreatment } from "hooks/useApprovedTreatment";
-import { useAuth } from "hooks/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -59,70 +59,77 @@ export default function Prescription() {
   const [usage, setUsage] = useState("")
   const [notes, setNotes] = useState("")
   const [treatmentId, setTreatmentId] = useState("")
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
   const [loading, setLoading] = useState(false);
   const base = useBaseUrl()
   
   const prescribeDrugs = (e) => {
     e.preventDefault()
-    setLoading(true);
 
-    const details = {
-      patient_id: patientId,
-      drug: drug_id,
-      notes: notes,
-      usage: usage,
-      days: days,
-      treatment_id: treatmentId
+    const check = patientId == "" || drug_id == "" || notes == "" || usage == "" || days == "" || treatmentId == "";
+
+    if (check) {
+      toast.error("Parameter missing")
     }
+    else {
+      setLoading(true);
 
-    const payDetails = {
-      patient_id: patientId,
-      treatment_id: treatmentId,
-      service_name: "Consultation",
-      service_cost: "500",
-      service_department: currentUser.department_id,
-      added_by: currentUser.national_id
+      const details = {
+        patient_id: patientId,
+        drug: drug_id,
+        notes: notes,
+        usage: usage,
+        days: days,
+        treatment_id: treatmentId
+      }
+
+      const payDetails = {
+        patient_id: patientId,
+        treatment_id: treatmentId,
+        service_name: "Consultation",
+        service_cost: "500",
+        service_department: user.department_id,
+        added_by: user.national_id
+      }
+
+      axios({
+        method: 'post',
+        url: `${base}/KNH/patient/drugs/prescribe`,
+        data: details})
+        .then((data) => {
+            if (data.data.message == "Inserted Successfully") {
+              setLoading(false);
+              toast.success("Prescription added")
+
+              //billing
+              axios({
+                method: 'post',
+                url: `${base}/KNH/patient/billing/set`,
+                data: payDetails})
+                .then((data) => {
+                    if (data.data.message == "Added to Bill") {
+                        console.log("Added to Bill")
+                    }
+                    else{
+                        console.log("Not Added")
+                    }                
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+                }
+                else{
+                  setLoading(false);
+                  console.log("Not Inserted")
+                  toast.error("Prescription not added")
+                }                
+            })
+            .catch((error) => {
+              toast.error("Error")
+              setLoading(false);
+              console.log(error);
+        });
     }
-
-    console.log(payDetails)
-
-    axios({
-      method: 'post',
-      url: `${base}/KNH/patient/drugs/prescribe`,
-      data: details})
-      .then((data) => {
-          if (data.data.message == "Inserted Successfully") {
-            setLoading(false);
-            toast.success("Prescription added")
-
-            //billing
-            axios({
-              method: 'post',
-              url: `${base}/KNH/patient/billing/set`,
-              data: payDetails})
-              .then((data) => {
-                  if (data.data.message == "Added to Bill") {
-                      console.log("Added to Bill")
-                  }
-                  else{
-                      console.log("Not Added")
-                  }                
-              })
-              .catch((error) => {
-                  console.log(error);
-          });
-          }
-          else{
-            setLoading(false);
-            console.log("Not Inserted")
-            toast.error("Prescription not added")
-          }                
-      })
-      .catch((error) => {
-        console.log(error);
-  });
-
   }
 
   return (

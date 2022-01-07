@@ -9,6 +9,7 @@ import Icon from "@material-ui/core/Icon";
 import DateRange from "@material-ui/icons/DateRange";
 //import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
+import CancelIcon from '@material-ui/icons/Cancel';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
@@ -120,7 +121,7 @@ export default function ReceptionistDashboard() {
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
-                <Icon>info_outline</Icon>
+                <CancelIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Cancelled Appointment</p>
               <h3 className={classes.cardTitle}>{cancelled ? cancelled.data.length : 0}</h3>
@@ -144,8 +145,8 @@ export default function ReceptionistDashboard() {
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Update />
-                Just Updated
+                <DateRange />
+                Last 24 Hours
               </div>
             </CardFooter>
           </Card>

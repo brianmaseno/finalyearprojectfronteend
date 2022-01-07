@@ -9,9 +9,9 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import { ToastContainer, toast } from "react-toastify";
-import { useAuth } from "hooks/AuthProvider";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -51,7 +51,7 @@ export default function TestResults() {
   const [data, setData] = useState([])
   const [cost, setCost] = useState("")
   const [result, setResult] = useState("")
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false)
   const base = useBaseUrl()
@@ -154,7 +154,12 @@ export default function TestResults() {
                       <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
                         <div className="editContainer">
                           <p className="editP" style={{backgroundColor: "#11b8cc"}} onClick={() => {
-                                fetch(`${base}/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)
+                            const check = cost == "" || result == "";
+                            if (check) {
+                              toast.error("Parameter missing")
+                            }
+                            else {
+                              fetch(`${base}/KNH/patient/lab/tests/results/add?lab_test_id=${item.lab_test_id}&&test_cost=${cost}&&test_results=${result}`)
                                 .then(response => response.json())
                                 .then((data) => {
                                     if (data.message == "Inserted Successfully") {
@@ -168,7 +173,7 @@ export default function TestResults() {
 
                                       //notifications 
                                       const message = `Test ${item.lab_test_id} has been completed, check for results`;
-                                      fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${item.staff_id}`)
+                                      fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${item.staff_id}`)
                                         .then(response => response.json())
                                         .then((data) => {
                                             console.log(data);
@@ -181,8 +186,8 @@ export default function TestResults() {
                                         treatment_id: item.treatment_id,
                                         service_name: "Lab Tests",
                                         service_cost: cost,
-                                        service_department: currentUser.department_id,
-                                        added_by: currentUser.national_id
+                                        service_department: user.department_id,
+                                        added_by: user.national_id
                                       }
                                       axios({
                                         method: 'post',
@@ -198,13 +203,16 @@ export default function TestResults() {
                                         })
                                         .catch((error) => {
                                             console.log(error);
-                                    });
-                                    }
-                                    else{
-                                      toast.error("Result not submitted");
-                                      console.log("Not Updated")
-                                    }
-                                })
+                                        });
+                                        }
+                                        else{
+                                          toast.error("Result not submitted");
+                                          setLoading(false);
+                                          console.log("Not Updated")
+                                        }
+                                    })
+                                  }
+                                
                                 }}>Submit</p>
                         </div>
                       </td>

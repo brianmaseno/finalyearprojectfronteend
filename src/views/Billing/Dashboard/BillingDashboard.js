@@ -78,8 +78,7 @@ export default function BillingDashboard() {
                 <Icon><PaidIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Total</p>
-              <h3 className={classes.cardTitle}>$ 
-                {total > 0 ? total : 0} <small></small>
+              <h3 className={classes.cardTitle}>Ksh {total > 0 ? total : 0} <small></small>
               </h3>
             </CardHeader>
             <CardFooter stats>
@@ -97,7 +96,7 @@ export default function BillingDashboard() {
                 <AttachMoneyIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Paid Amount</p>
-              <h3 className={classes.cardTitle}>$ {paid > 0 ? paid : 0}</h3>
+              <h3 className={classes.cardTitle}>Ksh {paid > 0 ? paid : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -114,7 +113,7 @@ export default function BillingDashboard() {
                 <Icon><PaymentsIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Unpaid Amount</p>
-              <h3 className={classes.cardTitle}>$ {unpaid > 0 ? unpaid : 0}</h3>
+              <h3 className={classes.cardTitle}>Ksh {unpaid > 0 ? unpaid : 0}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>

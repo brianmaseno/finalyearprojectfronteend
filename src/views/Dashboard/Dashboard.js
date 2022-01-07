@@ -5,6 +5,7 @@ import ChartistGraph from "react-chartist";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
+import BlockIcon from '@material-ui/icons/Block';
 // @material-ui/icons
 import Store from "@material-ui/icons/Store";
 //import Warning from "@material-ui/icons/Warning";
@@ -124,7 +125,7 @@ export default function Dashboard() {
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
-                <Icon>info_outline</Icon>
+                <Icon><BlockIcon /></Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Blocked Accounts</p>
               <h3 className={classes.cardTitle}>{blocked ? blocked.length : 0}</h3>
@@ -148,8 +149,8 @@ export default function Dashboard() {
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Update />
-                Just Updated
+                <DateRange />
+                Last 24 Hours
               </div>
             </CardFooter>
           </Card>

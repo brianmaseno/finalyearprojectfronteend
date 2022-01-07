@@ -9,10 +9,10 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "../../hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -49,7 +49,7 @@ const useStyles = makeStyles(styles);
 
 export default function AddDepartment() {
   const classes = useStyles();
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser()
   const [staff_id, setStaff_id] = useState("");
   const [department_name, setDepartment_name] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,7 +57,14 @@ export default function AddDepartment() {
 
   const saveDepartment = (e) => {
     e.preventDefault()
-    setLoading(true);
+
+    const check = department_name == "" || staff_id == "";
+
+    if (check) {
+      toast.error("Parameter missing");
+    }
+    else {
+      setLoading(true);
 
     const details = {
       department_name: department_name,
@@ -81,9 +88,10 @@ export default function AddDepartment() {
           }                
       })
       .catch((error) => {
-          console.log(error);
+        toast.error("Error");
+        console.log(error);
     });
-
+    }
   }
 
   return (
@@ -114,7 +122,7 @@ export default function AddDepartment() {
                   <label className="idC">Staff ID*</label>
                   <select className="inCase" onChange={(e) => setStaff_id(e.target.value)}>
                     <option>Select...</option>
-                    <option>{currentUser.national_id}</option>
+                    <option>{user.national_id}</option>
                   </select>
                 </div>
                 <div className="caseFooter">

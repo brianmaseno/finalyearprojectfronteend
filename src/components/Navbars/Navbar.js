@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from "react";
 import classNames from "classnames";
 import PropTypes from "prop-types";
@@ -31,11 +32,7 @@ export default function Header(props) {
   return (
     <AppBar className={classes.appBar + appBarClasses}>
       <Toolbar className={classes.container}>
-        <div className={classes.flex}>
-          {/* Here we create navbar brand, based on route name */}
-          <Button color="transparent" href="#" className={classes.title}>
-            {routeName}
-          </Button>
+        <div className={classes.flex}>          
         </div>
         <Hidden smDown implementation="css">
           {props.rtlActive ? <RTLNavbarLinks /> : <AdminNavbarLinks />}

@@ -9,11 +9,11 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './case.css'
-import { useAuth } from "hooks/AuthProvider";
 import { useApprovedTreatment } from "hooks/useApprovedTreatment";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -50,7 +50,7 @@ const useStyles = makeStyles(styles);
 
 export default function CaseNotes() {
   const classes = useStyles();
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
   const [patientId, setPatientId] = useState("")
   const [notes, setNotes] = useState("")
   const [treatment_id, setTreatment_id] = useState("")
@@ -60,13 +60,20 @@ export default function CaseNotes() {
 
   const saveNotes = (e) => {
     e.preventDefault()
-    setLoading(true);
+
+    const check = patientId == "" || treatment_id == "" || notes == "" || user.national_id == "";
+
+    if (check) {
+      toast.error("Parameter Missing");
+    }
+    else {
+      setLoading(true);
 
     const details = {
       patient_id: patientId,
       treatment_id: treatment_id,
       treatment_notes: notes,
-      staff_id: currentUser.national_id
+      staff_id: user.national_id
     }
 
     axios({
@@ -86,9 +93,11 @@ export default function CaseNotes() {
           }                
       })
       .catch((error) => {
-          console.log(error);
+        setLoading(false)
+        toast.error("Error");
+        console.log(error);
     });
-
+    }
   }
 
   return (

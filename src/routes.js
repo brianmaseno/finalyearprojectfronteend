@@ -5,6 +5,10 @@ import Person from "@material-ui/icons/Person";
 import AddIcon from '@material-ui/icons/Add';
 import Notifications from "@material-ui/icons/Notifications";
 import LockIcon from '@mui/icons-material/Lock';
+import PendingIcon from '@mui/icons-material/Pending';
+import ErrorIcon from '@material-ui/icons/Error';
+import GppGoodIcon from '@mui/icons-material/GppGood';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
@@ -18,7 +22,7 @@ const dashboardRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName:"Dashboard",
     icon: Dashboard,
     component: DashboardPage,
     layout: "/admin",
@@ -26,31 +30,31 @@ const dashboardRoutes = [
   {
     path: "/activated",
     name: "Activated Accounts",
-    rtlName: "الرموز",
-    icon: "check",
+    rtlName: "Activated Accounts",
+    icon: GppGoodIcon,
     component: EditAccounts,
     layout: "/admin",
   },
   {
     path: "/pending",
     name: "Pending Accounts",
-    rtlName: "خرائط",
-    icon: "pending",
+    rtlName: "Pending Accounts",
+    icon: PendingIcon,
     component: PendingAccounts,
     layout: "/admin",
   },
   {
     path: "/suspended",
     name: "Suspended Accounts",
-    rtlName: "إخطارات",
-    icon: "error",
+    rtlName: "Suspended Accounts",
+    icon: ErrorIcon,
     component: SuspendedAccounts,
     layout: "/admin",
   },
   {
     path: "/changepassword",
     name: "Change Password",
-    rtlName: "إخطارات",
+    rtlName: "Change Password",
     icon: LockIcon,
     component: ChangePassword,
     layout: "/admin",
@@ -58,7 +62,7 @@ const dashboardRoutes = [
   {
     path: "/adddepartment",
     name: "Add Department",
-    rtlName: "إخطارات",
+    rtlName: "Add Department",
     icon: AddIcon,
     component: AddDepartment,
     layout: "/admin",
@@ -66,7 +70,7 @@ const dashboardRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
+    rtlName: "Notifications",
     icon: Notifications,
     component: NotificationsPage,
     layout: "/admin",
@@ -74,7 +78,7 @@ const dashboardRoutes = [
   {
     path: "/user",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
+    rtlName: "User Profile",
     icon: Person,
     component: UserProfile,
     layout: "/admin",
@@ -82,8 +86,8 @@ const dashboardRoutes = [
   {
     path: "/logout",
     name: "Log Out",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: "logout",
+    rtlName: "Log Out",
+    icon: ExitToAppIcon,
     component: UserProfile,
     layout: "/login",
   },

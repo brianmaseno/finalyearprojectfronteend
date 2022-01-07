@@ -5,6 +5,7 @@ import Person from "@material-ui/icons/Person";
 import Notifications from "@material-ui/icons/Notifications";
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import AddIcon from '@mui/icons-material/Add';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import UserProfile from "views/UserProfile/UserProfile.js";
@@ -19,7 +20,7 @@ const LabRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName: "Dashboard",
     icon: Dashboard,
     component: LabDashboard,
     layout: "/lab",
@@ -27,7 +28,7 @@ const LabRoutes = [
   {
     path: "/labrequests",
     name: "Lab Requests",
-    rtlName: "إخطارات",
+    rtlName: "Lab Requests",
     icon: ContactSupportIcon,
     component: LabRequests,
     layout: "/lab",
@@ -35,7 +36,7 @@ const LabRoutes = [
   {
     path: "/addtestresult",
     name: "Add Test Result",
-    rtlName: "إخطارات",
+    rtlName: "Add Test Result",
     icon: AddIcon,
     component: TestResults,
     layout: "/lab",
@@ -43,7 +44,7 @@ const LabRoutes = [
   {
     path: "/testservices",
     name: "Test Services",
-    rtlName: "إخطارات",
+    rtlName: "Test Services",
     icon: HomeRepairServiceIcon,
     component: TestServices,
     layout: "/lab",
@@ -51,7 +52,7 @@ const LabRoutes = [
   {
     path: "/labtestreports",
     name: "Test Reports",
-    rtlName: "إخطارات",
+    rtlName: "Test Reports",
     icon: TextSnippetIcon,
     component: LabReports,
     layout: "/lab",
@@ -59,7 +60,7 @@ const LabRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
+    rtlName: "Notifications",
     icon: Notifications,
     component: NotificationsPage,
     layout: "/lab",
@@ -67,7 +68,7 @@ const LabRoutes = [
   {
     path: "/user",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
+    rtlName: "User Profile",
     icon: Person,
     component: UserProfile,
     layout: "/lab",
@@ -75,8 +76,8 @@ const LabRoutes = [
   {
     path: "/logout",
     name: "Log Out",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: "logout",
+    rtlName: "Log Out",
+    icon: ExitToAppIcon,
     component: UserProfile,
     layout: "/login",
   },

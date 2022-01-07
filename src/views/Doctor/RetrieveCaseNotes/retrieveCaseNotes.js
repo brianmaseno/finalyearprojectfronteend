@@ -56,26 +56,36 @@ export default function RetrieveCaseNotes() {
 
   const checkPatient = (e) => {
     e.preventDefault()
-    setLoading(true);
-    setNotes([]);
 
-    axios.get(`${base}/KNH/patient/treatment/summary/patient?patient_id=${patientId}`)
-      .then((data) => {
-          if (data.data.message == "Treatment Details Found") {
-            setNotes(data.data.data)
-            setLoading(false)
-            console.log("Found")
-          }
-          else{
-            setLoading(false);
-            toast.error("No Result Found")
-            console.log("Not Found")
-          }                
-      })
-      .catch((error) => {
+    const check = patientId == "";
+
+    if (check) {
+      toast.error("Parameter missing")
+    }
+    else {
+      setLoading(true);
+      setNotes([]);
+
+      axios.get(`${base}/KNH/patient/treatment/summary/patient?patient_id=${patientId}`)
+        .then((data) => {
+            if (data.data.message == "Treatment Details Found") {
+              setNotes(data.data.data)
+              setLoading(false)
+              console.log("Found")
+            }
+            else{
+              setLoading(false);
+              toast.error("No Result Found")
+              console.log("Not Found")
+            }                
+        })
+        .catch((error) => {
+          setLoading(false);
+          toast.error("Error")
           console.log(error);
-      });
-  }
+        });
+      }
+    }
 
   return (
     <>

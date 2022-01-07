@@ -8,10 +8,10 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -48,10 +48,10 @@ const useStyles = makeStyles(styles);
 
 export default function DoctorAvailability() {
   const classes = useStyles();
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
 
   const [date, setDate] = useState("");
-  const [id, setId] = useState(currentUser.national_id);
+  const [id, setId] = useState(user.national_id);
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("");
   const [slots, setSlots] = useState("");
@@ -61,7 +61,7 @@ export default function DoctorAvailability() {
   const addAvailability = (e) => {
     e.preventDefault();
 
-    const status = date === "" && id === "" && from === "" && to === "" && slots === "";
+    const status = date == "" || id == "" || from == "" || to == "" || slots == "";
     if (!status) {
       setLoading(true);
 
@@ -122,7 +122,7 @@ export default function DoctorAvailability() {
                 <div className="caseContainer">
                   <div className="caseId">
                     <label className="idC">Doctor ID*</label>
-                    <input placeholder="Doctor ID" className="inCase" onChange={(e) => setId(e.target.value)} value={currentUser.national_id}/>
+                    <input placeholder="Doctor ID" className="inCase" onChange={(e) => setId(e.target.value)} value={user.national_id}/>
                   </div>
                   <div className="caseText">
                     <label className="idC">Date*</label>

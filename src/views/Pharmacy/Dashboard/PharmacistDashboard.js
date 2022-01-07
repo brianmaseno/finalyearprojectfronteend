@@ -9,6 +9,7 @@ import Icon from "@material-ui/core/Icon";
 import DateRange from "@material-ui/icons/DateRange";
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import BlockIcon from '@material-ui/icons/Block';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -113,7 +114,7 @@ export default function PharmacistDashboard() {
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
-                <Icon>info_outline</Icon>
+                <BlockIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Cancelled Prescriptions</p>
               <h3 className={classes.cardTitle}>{cancelled > 0 ? cancelled : 0}</h3>

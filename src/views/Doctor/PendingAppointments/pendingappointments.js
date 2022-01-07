@@ -8,10 +8,10 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 import ProjectLoading from "components/Loading/projectloading";
 import { ToastContainer, toast } from "react-toastify";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 
 const styles = {
   cardCategoryWhite: {
@@ -48,7 +48,7 @@ const useStyles = makeStyles(styles);
 export default function DoctorPendingAppointments() {
   const classes = useStyles();
   const [pending, setPending] = useState([])
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
   const base = useBaseUrl()
@@ -59,7 +59,7 @@ export default function DoctorPendingAppointments() {
   }
 
   const getAllPendingAppointments = () => {
-    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -73,7 +73,7 @@ export default function DoctorPendingAppointments() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
@@ -150,7 +150,7 @@ export default function DoctorPendingAppointments() {
                                 .then((data) => {
                                   if (data.message == "Appointment Approved Successfully") {
                                     const message = `Appointment ${item.appointment_id} has been approved successfully`;
-                                    fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${item.appointment_created_by}`)
+                                    fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${item.appointment_created_by}`)
                                       .then(response => response.json())
                                       .then((data) => {
                                           console.log(data);

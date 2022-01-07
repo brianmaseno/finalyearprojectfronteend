@@ -44,57 +44,65 @@ export default function RegisterComponent() {
 
       const pass = password === confirmpassword;
 
-      if (pass) {
-          const staffDetails = {
-              username: username,
-              firstname: firstname,
-              lastname: lastname,
-              gender: gender,
-              qualification: qualification,
-              department_id: department_id,
-              access_level: access_level,
-              country: country,
-              county: county,
-              residence: residence,
-              joining_date: joining_date,
-              password: password,
-              added_on: added_on,
-              added_by: added_by,
-              national_id: nationalId
+      const check = qualification == "" || department_id == "" || gender == "" || country == "" || county == "";
+
+      if (check) {
+        toast.error("Parameter Missing");
+      }
+      else {
+          if (pass) {
+            const staffDetails = {
+                username: username,
+                firstname: firstname,
+                lastname: lastname,
+                gender: gender,
+                qualification: qualification,
+                department_id: department_id,
+                access_level: access_level,
+                country: country,
+                county: county,
+                residence: residence,
+                joining_date: joining_date,
+                password: password,
+                added_on: added_on,
+                added_by: added_by,
+                national_id: nationalId
+            }
+  
+            axios({
+                method: 'post',
+                url: `${baseUrl}/KNH/staff/register`,
+                data: staffDetails})
+                .then((data) => {
+                    if (data.data.message != "Inserted Successfully") {
+                        toast.error("Not Registered");
+                    }
+                    else{
+                        toast.success("Registration successful, wait for account activation");
+                        const receiver_id = "9821";
+                        fetch(`${baseUrl}/KNH/staff/addNotification?message=${message}&&sender_id=${nationalId}&&category=${qualification}&&receiver_id=${receiver_id}`)
+                        .then(response => response.json())
+                        .then((data) => {
+                            console.log(data);
+                        })
+                        
+                        setTimeout(() => {
+                            history.push("/login");
+                        }, 3000);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
           }
-
-          console.log(department_id);
-
-          axios({
-              method: 'post',
-              url: `${baseUrl}/KNH/staff/register`,
-              data: staffDetails})
-              .then((data) => {
-                  if (data.data.message != "Inserted Successfully") {
-                      toast.error("Not Registered");
-                  }
-                  else{
-                      toast.success("Registration successful, wait for account activation");
-                      const receiver_id = "9821";
-                      fetch(`${baseUrl}/KNH/staff/addNotification?message=${message}&&sender_id=${nationalId}&&category=${qualification}&&receiver_id=${receiver_id}`)
-                      .then(response => response.json())
-                      .then((data) => {
-                          console.log(data);
-                      })
-                      
-                      setTimeout(() => {
-                          history.push("/login");
-                      }, 3000);
-                  }
-              })
-              .catch((error) => {
-                  console.log(error);
-              });
+          else {
+            toast.error("Passwords do not match");
+          }
+        }
+        
       }
-      else{
-          console.log("Passwords not matching");
-      }
-  }
+
+
   return (
     <div className="containerRegister">
       <div className="avatar">
@@ -122,7 +130,7 @@ export default function RegisterComponent() {
               <div className="nameSection">
                   <div className="firstN">
                       <label className="labelText">Qualification</label><br/>
-                      <select className="inputSelect" onChange={(e) => {setQualification(e.target.value); setAccessLevel(e.target.value)}}>
+                      <select className="inputSelect" required onChange={(e) => {setQualification(e.target.value); setAccessLevel(e.target.value)}}>
                           <option>Select---</option>
                           <option value="Doctor">Doctor</option>
                           <option value="Pharmacist">Pharmacist</option>
@@ -143,7 +151,7 @@ export default function RegisterComponent() {
                   </div>
                   <div className="userN">
                       <label className="labelText">Select Gender</label><br/>
-                      <select className="inputSelect" onChange={(e) => setGender(e.target.value)}>
+                      <select className="inputSelect" required onChange={(e) => setGender(e.target.value)}>
                           <option>Select---</option>
                           <option value="male">Male</option>
                           <option value="female">Female</option>
@@ -169,7 +177,7 @@ export default function RegisterComponent() {
               <div className="nameSection">
                   <div className="firstN">
                       <label className="labelText">Select Country</label><br/>
-                      <select className="inputSelect" onChange={(e) => setCountry(e.target.value)}>
+                      <select className="inputSelect" required onChange={(e) => setCountry(e.target.value)}>
                           <option>Select---</option>
                           <option value="Afganistan">Afghanistan</option>
                           <option value="Albania">Albania</option>
@@ -421,7 +429,7 @@ export default function RegisterComponent() {
                   </div>
                   <div className="lastN">
                       <label className="labelText">Select County</label><br/>
-                      <select className="inputSelect" onChange={(e) => setCounty(e.target.value)}>
+                      <select className="inputSelect" required onChange={(e) => setCounty(e.target.value)}>
                           <option>Select---</option>
                           <option value="Baringo">Baringo</option>
                           <option value='Bomet'>Bomet</option>

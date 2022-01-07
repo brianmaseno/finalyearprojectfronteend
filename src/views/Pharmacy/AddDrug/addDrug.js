@@ -12,7 +12,7 @@ const axios = require('axios').default;
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
-import { useAuth } from "hooks/AuthProvider";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 
 const styles = {
   cardCategoryWhite: {
@@ -50,7 +50,7 @@ export default function AddDrugs() {
   const classes = useStyles();
   const [loading, setLoading] = useState(false)
   const base = useBaseUrl()
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
 
   //drug
   const [drugName, setDrugName] = useState("")
@@ -62,37 +62,48 @@ export default function AddDrugs() {
 
   const addDrug = (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    const details = {
-        drug_name: drugName,
-        drug_cost: drugCost,
-        total: total,
-        buying_price: buyingPrice,
-        drug_description: drugDescription,
-        expiry_date: expiryDate,
-        staff_id: currentUser.national_id
+    const check = drugName == "" || drugCost == "" || total == "" || buyingPrice == "" || drugDescription == "" || 
+    expiryDate == "" || user.national_id == "";
+
+    if (check) {
+      toast.error("Parameter missing")
     }
+    else {
+      setLoading(true);
 
-    axios({
-        method: 'post',
-        url: `${base}/KNH/patient/drugs/add`,
-        data: details})
-        .then((data) => {
-            if (data.data.message == "Inserted Successfully") {
-                console.log("inserted")
-                setLoading(false);
-                toast.success("Drug Added Successfully")
-            }
-            else{
-                console.log("Not Inserted")
-                setLoading(false);
-                toast.error("Drug not added")
-            }                
-        })
-        .catch((error) => {
+      const details = {
+          drug_name: drugName,
+          drug_cost: drugCost,
+          total: total,
+          buying_price: buyingPrice,
+          drug_description: drugDescription,
+          expiry_date: expiryDate,
+          staff_id: user.national_id
+      }
+
+      axios({
+          method: 'post',
+          url: `${base}/KNH/patient/drugs/add`,
+          data: details})
+          .then((data) => {
+              if (data.data.message == "Inserted Successfully") {
+                  console.log("inserted")
+                  setLoading(false);
+                  toast.success("Drug Added Successfully")
+              }
+              else{
+                  console.log("Not Inserted")
+                  setLoading(false);
+                  toast.error("Drug not added")
+              }                
+          })
+          .catch((error) => {
+            setLoading(false);
+            toast.error("Error")
             console.log(error);
-    });
+      });
+    }
 }
 
 

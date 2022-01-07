@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
+import CancelIcon from '@material-ui/icons/Cancel';
 // @material-ui/icons
 import DateRange from "@material-ui/icons/DateRange";
 import Update from "@material-ui/icons/Update";
@@ -19,21 +20,21 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
 import { useDoctorAppointments } from "hooks/useDoctorAppointments";
-import { useAuth } from "hooks/AuthProvider";
 import { usePatients } from "hooks/usePatients";
 import ProjectLoading from "components/Loading/projectloading";
 import { ToastContainer, toast } from "react-toastify";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 
 const useStyles = makeStyles(styles);
 
 export default function DoctorDashboard() {
   const classes = useStyles();
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
   const [pending, setPending] = useState([])
-  const approved = useDoctorAppointments("approved", currentUser.national_id)
-  const pendingData = useDoctorAppointments("pending", currentUser.national_id)
-  const cancelled = useDoctorAppointments("cancelled", currentUser.national_id)
+  const approved = useDoctorAppointments("approved", user.national_id)
+  const pendingData = useDoctorAppointments("pending", user.national_id)
+  const cancelled = useDoctorAppointments("cancelled", user.national_id)
   const { patients } = usePatients()
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
@@ -45,7 +46,7 @@ export default function DoctorDashboard() {
   }
 
   const getAllPendingAppointments = () => {
-    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -59,7 +60,7 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {
@@ -115,9 +116,9 @@ export default function DoctorDashboard() {
           <Card>
             <CardHeader color="danger" stats icon>
               <CardIcon color="danger">
-                <Icon>info_outline</Icon>
+                <CancelIcon />
               </CardIcon>
-              <p className={classes.cardCategory}>Cancelled Appointments</p>
+              <p className={classes.cardCategory}>Cancelled</p>
               <h3 className={classes.cardTitle}>{cancelled.data ? cancelled.data.length : 0}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -139,8 +140,8 @@ export default function DoctorDashboard() {
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
-                <Update />
-                Just Updated
+                <DateRange />
+                Last 24 Hours
               </div>
             </CardFooter>
           </Card>
@@ -200,7 +201,7 @@ export default function DoctorDashboard() {
                                 .then((data) => {
                                     if (data.message == "Appointment Approved Successfully") {
                                       const message = `Appointment ${item.appointment_id} has been approved successfully`;
-                                      fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${item.appointment_created_by}`)
+                                      fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${item.appointment_created_by}`)
                                         .then(response => response.json())
                                         .then((data) => {
                                             console.log(data);

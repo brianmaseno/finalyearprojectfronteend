@@ -8,6 +8,7 @@ import UpdateIcon from '@mui/icons-material/Update';
 import MedicationIcon from '@mui/icons-material/Medication';
 import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 import PharmacistDashboard from "views/Pharmacy/Dashboard/PharmacistDashboard";
@@ -21,7 +22,7 @@ const PharmacistRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName: "Dashboard",
     icon: Dashboard,
     component: PharmacistDashboard,
     layout: "/pharmacist",
@@ -29,7 +30,7 @@ const PharmacistRoutes = [
   {
     path: "/adddrugs",
     name: "Add Drugs",
-    rtlName: "إخطارات",
+    rtlName: "Add Drugs",
     icon: AddIcon,
     component: AddDrugs,
     layout: "/pharmacist",
@@ -37,7 +38,7 @@ const PharmacistRoutes = [
   {
     path: "/updatedrug",
     name: "Manage Drugs",
-    rtlName: "إخطارات",
+    rtlName: "Manage Drugs",
     icon: UpdateIcon,
     component: ManageInventory,
     layout: "/pharmacist",
@@ -45,7 +46,7 @@ const PharmacistRoutes = [
   {
     path: "/prescribeddrugs",
     name: "Prescribed Drugs",
-    rtlName: "إخطارات",
+    rtlName: "Prescribed Drugs",
     icon: MedicationIcon,
     component: PrescribedDrugs,
     layout: "/pharmacist",
@@ -53,7 +54,7 @@ const PharmacistRoutes = [
   {
     path: "/dispenseddrugsreports",
     name: "Dispensed Drugs",
-    rtlName: "إخطارات",
+    rtlName: "Dispensed Drugs",
     icon: LocalPharmacyIcon,
     component: DispensedDrugs,
     layout: "/pharmacist",
@@ -61,7 +62,7 @@ const PharmacistRoutes = [
   {
     path: "/drugreports",
     name: "Drugs Report",
-    rtlName: "إخطارات",
+    rtlName: "Drugs Report",
     icon: MedicalServicesIcon,
     component: DrugReports,
     layout: "/pharmacist",
@@ -69,7 +70,7 @@ const PharmacistRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
+    rtlName: "Notifications",
     icon: Notifications,
     component: NotificationsPage,
     layout: "/pharmacist",
@@ -77,7 +78,7 @@ const PharmacistRoutes = [
   {
     path: "/user",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
+    rtlName: "User Profile",
     icon: Person,
     component: UserProfile,
     layout: "/pharmacist",
@@ -85,8 +86,8 @@ const PharmacistRoutes = [
   {
     path: "/logout",
     name: "Log Out",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: "logout",
+    rtlName: "Log Out",
+    icon: ExitToAppIcon,
     component: UserProfile,
     layout: "/login",
   },

@@ -5,7 +5,10 @@ import Person from "@material-ui/icons/Person";
 import Notifications from "@material-ui/icons/Notifications";
 import AddIcon from '@mui/icons-material/Add';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import PendingIcon from '@mui/icons-material/Pending';
 import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import GppGoodIcon from '@mui/icons-material/GppGood';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import UserProfile from "views/UserProfile/UserProfile.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
@@ -21,7 +24,7 @@ const ReceptionistRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName: "Dashboard",
     icon: Dashboard,
     component: ReceptionistDashboard,
     layout: "/receptionist",
@@ -29,7 +32,7 @@ const ReceptionistRoutes = [
   {
     path: "/patientregistration",
     name: "Add Patient",
-    rtlName: "طباعة",
+    rtlName:  "Add Patient",
     icon: AddIcon,
     component: AddPatient,
     layout: "/receptionist",
@@ -37,7 +40,7 @@ const ReceptionistRoutes = [
   {
     path: "/searchpatient",
     name: "Find Patient",
-    rtlName: "طباعة",
+    rtlName: "Find Patient",
     icon: PersonSearchIcon,
     component: FindPatient,
     layout: "/receptionist",
@@ -45,7 +48,7 @@ const ReceptionistRoutes = [
   {
     path: "/bookappointment",
     name: "Book Appointment",
-    rtlName: "قائمة الجدول",
+    rtlName: "Book Appointment",
     icon: BookOnlineIcon,
     component: BookAppointment,
     layout: "/receptionist",
@@ -53,23 +56,23 @@ const ReceptionistRoutes = [
   {
     path: "/allpendingappointments",
     name: "Pending Appointment",
-    rtlName: "الرموز",
-    icon: "pending",
+    rtlName: "Pending Appointment",
+    icon: PendingIcon,
     component: PendingAppointments,
     layout: "/receptionist",
   },
   {
     path: "/allapprovedappointments",
     name: "Approved Appointment",
-    rtlName: "خرائط",
-    icon: "check",
+    rtlName: "Approved Appointment",
+    icon: GppGoodIcon,
     component: ApprovedAppointments,
     layout: "/receptionist",
   },
   {
     path: "/treatmentreports",
     name: "Treatment Reports",
-    rtlName: "إخطارات",
+    rtlName: "Treatment Reports",
     icon: SummarizeIcon,
     component: TreatmentReports,
     layout: "/receptionist",
@@ -77,7 +80,7 @@ const ReceptionistRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
+    rtlName: "Notifications",
     icon: Notifications,
     component: NotificationsPage,
     layout: "/receptionist",
@@ -85,7 +88,7 @@ const ReceptionistRoutes = [
   {
     path: "/user",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
+    rtlName: "User Profile",
     icon: Person,
     component: UserProfile,
     layout: "/receptionist",
@@ -93,8 +96,8 @@ const ReceptionistRoutes = [
   {
     path: "/logout",
     name: "Log Out",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: "logout",
+    rtlName: "Log Out",
+    icon: ExitToAppIcon,
     component: UserProfile,
     layout: "/login",
   },

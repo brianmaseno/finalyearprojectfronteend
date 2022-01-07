@@ -8,10 +8,10 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 
 const styles = {
   cardCategoryWhite: {
@@ -48,7 +48,7 @@ const useStyles = makeStyles(styles);
 export default function DoctorApprovedAppointments() {
   const classes = useStyles();
   const [approved, setApproved] = useState([])
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false);
   const base = useBaseUrl()
@@ -59,7 +59,7 @@ export default function DoctorApprovedAppointments() {
   }
 
   const getAllApprovedAppointments = () => {
-    fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${user.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -73,7 +73,7 @@ export default function DoctorApprovedAppointments() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${user.national_id}`)
           .then(response => response.json())
           .then((data) => {
               if (data.message == "Found") {

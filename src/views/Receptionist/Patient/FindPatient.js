@@ -147,7 +147,7 @@ export default function FindPatient() {
   const searchPatient = (e) => {
     e.preventDefault();
 
-    const check = patientID === "";
+    const check = patientID == "";
 
     if (!check) {
       setLoading(true);
@@ -182,6 +182,7 @@ export default function FindPatient() {
       });
     }
     else{
+      toast.error("Patient Id required")
       console.log("Missing Parameters")
     }
     

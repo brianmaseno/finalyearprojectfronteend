@@ -42,10 +42,17 @@ export default function LogComponent() {
                   setTimeout(() => {
                     setLogged(true);
                     setUser(data.data.details)
-                    sessionStorage.setItem("user", data.data.details.username)
-                    sessionStorage.setItem("UserId", data.data.details.national_id)
+                    sessionStorage.setItem("username", data.data.details.username)
+                    sessionStorage.setItem("national_id", data.data.details.national_id)
                     sessionStorage.setItem("status", data.data.details.status)
                     sessionStorage.setItem("password", data.data.password)
+                    sessionStorage.setItem("firstname", data.data.details.firstname)
+                    sessionStorage.setItem("lastname", data.data.details.lastname)
+                    sessionStorage.setItem("email", data.data.details.email)
+                    sessionStorage.setItem("country", data.data.details.country)
+                    sessionStorage.setItem("county", data.data.details.county)
+                    sessionStorage.setItem("residence", data.data.details.residence)
+                    sessionStorage.setItem("qualification", data.data.details.qualification)
                     setCurrentUser(data.data.details);
 
                     if (data.data.details.access_level == "Doctor") {

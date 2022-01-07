@@ -8,12 +8,12 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 import { useApprovedTreatment } from "hooks/useApprovedTreatment";
 import { useLabTechnicianIds } from "hooks/useLabTechnicianIDS";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -50,7 +50,7 @@ const useStyles = makeStyles(styles);
 
 export default function RequestLabTest() {
   const classes = useStyles();
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
   const [patientId, setPatientId] = useState("")
   const [treatmentId, setTreatmentId] = useState("");
   const [labTechnician, setLabTechnician] = useState("");
@@ -64,11 +64,18 @@ export default function RequestLabTest() {
 
   const requestLab = (e) => {
     e.preventDefault()
-    setLoading(true);
+
+    const check = patientId == "" || user.national_id == "" || treatmentId == "" || labTechnician == ""|| notes == "";
+
+    if (check) {
+      toast.error("Parameter missing");
+    }
+    else {
+      setLoading(true);
 
     const details = {
       patient_id: patientId,
-      staff_id: currentUser.national_id,
+      staff_id: user.national_id,
       treatment_id: treatmentId,
       lab_technician_id: labTechnician,
       test_notes: notes
@@ -84,22 +91,25 @@ export default function RequestLabTest() {
               setLoading(false);
               toast.success("Request Successful");
 
-              const message = `${currentUser.national_id} has requested for a lab test to be conducted, check notifications for details`;
-              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${labTechnician}`)
+              const message = `${user.national_id} has requested for a lab test to be conducted, check notifications for details`;
+              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${labTechnician}`)
                 .then(response => response.json())
                 .then((data) => {
                     console.log(data);
                 })
-          }
-          else{
+              }
+            else{
+              setLoading(false);
+              console.log("Not Inserted")
+              toast.error("Request Not Successful");
+            }                
+          })
+          .catch((error) => {
+            toast.error("Error");
             setLoading(false);
-            console.log("Not Inserted")
-            toast.error("Request Not Successful");
-          }                
-      })
-      .catch((error) => {
-          console.log(error);
-  });
+            console.log(error);
+      });
+    }
   }
 
   return (

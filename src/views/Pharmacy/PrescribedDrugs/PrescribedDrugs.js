@@ -8,11 +8,11 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-import { useAuth } from "hooks/AuthProvider";
 import { useDrugs } from "hooks/useDrugs";
 import ProjectLoading from "components/Loading/projectloading";
 import { ToastContainer, toast } from "react-toastify";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -51,7 +51,7 @@ export default function PrescribedDrugs() {
   const classes = useStyles();
   const [patientId, setPatientId] = useState("")
   const [data, setData] = useState([])
-  const { currentUser } = useAuth()
+  const { user } = useLoggedInUser();
   const { drug } = useDrugs()
   const [loading, setLoading] = useState(false);
   const [disLoading, setDisLoading] = useState(false);
@@ -74,8 +74,8 @@ export default function PrescribedDrugs() {
           treatment_id: treatment_id,
           service_name: "Drug Dispensation",
           service_cost: drug.filter((item) => item._id == drug_id)[0].drug_cost,
-          service_department: currentUser.department_id,
-          added_by: currentUser.national_id
+          service_department: user.department_id,
+          added_by: user.national_id
         }
 
         fetch(`${base}/KNH/patient/drugs/issue?prescription_id=${prescription_id}&&drug_id=${drug_id}&&quantity=${"10"}`)
@@ -86,7 +86,7 @@ export default function PrescribedDrugs() {
                 toast.success(`${drug.filter((item) => item._id == drug_id)[0].drug_name} Issued`);
                 //notification
                 const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
-                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${userId}&&category=${currentUser.qualification}&&receiver_id=${userId}`)
+                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${userId}&&category=${user.qualification}&&receiver_id=${userId}`)
                   .then(response => response.json())
                   .then((data) => {
                       console.log(data);
@@ -125,8 +125,13 @@ export default function PrescribedDrugs() {
   }
 
   const checkPatient = (e) => {
-    //e.preventDefault()
-    setLoading(true);
+    const check = patientId == "";
+
+    if (check) {
+      toast.error("Patient Id required")
+    }
+    else {
+      setLoading(true);
 
     if (!(patientId === "")) {
       fetch(`${base}/KNH/patient/drugs/prescribed/patient?patient_id=${patientId}`)
@@ -144,7 +149,10 @@ export default function PrescribedDrugs() {
       })
     }
     else{
+      toast.error("Error")
+      setLoading(false);
       console.log("ID MIssing")
+    }
     }
   }
 
@@ -223,8 +231,8 @@ export default function PrescribedDrugs() {
                                           treatment_id: treatment_id,
                                           service_name: "Drug Dispensation",
                                           service_cost: drug.filter((item) => item._id == drug_id)[0].drug_cost,
-                                          service_department: currentUser.department_id,
-                                          added_by: currentUser.national_id
+                                          service_department: user.department_id,
+                                          added_by: user.national_id
                                         }
                                 
                                         fetch(`${base}/KNH/patient/drugs/issue?prescription_id=${prescription_id}&&drug_id=${drug_id}&&quantity=${"3"}`)
@@ -236,7 +244,7 @@ export default function PrescribedDrugs() {
                                                 toast.success("Drug Issued");
                                                 //notification
                                                 const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
-                                                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                                                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
                                                   .then(response => response.json())
                                                   .then((data) => {
                                                       console.log(data);

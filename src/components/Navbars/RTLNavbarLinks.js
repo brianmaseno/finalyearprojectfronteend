@@ -1,4 +1,5 @@
-import React from "react";
+/* eslint-disable */
+import React, {useEffect, useState} from "react";
 import classNames from "classnames";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -19,11 +20,17 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 
 import styles from "assets/jss/material-dashboard-react/components/rtlHeaderLinksStyle.js";
+import { useBaseUrl } from "hooks/useBaseUrl";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
+
 
 const useStyles = makeStyles(styles);
 
 export default function RTLNavbarLinks() {
   const classes = useStyles();
+  const { base } = useBaseUrl();
+  const { user } = useLoggedInUser();
+  const [notification, setNotifications] = useState([]);
   const [open, setOpen] = React.useState(null);
   const handleToggle = (event) => {
     if (open && open.contains(event.target)) {
@@ -37,6 +44,20 @@ export default function RTLNavbarLinks() {
     setOpen(null);
   };
 
+  useEffect(() => {
+    fetch(`${base}/KNH/staff/viewNotifications?id=${user.national_id}`)
+          .then(response => response.json())
+          .then((data) => {
+              if (data.message == "Found") {
+                  setNotifications(data.data);
+                  console.log(data.data);
+              }
+              else{
+                  console.log("no Notification");
+              }
+          })
+  }, [])
+
   return (
     <div>
       <div className={classes.searchWrapper}>
@@ -45,7 +66,7 @@ export default function RTLNavbarLinks() {
             className: classes.margin + " " + classes.search,
           }}
           inputProps={{
-            placeholder: "جستجو...",
+            placeholder: "Search",
             inputProps: {
               "aria-label": "Search",
             },
@@ -64,7 +85,7 @@ export default function RTLNavbarLinks() {
       >
         <Dashboard className={classes.icons} />
         <Hidden mdUp implementation="css">
-          <p className={classes.linkText}>آمارها</p>
+          <p className={classes.linkText}>Profile</p>
         </Hidden>
       </Button>
       <div className={classes.manager}>
@@ -78,10 +99,10 @@ export default function RTLNavbarLinks() {
           className={classes.buttonLink}
         >
           <Notifications className={classes.icons} />
-          <span className={classes.notifications}>۵</span>
+          <span className={classes.notifications}>{notification ? notification.length : 0}</span>
           <Hidden mdUp implementation="css">
             <p onClick={handleToggle} className={classes.linkText}>
-              اعلان‌ها
+            Notification
             </p>
           </Hidden>
         </Button>

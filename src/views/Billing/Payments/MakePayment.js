@@ -11,9 +11,9 @@ import CardBody from "components/Card/CardBody.js";
 import './makepayments.css';
 import ProjectLoading from "components/Loading/projectloading";
 import { ToastContainer, toast } from "react-toastify";
-import { useAuth } from "hooks/AuthProvider";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import StripeCheckout from "react-stripe-checkout";
+import { useLoggedInUser } from "hooks/useLoggedInUser";
 const axios = require('axios').default;
 
 const styles = {
@@ -55,16 +55,16 @@ export default function MakePayment() {
   const [total, setTotal] = useState("")
   const [loading, setLoading] = useState(false);
   const [payLoad, setPayLoad] = useState(false);
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
   const base = useBaseUrl()
   const [product, setProduct] = useState({})
   const [item, setItem] = useState({})
 
   const checkPatient = (e) => {
     //e.preventDefault()
-    setLoading(true);
 
-    if (!(patientId === "")) {
+    if (!(patientId == "")) {
+      setLoading(true);
       fetch(`${base}/KNH/patient/billing/${patientId}/total`)
           .then(response => response.json())
           .then((data) => {
@@ -88,6 +88,9 @@ export default function MakePayment() {
                 console.log("no data");
               }
           })
+    }
+    else{
+      toast.error("Patient Id required");
     }
   }
 
@@ -157,7 +160,7 @@ export default function MakePayment() {
 
                   //notification
                   const message = `Bill ${bill_id} for patient ${patientId} has been settled successfully`;
-                  fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                  fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${uUser.national_id}`)
                     .then(response => response.json())
                     .then((data) => {
                         console.log(data);
@@ -251,7 +254,7 @@ export default function MakePayment() {
                             
                                               //notification
                                               const message = `Bill ${item._id} for patient ${patientId} has been settled successfully`;
-                                              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${currentUser.national_id}&&category=${currentUser.qualification}&&receiver_id=${currentUser.national_id}`)
+                                              fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
                                                 .then(response => response.json())
                                                 .then((data) => {
                                                     console.log(data);

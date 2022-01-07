@@ -1,14 +1,14 @@
 /* eslint-disable */
 import React from 'react'
 import { Redirect, Route } from 'react-router-dom';
-import { useAuth } from './AuthProvider';
+import { useLoggedInUser } from './useLoggedInUser';
 
 export const ProtectedRoute = ({children, ...rest}) => {
-  const { currentUser, loggedOut } = useAuth();
+  const { user } = useLoggedInUser();
   return (
     <Route
     {...rest}
-    render={({ location }) => currentUser && !(currentUser === undefined) ? children : 
+    render={({ location }) => user && !(user === undefined) ? children : 
     (
       <Redirect to={{pathname: "/login", state: {from: location}}} />
     )}/>

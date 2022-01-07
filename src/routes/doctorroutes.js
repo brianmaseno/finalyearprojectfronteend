@@ -2,12 +2,16 @@
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
+import AddIcon from '@material-ui/icons/Add';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import PendingIcon from '@mui/icons-material/Pending';
+import GppGoodIcon from '@mui/icons-material/GppGood';
 import Notifications from "@material-ui/icons/Notifications";
 import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 import FeedbackIcon from '@material-ui/icons/Feedback';
 import AssignmentReturnedIcon from '@material-ui/icons/AssignmentReturned';
 import UserProfile from "views/UserProfile/UserProfile.js";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import NotificationsPage from "views/Notifications/Notifications.js";
 import DoctorDashboard from "views/Doctor/Dashboard/DoctorDashboard";
 import CaseNotes from "views/Doctor/CaseNotes/CaseNotes";
@@ -24,7 +28,7 @@ const DoctorRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
+    rtlName: "Dashboard",
     icon: Dashboard,
     component: DoctorDashboard,
     layout: "/doctor",
@@ -32,15 +36,15 @@ const DoctorRoutes = [
   {
     path: "/casenotes",
     name: "Add Case Notes",
-    rtlName: "قائمة الجدول",
-    icon: "content_paste",
+    rtlName: "Add Case Notes",
+    icon: AddIcon,
     component: CaseNotes,
     layout: "/doctor",
   },
   {
     path: "/retrievecasenotes",
     name: "Retrieve Case Notes",
-    rtlName: "طباعة",
+    rtlName: "Retrieve Case Notes",
     icon: FindInPageIcon,
     component: RetrieveCaseNotes,
     layout: "/doctor",
@@ -48,7 +52,7 @@ const DoctorRoutes = [
   {
     path: "/availability",
     name: "Doctor Availability",
-    rtlName: "طباعة",
+    rtlName: "Doctor Availability",
     icon: AccessTimeIcon,
     component: DoctorAvailability,
     layout: "/doctor",
@@ -56,23 +60,23 @@ const DoctorRoutes = [
   {
     path: "/pendingappointments",
     name: "Pending Appointment",
-    rtlName: "الرموز",
-    icon: "pending",
+    rtlName: "Pending Appointment",
+    icon: PendingIcon,
     component: DoctorPendingAppointments,
     layout: "/doctor",
   },
   {
     path: "/approvedappointments",
     name: "Approved Appointment",
-    rtlName: "خرائط",
-    icon: "check",
+    rtlName: "Approved Appointment",
+    icon: GppGoodIcon,
     component: DoctorApprovedAppointments,
     layout: "/doctor",
   },
   {
     path: "/labtests",
     name: "Request LabTest",
-    rtlName: "إخطارات",
+    rtlName: "Request LabTest",
     icon: LiveHelpIcon,
     component: RequestLabTest,
     layout: "/doctor",
@@ -80,7 +84,7 @@ const DoctorRoutes = [
   {
     path: "/labtestresults",
     name: "LabTest Results",
-    rtlName: "إخطارات",
+    rtlName: "LabTest Results",
     icon: FeedbackIcon,
     component: DoctorLabTestResults,
     layout: "/doctor",
@@ -88,7 +92,7 @@ const DoctorRoutes = [
   {
     path: "/prescription",
     name: "Prescription",
-    rtlName: "إخطارات",
+    rtlName: "Prescription",
     icon: AssignmentReturnedIcon,
     component: Prescription,
     layout: "/doctor",
@@ -96,7 +100,7 @@ const DoctorRoutes = [
   {
     path: "/notifications",
     name: "Notifications",
-    rtlName: "إخطارات",
+    rtlName: "Notifications",
     icon: Notifications,
     component: NotificationsPage,
     layout: "/doctor",
@@ -104,7 +108,7 @@ const DoctorRoutes = [
   {
     path: "/user",
     name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
+    rtlName: "User Profile",
     icon: Person,
     component: UserProfile,
     layout: "/doctor",
@@ -112,8 +116,8 @@ const DoctorRoutes = [
   {
     path: "/logout",
     name: "Log Out",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: "logout",
+    rtlName: "User Profile",
+    icon: ExitToAppIcon,
     component: UserProfile,
     layout: "/login",
   },
