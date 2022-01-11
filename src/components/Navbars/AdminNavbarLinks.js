@@ -64,7 +64,7 @@ export default function AdminNavbarLinks() {
           .then((data) => {
               if (data.message == "Found") {
                   setNotifications(data.data);
-                  console.log(data.data);
+                  console.log("notifications " + data.data);
               }
               else{
                   console.log("no Notification");

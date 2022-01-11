@@ -54,6 +54,7 @@ export default function BillingReports() {
   const base = useBaseUrl()
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
+  const [cost, setCost] = useState("0");
   const date = new Date()
   const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
 
@@ -85,6 +86,12 @@ export default function BillingReports() {
               if (data.message == "Found") {
                   setRows(data.data);
                   console.log(data.data)
+                  let total = 0;
+                  for (let index = 0; index < data.data.length; index++) {
+                    total = parseInt(data.data[index].service_cost) + total;
+                  }
+
+                  setCost(total.toString());
               }
               else{
                   console.log("no data");
@@ -154,8 +161,8 @@ export default function BillingReports() {
                         <th>Patient ID</th>
                         <th>Treatment ID</th>
                         <th>Service Name</th>
-                        <th>Service Cost</th>
                         <th>Service Department</th>
+                        <th>Service Cost</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -165,12 +172,20 @@ export default function BillingReports() {
                             <td className="trBody">{item.patient_id}</td>
                             <td className="trBody">{item.treatment_id}</td>
                             <td className="trBody">{item.service_name}</td>
-                            <td className="trBody">{item.service_cost}</td>
                             <td className="trBody">{item.service_department}</td>
+                            <td className="trBody">Ksh {item.service_cost}</td>
                           </tr>
                       ))
                       :
                       null }
+                      <tr>
+                        <td className="trBody" style={{ fontWeight: "bold", fontSize: "15px", color: "#11b8cc" }}>Total</td>
+                        <td className="trBody"></td>
+                        <td className="trBody"></td>
+                        <td className="trBody"></td>
+                        <td className="trBody"></td>
+                        <td className="trBody" style={{color: "#11b8cc"}}>Ksh {cost}</td>
+                      </tr>
                     </tbody>
                   </table>
                   :
@@ -178,7 +193,6 @@ export default function BillingReports() {
                 </div>
               </div>
               <div className="print">
-                  <button className="pdf">PDF</button>
                   <CSVLink data={rows} className="excel">Excel</CSVLink>
               </div>
               </>

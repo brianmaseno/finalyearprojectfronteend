@@ -49,6 +49,7 @@ export default function AdminLogComponent() {
                   sessionStorage.setItem("county", data.data.details.county)
                   sessionStorage.setItem("residence", data.data.details.residence)
                   sessionStorage.setItem("qualification", data.data.details.qualification)
+                  sessionStorage.setItem("department_id", data.data.details.department_id)
                   setCurrentUser(data.data.details);
                   setTimeout(() => {
                     history.push('/admin');

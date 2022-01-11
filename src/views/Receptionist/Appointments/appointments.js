@@ -107,10 +107,10 @@ export default function BookAppointment() {
       const currDate = new Date();
       const newDate = currDate.getDate() + "/" + currDate.getMonth() + "/" + currDate.getFullYear();
 
-      if (clinicianId !== "") {
+      if (clinicianId != "") {
         let finL;
         for (let index = 0; index < clinicians.length; index++) {
-          if (clinicians[index]._id === clinicianId) {
+          if (clinicians[index].doctor_id == clinicianId) {
             finL = clinicians[index].doctor_id;
           }
           else{
@@ -213,7 +213,7 @@ export default function BookAppointment() {
                                 <select type="text" className="patInput" style={{width: "100%"}} onChange={(e) => setClinicianId(e.target.value)}>
                                   <option>Select...</option>
                                   {clinicians.length > 0 ? clinicians.map((item) => (
-                                    <option value={item._id}>{item.doctor_id}</option>
+                                    <option value={item.doctor_id}>{item.doctor_id}</option>
                                   ))
                                   :
                                   <option>Select...</option>

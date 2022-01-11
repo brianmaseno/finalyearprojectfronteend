@@ -197,7 +197,6 @@ export default function TreatmentReports() {
                 </div>
               </div>
               <div className="print">
-                  <button className="pdf">PDF</button>
                   <CSVLink data={rows} className="excel" filename={"treatmentreport.csv"}>Excel</CSVLink>
               </div>
               </>

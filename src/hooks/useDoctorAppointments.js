@@ -11,7 +11,8 @@ export const useDoctorAppointments = (status, doctor_id) => {
       .then(response => response.json())
       .then((data) => {
           if (data.message == "Found") {
-            setData(data.data)
+            setData(data.data);
+            console.log(data.data);
           }
           else{
             setData([])

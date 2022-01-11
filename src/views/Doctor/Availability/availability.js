@@ -51,7 +51,6 @@ export default function DoctorAvailability() {
   const { user } = useLoggedInUser();
 
   const [date, setDate] = useState("");
-  const [id, setId] = useState(user.national_id);
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("");
   const [slots, setSlots] = useState("");
@@ -61,13 +60,13 @@ export default function DoctorAvailability() {
   const addAvailability = (e) => {
     e.preventDefault();
 
-    const status = date == "" || id == "" || from == "" || to == "" || slots == "";
+    const status = date == "" || from == "" || to == "" || slots == "";
     if (!status) {
       setLoading(true);
 
       const details = {
         date: date,
-        doctor_id: id,
+        doctor_id: user.national_id,
         fromTime: from,
         toTime: to,
         slots: slots

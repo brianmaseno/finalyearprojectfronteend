@@ -1,15 +1,15 @@
 /* eslint-disable */
 import {useState, useEffect} from 'react';
-import { useAuth } from '../hooks/AuthProvider';
 import { useBaseUrl } from './useBaseUrl';
+import { useLoggedInUser } from './useLoggedInUser';
 
 export const useNotification = () => {
-  const { currentUser } = useAuth();
+  const { user } = useLoggedInUser();
   const [notifications, setNotifications] = useState([]);
   const base = useBaseUrl();
 
   useEffect(() => {
-    fetch(`${base}/KNH/staff/viewNotifications?id=${currentUser.national_id}`)
+    fetch(`${base}/KNH/staff/viewNotifications?id=${user.national_id}`)
     .then(response => response.json())
     .then((data) => {
         if (data.message == "Found") {
@@ -20,7 +20,7 @@ export const useNotification = () => {
             console.log("no Notification");
         }
     })
-  }, [currentUser, base])
+  }, [user, base])
 
   return { notifications }
 }

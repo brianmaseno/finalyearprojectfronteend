@@ -103,8 +103,35 @@ export default function MakePayment() {
   
     axios.post(`${base}/KNH/patient/create-checkout-session`, details)
     .then(function (response) {
-      if (response.status === 200) {
+      if (response.status == 200) {
+        //toast.success("Payment Successful")
         //makeAllPayments()
+        for (let index = 0; index < data.length; index++) {
+          const bill_id = data[index]._id
+          
+          if (bill_id != null) {
+            fetch(`${base}/KNH/patient/billing/pay?bill_id=${bill_id}`)
+            .then(response => response.json())
+            .then((data) => {
+                if (data.message == "Bill Payed") {
+                    console.log("Bill Payed")
+                    toast.success("Bill Paid");
+  
+                    //notification
+                    const message = `Bill ${bill_id} for patient ${patientId} has been settled successfully`;
+                    fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
+                      .then(response => response.json())
+                      .then((data) => {
+                          console.log(data);
+                      })
+                }
+                else{
+                    console.log("not payed");
+                    toast.error("Bill not paid")
+                }
+            })
+          }
+        }
       }
       else{
         toast.error("Payment Not Successful")
@@ -160,7 +187,7 @@ export default function MakePayment() {
 
                   //notification
                   const message = `Bill ${bill_id} for patient ${patientId} has been settled successfully`;
-                  fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${uUser.national_id}`)
+                  fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
                     .then(response => response.json())
                     .then((data) => {
                         console.log(data);

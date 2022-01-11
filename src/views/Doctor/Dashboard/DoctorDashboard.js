@@ -58,6 +58,8 @@ export default function DoctorDashboard() {
     })
   }
 
+  console.log("user information " + user);
+
   useEffect(() => {
     setLoading(true);
     fetch(`${base}/KNH/appointments/doctor/pending?doctor_id=${user.national_id}`)
@@ -72,6 +74,7 @@ export default function DoctorDashboard() {
               }
           })
   }, [])
+  
   return (
     <div>
       <ToastContainer />

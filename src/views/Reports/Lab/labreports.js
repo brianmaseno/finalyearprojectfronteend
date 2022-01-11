@@ -173,7 +173,6 @@ export default function LabReports() {
                 </div>
               </div>
               <div className="print">
-                  <button className="pdf">PDF</button>
                   <CSVLink data={rows} className="excel">Excel</CSVLink>
               </div>
               </>

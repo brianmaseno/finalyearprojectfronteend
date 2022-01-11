@@ -56,6 +56,8 @@ export default function UserProfile() {
   const [residence, setResidence] = useState(user.residence)
   const [county, setCounty] = useState(user.county)
   const [password, setPassword] = useState(user.password)
+
+  console.log("User info " + user.national_id);
   
   const updateProfile = (e) => {
     e.preventDefault()

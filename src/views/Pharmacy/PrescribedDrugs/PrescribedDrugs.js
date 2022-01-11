@@ -56,7 +56,6 @@ export default function PrescribedDrugs() {
   const [loading, setLoading] = useState(false);
   const [disLoading, setDisLoading] = useState(false);
   const base = useBaseUrl()
-  const userId = sessionStorage.getItem("UserId")
 
   const dispenseDrugs = (e) => {
     e.preventDefault()
@@ -86,7 +85,7 @@ export default function PrescribedDrugs() {
                 toast.success(`${drug.filter((item) => item._id == drug_id)[0].drug_name} Issued`);
                 //notification
                 const message = `${drug.filter((item) => item._id == drug_id)[0].drug_name} has been dispensed to ${patientId}`;
-                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${userId}&&category=${user.qualification}&&receiver_id=${userId}`)
+                fetch(`${base}/KNH/staff/addNotification?message=${message}&&sender_id=${user.national_id}&&category=${user.qualification}&&receiver_id=${user.national_id}`)
                   .then(response => response.json())
                   .then((data) => {
                       console.log(data);

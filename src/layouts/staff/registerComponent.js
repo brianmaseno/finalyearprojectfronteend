@@ -79,7 +79,7 @@ export default function RegisterComponent() {
                     }
                     else{
                         toast.success("Registration successful, wait for account activation");
-                        const receiver_id = "9821";
+                        const receiver_id = "12345";
                         fetch(`${baseUrl}/KNH/staff/addNotification?message=${message}&&sender_id=${nationalId}&&category=${qualification}&&receiver_id=${receiver_id}`)
                         .then(response => response.json())
                         .then((data) => {
