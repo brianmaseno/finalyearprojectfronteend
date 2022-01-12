@@ -50,7 +50,20 @@ export default function Dashboard() {
 
   const searchStaff = (e) => {
     e.preventDefault()
-    setRows(rows.filter((item) => item.national_id == search))
+
+    if (search != "") {
+      setRows([]);
+      fetch(`${base}/KNH/staff/all`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+            setRows(data.data.filter((item) => item.national_id == search));
+          }
+          else{
+            console.log("Not Found")
+          }
+      })
+    }    
   }
 
   const getAllStaff = () => {
@@ -169,7 +182,7 @@ export default function Dashboard() {
               <div className="searchOut">
                 <div className="searchCont">
                   <input type="text" className="searchInput" placeholder="Search Employee By ID" onChange={(e) => {
-                    if (e.target.value === "") {
+                    if (e.target.value == "") {
                       getAllStaff()
                     }
                     else{
@@ -185,8 +198,8 @@ export default function Dashboard() {
               {rows.length > 0 ? 
               <Table
                 tableHeaderColor="info"
-                tableHead={["ID", "Name", "Qualification", "County"]}
-                tableData={rows.map((item) => ([item._id, item.qualification, item.residence, item.national_id]))}
+                tableHead={["ID", "First Name", "Last Name", "Qualification", "County"]}
+                tableData={rows.map((item) => ([item.national_id, item.firstname, item.lastname, item.qualification, item.county]))}
               />
               :
               <div className="noData">

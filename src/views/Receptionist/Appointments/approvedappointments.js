@@ -53,15 +53,26 @@ export default function ApprovedAppointments() {
 
   const searchApproved = (e) => {
     e.preventDefault()
-    setApproved(approved.filter((item) => item.patient_id === search))
-    console.log(approved)
+    if (search != "") {
+      setApproved([]);
+      fetch(`${base}/KNH/appointments/all/approved`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setApproved(data.data.filter((item) => item.patient_id == search))
+          }
+          else{
+              console.log("no Appointment");
+          }
+      })
+    }
   }
   
   const getApprovedAppointments = () => {
-    fetch(`${base}/KNH/appointments/all/activated`)
+    fetch(`${base}/KNH/appointments/all/approved`)
     .then(response => response.json())
     .then((data) => {
-        if (data.message === "Found") {
+        if (data.message == "Found") {
             setApproved(data.data)
         }
         else{
@@ -72,12 +83,12 @@ export default function ApprovedAppointments() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`${base}/KNH/appointments/all/activated`)
+    fetch(`${base}/KNH/appointments/all/approved`)
       .then(response => response.json())
       .then((data) => {
-          if (data.message === "Found") {
+          if (data.message == "Found") {
             setApproved(data.data)
-            setLoading(false);
+            setLoading(true);
           }
           else{
             setLoading(false);
@@ -107,18 +118,18 @@ export default function ApprovedAppointments() {
           <div className="searchOut">
               <div className="searchCont">
                 <input type="text" className="searchInput" placeholder="Search Appointment By ID" onChange={(e) => {
-                  if (e.target.value === "") {
+                  if (e.target.value == "") {
                     getApprovedAppointments()
                   }
                   else{
                     setSearch(e.target.value)
-                    setApproved(approved.filter((item) => item.patient_id === e.target.value))
+                    setApproved(approved.filter((item) => item.patient_id == e.target.value))
                   }
                 }}/>
                 <button className="btnSearch" onClick={searchApproved}>Search</button>
               </div>
               </div>
-              {!loading ? 
+              {loading ? 
               <>
               {approved.length > 0 ? 
               <table className="styled-table">

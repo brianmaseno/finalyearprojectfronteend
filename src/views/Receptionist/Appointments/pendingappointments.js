@@ -55,7 +55,19 @@ export default function PendingAppointments() {
 
   const searchPending = (e) => {
     e.preventDefault()
-    setPending(pending.filter((item) => item.patient_id == search))
+    if (search != "") {
+      setPending([]);
+      fetch(`${base}/KNH/appointments/all/pending`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setPending(data.data.filter((item) => item.patient_id == search))
+          }
+          else{
+              console.log("no Appointment");
+          }
+      })
+    }
   }
   
   const getPendingAppointments = () => {

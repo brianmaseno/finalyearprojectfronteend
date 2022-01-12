@@ -55,7 +55,19 @@ export default function DoctorApprovedAppointments() {
 
   const searchAppointment = (e) => {
     e.preventDefault()
-    setApproved(approved.filter((item) => item.patient_id == search))
+    if (search != "") {
+      setApproved([]);
+      fetch(`${base}/KNH/appointments/doctor/approved?doctor_id=${user.national_id}`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setApproved(data.data.filter((item) => item.patient_id == search))
+          }
+          else{
+              console.log("no Patient");
+          }
+      })
+    }
   }
 
   const getAllApprovedAppointments = () => {

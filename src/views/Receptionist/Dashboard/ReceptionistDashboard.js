@@ -45,7 +45,19 @@ export default function ReceptionistDashboard() {
 
   const searchPatient = (e) => {
     e.preventDefault()
-    setPatients(patients.filter((item) => item.identity_no == search))
+    if (search != "") {
+      setPatients([]);
+      fetch(`${base}/KNH/patient/allpatients`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Patients Records available") {
+              setPatients(data.data.filter((item) => item.identity_no == search))
+          }
+          else{
+              console.log("no Patient");
+          }
+      })
+    }
   }
 
   const getAllPatients = () => {
@@ -182,10 +194,10 @@ export default function ReceptionistDashboard() {
               <table className="styled-table">
                 <thead>
                   <tr style={{marginBottom: "20px"}}>
-                    <th>ID</th>
+                    <th>Identity Number</th>
                     <th>First Name</th>
                     <th>Last Name</th>
-                    <th>Identity Number</th>
+                    <th>County</th>
                     <th>Telephone</th>
                     <th>Gender</th>
                     <th style={{textAlign: "center"}}>Action</th>
@@ -197,7 +209,7 @@ export default function ReceptionistDashboard() {
                         <td>{item.identity_no}</td>
                         <td>{item.firstname}</td>
                         <td>{item.lastname}</td>
-                        <td>{item.identity_no}</td>
+                        <td>{item.county}</td>
                         <td>{item.telephone}</td>
                         <td>{item.gender}</td>
                         <td style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>

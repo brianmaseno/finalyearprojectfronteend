@@ -38,7 +38,19 @@ export default function PharmacistDashboard() {
 
   const searchPrescription = (e) => {
     e.preventDefault()
-    setRows(rows.filter((item) => item.patient_id == search))
+    if (search != "") {
+      setRows([]);
+      fetch(`${base}/KNH/patient/drugs/dispensingreport`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data.filter((item) => item.patient_id == search));
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
   }
 
   const getAllPrescriptions = () => {
@@ -140,7 +152,7 @@ export default function PharmacistDashboard() {
             <CardBody>
               <div className="searchOut">
                 <div className="searchCont">
-                  <input type="text" className="searchInput" placeholder="Search Prescription ID" onChange={(e) => {
+                  <input type="text" className="searchInput" placeholder="Search Patient ID" onChange={(e) => {
                     if (e.target.value === "") {
                       getAllPrescriptions()
                     }

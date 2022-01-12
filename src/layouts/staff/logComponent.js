@@ -14,9 +14,9 @@ export default function LogComponent() {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState({});
   const [logged, setLogged] = useState(false);
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
   const { setCurrentUser } = useAuth();
-  const [loading, setLoading] = useState(false)
   const base = useBaseUrl()
 
   const checkUser = (e) => {

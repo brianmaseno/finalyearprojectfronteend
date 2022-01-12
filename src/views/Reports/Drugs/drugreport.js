@@ -13,6 +13,7 @@ import { usePatients } from "hooks/usePatients";
 import logo from "assets/img/logoknh.jpg";
 import { CSVLink, CSVDownload } from "react-csv";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useDrugs } from "hooks/useDrugs";
 
 const styles = {
   cardCategoryWhite: {
@@ -55,6 +56,7 @@ export default function DrugReports() {
   const [to, setTo] = useState("")
   const base = useBaseUrl()
   const date = new Date()
+  const { drug } = useDrugs();
   const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
 
   const searchPrescription = (e) => {
@@ -153,6 +155,9 @@ export default function DrugReports() {
                         <th>Patient ID</th>
                         <th>Drug</th>
                         <th>Usage</th>
+                        <th>Buying Price</th>
+                        <th>Selling Price</th>
+                        <th>Profit</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -161,8 +166,11 @@ export default function DrugReports() {
                           <td className="trBody">12/11/2021</td>
                           <td className="trBody">{item.treatment_id}</td>
                           <td className="trBody">{item.patient_id}</td>
-                          <td className="trBody">{item.drug}</td>
+                          <td className="trBody">{drug.filter((e) => e._id == item.drug)[0].drug_name}</td>
                           <td className="trBody">{item.usage_per_day}</td>
+                          <td className="trBody">Ksh {drug.filter((e) => e._id == item.drug)[0].drug_buying_price}</td>
+                          <td className="trBody">Ksh {drug.filter((e) => e._id == item.drug)[0].drug_cost}</td>
+                          <td className="trBody">Ksh {parseInt(drug.filter((e) => e._id == item.drug)[0].drug_cost) - parseInt(drug.filter((e) => e._id == item.drug)[0].drug_buying_price)}</td>
                         </tr>
                       ))
                     :

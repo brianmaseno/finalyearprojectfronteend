@@ -36,7 +36,19 @@ export default function BillingDashboard() {
 
   const searchBilling = (e) => {
     e.preventDefault()
-    rows.filter((item) => item.patient_id == search)
+    if (search != "") {
+      setRows([]);
+      fetch(`${base}/KNH/patient/billing/completedbills/report/all`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setRows(data.data.filter((item) => item.patient_id == search));
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
   }
 
   const allBillings = () => {

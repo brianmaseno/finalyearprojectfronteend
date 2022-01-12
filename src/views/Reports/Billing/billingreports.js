@@ -13,6 +13,7 @@ import { usePatients } from "hooks/usePatients";
 import logo from "assets/img/logoknh.jpg";
 import { CSVLink, CSVDownload } from "react-csv";
 import { useBaseUrl } from "hooks/useBaseUrl";
+import { useDepartments } from "hooks/useDepartments";
 
 const styles = {
   cardCategoryWhite: {
@@ -56,6 +57,7 @@ export default function BillingReports() {
   const [to, setTo] = useState("")
   const [cost, setCost] = useState("0");
   const date = new Date()
+  const { departments } = useDepartments();
   const today = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
 
 
@@ -172,7 +174,7 @@ export default function BillingReports() {
                             <td className="trBody">{item.patient_id}</td>
                             <td className="trBody">{item.treatment_id}</td>
                             <td className="trBody">{item.service_name}</td>
-                            <td className="trBody">{item.service_department}</td>
+                            <td className="trBody">{departments.filter((e) => e.department_id == item.service_department)[0].department_name}</td>
                             <td className="trBody">Ksh {item.service_cost}</td>
                           </tr>
                       ))

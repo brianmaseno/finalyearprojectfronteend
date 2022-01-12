@@ -38,7 +38,19 @@ export default function LabDashboard() {
 
   const searchTests = (e) => {
     e.preventDefault()
-    setRows(rows.filter((item) => item.patient_id == search))
+    if (search != "") {
+      setRows([]);
+      fetch(`${base}/KNH/patient/lab/tests/report`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Report Found") {
+              setRows(data.data.filter((item) => item.patient_id == search));
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
   }
 
   const getAllTests = () => {

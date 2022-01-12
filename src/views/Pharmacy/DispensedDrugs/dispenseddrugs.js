@@ -53,7 +53,19 @@ export default function DispensedDrugs() {
 
   const searchPrescription = (e) => {
     e.preventDefault()
-    setData(data.filter((item) => item.patient_id == search))
+    if (search != "") {
+      setData([]);
+      fetch(`${base}/KNH/patient/drugs/dispensingreport`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Found") {
+              setData(data.data.filter((item) => item.patient_id == search));
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
   }
 
   const getAllPrescriptions = () => {

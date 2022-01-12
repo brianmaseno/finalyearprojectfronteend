@@ -58,7 +58,19 @@ export default function TestResults() {
 
   const searchTests = (e) => {
     e.preventDefault()
-    setData(data.filter((item) => item.patient_id == search))
+    if (search != "") {
+      setData([]);
+      fetch(`${base}/KNH/patient/lab/tests/requests/approved`)
+      .then(response => response.json())
+      .then((data) => {
+          if (data.message == "Requests Found") {
+              setData(data.data.filter((item) => item.patient_id == search));
+          }
+          else{
+              console.log("no data");
+          }
+      })
+    }
   }
 
   const getAllTests = () => {

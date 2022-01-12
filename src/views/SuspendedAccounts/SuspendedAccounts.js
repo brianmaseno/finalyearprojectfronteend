@@ -54,7 +54,19 @@ export default function SuspendedAccounts() {
 
   const searchStaff = (e) => {
     e.preventDefault()
-    setData(data.filter((item) => item.national_id == search))
+    if (search != "") {
+      setData([]);
+      fetch(`${base}/KNH/staff/accounts/suspended`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Found") {
+                setData(data.data.filter((item) => item.national_id == search));
+            }
+            else{
+                console.log("no data");
+            }
+        })
+    }
   }
 
   const getAllSuspendedStaff = () => {

@@ -56,7 +56,19 @@ export default function EditAccounts() {
 
   const searchStaff = (e) => {
     e.preventDefault()
-    setData(data.filter((item) => item.national_id == search))
+    if (search != "") {
+      setData([]);
+      fetch(`${base}/KNH/staff/accounts/activated`)
+        .then(response => response.json())
+        .then((data) => {
+            if (data.message == "Found") {
+                setData(data.data.filter((item) => item.national_id == search));
+            }
+            else{
+                console.log("no data");
+            }
+        })
+    }
   }
 
   const getAllActivatedStaff = () => {
@@ -117,7 +129,7 @@ export default function EditAccounts() {
                     setData(data.filter((item) => item.national_id == e.target.value))
                   }
                 }}/>
-                <button className="btnSearch">Search</button>
+                <button className="btnSearch" onClick={searchStaff}>Search</button>
               </div>
             </div>
             {!loading ?
