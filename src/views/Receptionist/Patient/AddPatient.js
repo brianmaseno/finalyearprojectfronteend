@@ -270,8 +270,8 @@ export default function AddPatient() {
                       </select>
                     </div>
                     <div class="patRow">
-                      <input type="text" required placeholder="Enter Weight" class="patInput" onChange={(e) => setWeight(e.target.value)}/>
-                      <input type="text" required placeholder="Enter Height" class="patInput" onChange={(e) => setHeight(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Weight (Kg)" class="patInput" onChange={(e) => setWeight(e.target.value)}/>
+                      <input type="text" required placeholder="Enter Height (M)" class="patInput" onChange={(e) => setHeight(e.target.value)}/>
                       <input type="text" required placeholder="Enter Temperature (in degrees celcius)" class="patInput" onChange={(e) => setTemperature(e.target.value)}/>
                     </div>
                     <div class="patRow">

@@ -200,7 +200,7 @@ export default function UserProfile() {
             </CardAvatar>
             <CardBody profile>
               <h6 className="profileQualification">{user.qualification}</h6>
-              <h4 className="profileName">{user.username + " " + user.lastname}</h4>
+              <h4 className="profileName">{user.firstname + " " + user.lastname}</h4>
             </CardBody>
           </Card>
         </GridItem>

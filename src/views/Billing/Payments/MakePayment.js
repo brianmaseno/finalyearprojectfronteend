@@ -295,7 +295,7 @@ export default function MakePayment() {
                                           }
                                       })
                                   }}}>
-                                    <p className="editP" style={{backgroundColor: "green"}} >Pay on discharge</p>
+                                    <p className="editP" style={{backgroundColor: "green"}} >Cash Payment</p>
                                   </div>
                                   <div className="stripeBtn">
                                     <StripeCheckout 
@@ -333,7 +333,7 @@ export default function MakePayment() {
                         <p className="txtReceive">Total Amount Ksh.{total}</p>
                       </div>
                       {!payLoad ? <>
-                      <button className="btnReceive" onClick={makeAllPayments}>Pay on discharge</button><br/>
+                      <button className="btnReceive" onClick={makeAllPayments}>Cash Payment</button><br/>
                       <StripeCheckout 
                           stripeKey={process.env.REACT_APP_KEY} 
                           token={sendStripePayment} 
