@@ -8,7 +8,7 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
-const axios = require('axios').default;
+import axios from 'axios';
 import './styles/add.css';
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";

@@ -12,7 +12,7 @@ import { useAccountStatus } from "hooks/useAccountStatus";
 import { ToastContainer, toast } from "react-toastify";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
-const axios = require('axios').default;
+import axios from 'axios';
 
 const styles = {
   cardCategoryWhite: {

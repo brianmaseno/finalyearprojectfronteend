@@ -14,7 +14,7 @@ import './update.css'
 import ProjectLoading from "components/Loading/projectloading";
 import { ToastContainer, toast } from "react-toastify";
 import { useBaseUrl } from "hooks/useBaseUrl";
-const axios = require('axios').default;
+import axios from 'axios';
 
 const styles = {
   cardCategoryWhite: {

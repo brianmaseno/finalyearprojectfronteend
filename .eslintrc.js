@@ -1,5 +1,6 @@
 module.exports = {
-  parser: "babel-eslint",
+  // Remove or comment out the babel-eslint parser line
+  // parser: "babel-eslint",
   env: {
     es6: true,
     node: true,
@@ -15,11 +16,12 @@ module.exports = {
     ]
   },
   parserOptions: {
-    ecmaVersion: 6,
-    sourceType: "module",
+    ecmaVersion: 2020,
+    sourceType: 'module',
     ecmaFeatures: {
-      jsx: true,
+      jsx: true
     },
+    requireConfigFile: false
   },
   plugins: ["react"],
   extends: [

@@ -14,7 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useBaseUrl } from "../../../hooks/useBaseUrl";
 import StripeCheckout from "react-stripe-checkout";
 import { useLoggedInUser } from "hooks/useLoggedInUser";
-const axios = require('axios').default;
+import axios from 'axios';
 
 const styles = {
   cardCategoryWhite: {

@@ -6,11 +6,11 @@ import {
     Link,
     useHistory
   } from "react-router-dom";
-  import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import axios from 'axios';
 //import ReactLoading from "react-loading";
 import "react-toastify/dist/ReactToastify.css";
 import logo from '../../assets/img/logoknh.jpg';
-const axios = require('axios').default;
 import './register.css';
 
 export default function RegisterComponent() {

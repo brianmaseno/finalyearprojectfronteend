@@ -2,7 +2,7 @@
 import {useState, useEffect} from 'react';
 import { useAuth } from './AuthProvider';
 import { useBaseUrl } from './useBaseUrl';
-const axios = require('axios').default;
+import axios from 'axios';
 
 export const useApprovedTreatment = () => {
   const [data, setData] = useState([])

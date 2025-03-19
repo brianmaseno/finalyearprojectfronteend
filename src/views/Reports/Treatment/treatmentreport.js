@@ -15,6 +15,7 @@ import { useDrugs } from "hooks/useDrugs";
 import { CSVLink, CSVDownload } from "react-csv";
 import { useBaseUrl } from "hooks/useBaseUrl";
 
+
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {

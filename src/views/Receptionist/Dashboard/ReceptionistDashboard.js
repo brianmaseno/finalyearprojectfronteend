@@ -28,7 +28,7 @@ import { usePatients } from "hooks/usePatients";
 import { useAppointments } from "hooks/useAppointments";
 import ProjectLoading from "components/Loading/projectloading";
 import { useBaseUrl } from "hooks/useBaseUrl";
-const axios = require('axios').default;
+import axios from 'axios';
 
 const useStyles = makeStyles(styles);
 

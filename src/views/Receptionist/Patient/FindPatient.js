@@ -10,7 +10,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import './styles/find.css';
 import ProjectLoading from "components/Loading/projectloading";
-const axios = require('axios').default;
+import axios from 'axios';
 import { ToastContainer, toast } from "react-toastify";
 import { useBaseUrl } from "hooks/useBaseUrl";
 
