@@ -1,0 +1,78 @@
+.styled-table{
+  border-collapse: collapse;
+  width: 100%;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+}
+
+thead th{
+  color: #11b8cc;
+  text-align: start;
+  padding: 10px 15px;
+  border-bottom: 0.1px solid #11b8cc;
+  
+}
+
+tbody td{
+  border-bottom: 0.01px solid #E1E1E1;
+  padding: 0px 15px;
+  text-align: start;
+  font-weight: bold;
+}
+
+.editContainer{
+  cursor: pointer;
+}
+
+.editP{
+  background-color: red;
+  border-radius: 3px;
+  color: white;
+  text-align: center;
+  padding: 2px;
+}
+
+.searchOut{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
+.searchInput{
+  padding: 8px;
+  font-weight: bold;
+  width: 250px;
+  border: 2px solid #11b8cc;
+}
+
+.btnSearch{
+  background-color: #11b8cc;
+  color: white;
+  border: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 15px;
+  padding-left: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.pathCont{
+  margin-top: -30px;
+}
+
+.noData{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+}
+
+.txtNo{
+  color: #11b8cc;
+  font-weight: bold;
+}
