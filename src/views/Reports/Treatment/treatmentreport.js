@@ -14,7 +14,7 @@ import logo from "assets/img/logoknh.jpg";
 import { useDrugs } from "hooks/useDrugs";
 import { CSVLink, CSVDownload } from "react-csv";
 import { useBaseUrl } from "hooks/useBaseUrl";
-
+import axios from "axios";
 
 const styles = {
   cardCategoryWhite: {
@@ -77,7 +77,7 @@ export default function TreatmentReports() {
       const last = new Date(lastDate);
       const diff = Math.abs(last - first);**/
 
-      console.log(Here);
+      console.log("Here");
   }
 
   useEffect(() => {
